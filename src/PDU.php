@@ -35,18 +35,17 @@
 
 /**
  * PDU Class
- **/
-class PDU extends CommonDBTM
-{
+ * */
+class PDU extends CommonDBTM {
+
     use Glpi\Features\DCBreadcrumb;
     use Glpi\Features\Clonable;
 
-   // From CommonDBTM
-    public $dohistory                   = true;
-    public static $rightname                   = 'datacenter';
+    // From CommonDBTM
+    public $dohistory = true;
+    public static $rightname = 'datacenter';
 
-    public function getCloneRelations(): array
-    {
+    public function getCloneRelations(): array {
         return [
             Pdu_Plug::class,
             Item_Devices::class,
@@ -54,158 +53,171 @@ class PDU extends CommonDBTM
         ];
     }
 
-    public static function getTypeName($nb = 0)
-    {
+    public static function getTypeName($nb = 0) {
         return _n('PDU', 'PDUs', $nb);
     }
 
-    public function defineTabs($options = [])
-    {
+    public function defineTabs($options = []) {
         $ong = [];
         $this->addDefaultFormTab($ong)
-         ->addImpactTab($ong, $options)
-         ->addStandardTab('Pdu_Plug', $ong, $options)
-         ->addStandardTab('Item_Devices', $ong, $options)
-         ->addStandardTab('NetworkPort', $ong, $options)
-         ->addStandardTab('Infocom', $ong, $options)
-         ->addStandardTab('Contract_Item', $ong, $options)
-         ->addStandardTab('Document_Item', $ong, $options)
-         ->addStandardTab('Ticket', $ong, $options)
-         ->addStandardTab('Item_Problem', $ong, $options)
-         ->addStandardTab('Change_Item', $ong, $options)
-         ->addStandardTab('Log', $ong, $options);
+                ->addImpactTab($ong, $options)
+                ->addStandardTab('Pdu_Plug', $ong, $options)
+                ->addStandardTab('Item_Devices', $ong, $options)
+                ->addStandardTab('NetworkPort', $ong, $options)
+                ->addStandardTab('Infocom', $ong, $options)
+                ->addStandardTab('Contract_Item', $ong, $options)
+                ->addStandardTab('Document_Item', $ong, $options)
+                ->addStandardTab('Ticket', $ong, $options)
+                ->addStandardTab('Item_Problem', $ong, $options)
+                ->addStandardTab('Change_Item', $ong, $options)
+                ->addStandardTab('Log', $ong, $options);
         ;
         return $ong;
     }
 
-
-    public function rawSearchOptions()
-    {
+    public function rawSearchOptions() {
         $tab = parent::rawSearchOptions();
 
         $tab[] = [
-            'id'                 => '2',
-            'table'              => $this->getTable(),
-            'field'              => 'id',
-            'name'               => __('ID'),
-            'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'number'
+            'id' => '2',
+            'table' => $this->getTable(),
+            'field' => 'id',
+            'name' => __('ID'),
+            'massiveaction' => false, // implicit field is id
+            'datatype' => 'number'
         ];
 
         $tab[] = [
-            'id'                 => '4',
-            'table'              => 'glpi_pdutypes',
-            'field'              => 'name',
-            'name'               => _n('Type', 'Types', 1),
-            'datatype'           => 'dropdown'
+            'id' => '4',
+            'table' => 'glpi_pdutypes',
+            'field' => 'name',
+            'name' => _n('Type', 'Types', 1),
+            'datatype' => 'dropdown'
         ];
 
         $tab[] = [
-            'id'                 => '5',
-            'table'              => $this->getTable(),
-            'field'              => 'serial',
-            'name'               => __('Serial number'),
-            'datatype'           => 'string',
+            'id' => '5',
+            'table' => $this->getTable(),
+            'field' => 'serial',
+            'name' => __('Serial number'),
+            'datatype' => 'string',
         ];
 
         $tab[] = [
-            'id'                 => '6',
-            'table'              => $this->getTable(),
-            'field'              => 'otherserial',
-            'name'               => __('Inventory number'),
-            'datatype'           => 'string',
+            'id' => '6',
+            'table' => $this->getTable(),
+            'field' => 'otherserial',
+            'name' => __('Inventory number'),
+            'datatype' => 'string',
         ];
 
         $tab = array_merge($tab, Location::rawSearchOptionsToAdd());
 
         $tab[] = [
-            'id'                 => '16',
-            'table'              => $this->getTable(),
-            'field'              => 'comment',
-            'name'               => __('Comments'),
-            'datatype'           => 'text'
+            'id' => '16',
+            'table' => $this->getTable(),
+            'field' => 'comment',
+            'name' => __('Comments'),
+            'datatype' => 'text'
         ];
 
         $tab[] = [
-            'id'                 => '19',
-            'table'              => $this->getTable(),
-            'field'              => 'date_mod',
-            'name'               => __('Last update'),
-            'datatype'           => 'datetime',
-            'massiveaction'      => false
+            'id' => '19',
+            'table' => $this->getTable(),
+            'field' => 'date_mod',
+            'name' => __('Last update'),
+            'datatype' => 'datetime',
+            'massiveaction' => false
         ];
 
         $tab[] = [
-            'id'                 => '23',
-            'table'              => 'glpi_manufacturers',
-            'field'              => 'name',
-            'name'               => Manufacturer::getTypeName(1),
-            'datatype'           => 'dropdown'
+            'id' => '23',
+            'table' => 'glpi_manufacturers',
+            'field' => 'name',
+            'name' => Manufacturer::getTypeName(1),
+            'datatype' => 'dropdown'
         ];
 
         $tab[] = [
-            'id'                 => '31',
-            'table'              => 'glpi_states',
-            'field'              => 'completename',
-            'name'               => __('Status'),
-            'datatype'           => 'dropdown',
-            'condition'          => ['is_visible_pdu' => 1]
+            'id' => '31',
+            'table' => 'glpi_states',
+            'field' => 'completename',
+            'name' => __('Status'),
+            'datatype' => 'dropdown',
+            'condition' => ['is_visible_pdu' => 1]
         ];
 
         $tab[] = [
-            'id'                 => '24',
-            'table'              => 'glpi_users',
-            'field'              => 'name',
-            'linkfield'          => 'users_id_tech',
-            'name'               => __('Technician in charge of the hardware'),
-            'datatype'           => 'dropdown',
-            'right'              => 'own_ticket'
+            'id' => '24',
+            'table' => 'glpi_users',
+            'field' => 'name',
+            'linkfield' => 'users_id_tech',
+            'name' => __('Technician in charge of the hardware'),
+            'datatype' => 'dropdown',
+            'right' => 'own_ticket'
         ];
 
         $tab[] = [
-            'id'                 => '40',
-            'table'              => 'glpi_pdumodels',
-            'field'              => 'name',
-            'name'               => _n('Model', 'Models', 1),
-            'datatype'           => 'dropdown'
+            'id' => '40',
+            'table' => 'glpi_pdumodels',
+            'field' => 'name',
+            'name' => _n('Model', 'Models', 1),
+            'datatype' => 'dropdown'
         ];
 
         $tab[] = [
-            'id'                 => '49',
-            'table'              => 'glpi_groups',
-            'field'              => 'completename',
-            'linkfield'          => 'groups_id_tech',
-            'name'               => __('Group in charge of the hardware'),
-            'condition'          => ['is_assign' => 1],
-            'datatype'           => 'dropdown'
+            'id' => '500',
+            'table' => 'glpi_pdumodels',
+            'field' => 'picture_front',
+            'name' => _n('Image', 'Images', 1),
+            'datatype' => 'string'
         ];
 
         $tab[] = [
-            'id'                 => '61',
-            'table'              => $this->getTable(),
-            'field'              => 'template_name',
-            'name'               => __('Template name'),
-            'datatype'           => 'text',
-            'massiveaction'      => false,
-            'nosearch'           => true,
-            'nodisplay'          => true,
+            'id' => '210',
+            'table' => $this->getTable(),
+            'field' => 'tag',
+            'name' => __('Tag'),
+            'datatype' => 'bool',
+            'autocomplete' => true,
         ];
 
         $tab[] = [
-            'id'                 => '121',
-            'table'              => $this->getTable(),
-            'field'              => 'date_creation',
-            'name'               => __('Creation date'),
-            'datatype'           => 'datetime',
-            'massiveaction'      => false
+            'id' => '49',
+            'table' => 'glpi_groups',
+            'field' => 'completename',
+            'linkfield' => 'groups_id_tech',
+            'name' => __('Group in charge of the hardware'),
+            'condition' => ['is_assign' => 1],
+            'datatype' => 'dropdown'
         ];
 
         $tab[] = [
-            'id'                 => '80',
-            'table'              => 'glpi_entities',
-            'field'              => 'completename',
-            'name'               => Entity::getTypeName(1),
-            'datatype'           => 'dropdown'
+            'id' => '61',
+            'table' => $this->getTable(),
+            'field' => 'template_name',
+            'name' => __('Template name'),
+            'datatype' => 'text',
+            'massiveaction' => false,
+            'nosearch' => true,
+            'nodisplay' => true,
+        ];
+
+        $tab[] = [
+            'id' => '121',
+            'table' => $this->getTable(),
+            'field' => 'date_creation',
+            'name' => __('Creation date'),
+            'datatype' => 'datetime',
+            'massiveaction' => false
+        ];
+
+        $tab[] = [
+            'id' => '80',
+            'table' => 'glpi_entities',
+            'field' => 'completename',
+            'name' => Entity::getTypeName(1),
+            'datatype' => 'dropdown'
         ];
 
         $tab = array_merge($tab, Datacenter::rawSearchOptionsToAdd(get_class($this)));
@@ -215,25 +227,21 @@ class PDU extends CommonDBTM
         return $tab;
     }
 
-    public function cleanDBonPurge()
-    {
+    public function cleanDBonPurge() {
 
         $this->deleteChildrenAndRelationsFromDb(
-            [
-                Pdu_Plug::class,
-                PDU_Rack::class,
-            ]
+                [
+                    Pdu_Plug::class,
+                    PDU_Rack::class,
+                ]
         );
     }
 
-
-    public static function getIcon()
-    {
+    public static function getIcon() {
         return "ti ti-plug";
     }
 
-    public function prepareInputForAdd($input)
-    {
+    public function prepareInputForAdd($input) {
         if (isset($input["id"]) && ($input["id"] > 0)) {
             $input["_oldID"] = $input["id"];
         }
@@ -241,4 +249,5 @@ class PDU extends CommonDBTM
         unset($input['withtemplate']);
         return $input;
     }
+
 }

@@ -1215,6 +1215,16 @@ class Infocom extends CommonDBChild
             'joinparams'         => $joinparams,
             'datatype'           => 'string'
         ];
+        
+        $tab[] = [
+            'id'                 => '211',
+            'table'              => 'glpi_infocoms',
+            'field'              => 'casefile',
+            'name'               => __('Case file'),
+            'forcegroupby'       => true,
+            'joinparams'         => $joinparams,
+            'datatype'           => 'string'
+        ];
 
         $tab[] = [
             'id'                 => '27',
@@ -1575,6 +1585,16 @@ class Infocom extends CommonDBChild
             'datatype'           => 'dropdown'
         ];
 
+        $tab[] = [
+            'id'                 => '211',
+            'table'              => 'glpi_infocoms',
+            'field'              => 'casefile',
+            'name'               => __('Case file'),
+            'forcegroupby'       => true,
+            'joinparams'         => $joinparams,
+            'datatype'           => 'string'
+        ];
+        
         $tab[] = [
             'id'                 => '10',
             'table'              => $this->getTable(),

@@ -1,29 +1,29 @@
-1731407549
+1731408320
 4fdca4d44983d34dcb70bb117fb90c95fefe5e72
 a:1:{s:56:"bn_count_Peripheral_0c7b4548-0776-4112-b68d-b5612d49c8e7";s:1176:"      <style>
-         #bn_1063978101 {
+         #bn_1224330998 {
             background-color: #bcf0ce;
             color: #29b75a;
          }
 
-         #bn_1063978101:hover {
+         #bn_1224330998:hover {
             background-color: #7de2a0;
             border: 1px solid #3fd473;
          }
 
-         .theme-dark #bn_1063978101 {
+         .theme-dark #bn_1224330998 {
             background-color: #29b75a;
             color: #bcf0ce;
          }
 
-         .theme-dark #bn_1063978101:hover {
+         .theme-dark #bn_1224330998:hover {
             background-color: #7de2a0;
             color: #29b75a;
             border: 1px solid #3fd473;
          }
       </style>
       <a href='/glpi_7_new/front/peripheral.php?reset=reset'
-         id="bn_1063978101"
+         id="bn_1224330998"
          class="card big-number  filter-dates filter-dates_mod filter-location filter-manufacturer filter-group_tech filter-user_tech filter-state"
          title="">
          <span class="content">            <span title="3389"

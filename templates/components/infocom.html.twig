@@ -108,12 +108,84 @@
                         {'disabled': disabled}
                      ) }}
 
+                     {# ## WARRANTY PART ## #}
+                     {{ fields.largeTitle(
+                        __('Warranty information'),
+                        'fas fa-file-contract'
+                     ) }}
+
+                     {{ fields.dateField(
+                        'warranty_date',
+                        infocom.fields['warranty_date'],
+                        __('Start date of warranty'),
+                        {'disabled': disabled}
+                     ) }}
+
+                     {% if withtemplate == 2 %}
+                        {% if infocom.fields['warranty_duration'] == -1 %}
+                           {{ __('Lifelong') }}
+                        {% else %}
+                           {{ _n('%d month', '%d months', infocom.fields['warranty_duration'])|format(infocom.fields['warranty_duration']) }}
+                        {% endif %}
+                     {% else %}
+                        {% set warrantyexpir = infocom.getWarrantyExpir(infocom.fields['warranty_date'], infocom.fields['warranty_duration'], 0, true) %}
+                        {{ fields.dropdownNumberField(
+                           'warranty_duration',
+                           infocom.fields['warranty_duration'],
+                           __('Warranty duration'),
+                           {
+                              'min'            : 0,
+                              'max'            : 120,
+                              'step'           : 1,
+                              'toadd'          : {'-1': __('Lifelong')},
+                              'unit'           : 'month',
+                              'disabled'       : disabled,
+                              'add_field_html' : '<span class="text-muted">' ~ __('Valid to %s')|format(warrantyexpir) ~ '</span>'
+                           }
+                        ) }}
+                     {% endif %}
+
+                     {{ fields.textField(
+                        'warranty_info',
+                        infocom.fields['warranty_info'],
+                        __('Warranty information'),
+                        {'disabled': disabled}
+                     ) }}
+
+                     {% if config('use_notifications') %}
+                        {% set alert_html %}
+                           {% do call('Alert::displayLastAlert', ['Infocom', infocom.fields['id']]) %}
+                        {% endset %}
+
+                        {% set alert_field = infocom.dropdownAlert({
+                              'name'   : 'alert',
+                              'value'  : infocom.fields['alert'],
+                              'display': false,
+                              'width'  : '100%',
+                              'class'  : 'form-select'
+                           }) %}
+
+                        {{ fields.field(
+                           'alert',
+                           alert_field,
+                           __('Alarms on financial and administrative information'),
+                           {'add_field_html': '<span class="text-muted">' ~ alert_html ~ '</span>'}
+                        ) }}
+                     {% endif %}
+                     
                      {# ## FINANCIAL PART ## #}
                      {{ fields.largeTitle(
                         __('Financial and administrative information'),
                         'fas fa-coins'
                      ) }}
 
+                     {{ fields.textField(
+                        'casefile',
+                        infocom.fields['casefile'],
+                        __('Case file'),
+                        {'disabled': disabled}
+                     ) }}
+                     
                      {{ fields.dropdownField(
                         'Supplier',
                         'suppliers_id',
@@ -271,70 +343,7 @@
                         {'disabled': disabled}
                      ) }}
 
-                     {# ## WARRANTY PART ## #}
-                     {{ fields.largeTitle(
-                        __('Warranty information'),
-                        'fas fa-file-contract'
-                     ) }}
-
-                     {{ fields.dateField(
-                        'warranty_date',
-                        infocom.fields['warranty_date'],
-                        __('Start date of warranty'),
-                        {'disabled': disabled}
-                     ) }}
-
-                     {% if withtemplate == 2 %}
-                        {% if infocom.fields['warranty_duration'] == -1 %}
-                           {{ __('Lifelong') }}
-                        {% else %}
-                           {{ _n('%d month', '%d months', infocom.fields['warranty_duration'])|format(infocom.fields['warranty_duration']) }}
-                        {% endif %}
-                     {% else %}
-                        {% set warrantyexpir = infocom.getWarrantyExpir(infocom.fields['warranty_date'], infocom.fields['warranty_duration'], 0, true) %}
-                        {{ fields.dropdownNumberField(
-                           'warranty_duration',
-                           infocom.fields['warranty_duration'],
-                           __('Warranty duration'),
-                           {
-                              'min'            : 0,
-                              'max'            : 120,
-                              'step'           : 1,
-                              'toadd'          : {'-1': __('Lifelong')},
-                              'unit'           : 'month',
-                              'disabled'       : disabled,
-                              'add_field_html' : '<span class="text-muted">' ~ __('Valid to %s')|format(warrantyexpir) ~ '</span>'
-                           }
-                        ) }}
-                     {% endif %}
-
-                     {{ fields.textField(
-                        'warranty_info',
-                        infocom.fields['warranty_info'],
-                        __('Warranty information'),
-                        {'disabled': disabled}
-                     ) }}
-
-                     {% if config('use_notifications') %}
-                        {% set alert_html %}
-                           {% do call('Alert::displayLastAlert', ['Infocom', infocom.fields['id']]) %}
-                        {% endset %}
-
-                        {% set alert_field = infocom.dropdownAlert({
-                              'name'   : 'alert',
-                              'value'  : infocom.fields['alert'],
-                              'display': false,
-                              'width'  : '100%',
-                              'class'  : 'form-select'
-                           }) %}
-
-                        {{ fields.field(
-                           'alert',
-                           alert_field,
-                           __('Alarms on financial and administrative information'),
-                           {'add_field_html': '<span class="text-muted">' ~ alert_html ~ '</span>'}
-                        ) }}
-                     {% endif %}
+                     
 
                      {% do call_plugin_hook_func(constant('Glpi\\Plugin\\Hooks::INFOCOM'), item) %}
 
