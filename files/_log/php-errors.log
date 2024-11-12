@@ -1,16 +1,15 @@
-[2024-11-12 09:28:46] glpiphplog.WARNING: Test logger  
-[2024-11-12 09:29:07] glpiphplog.WARNING: Test logger  
-[2024-11-12 09:30:48] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+[2024-11-12 11:30:05] glpiphplog.WARNING: Test logger  
+[2024-11-12 11:31:19] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
 Compile css/palettes/auror.scss  {"user":"@PC140-08"} 
-[2024-11-12 09:31:07] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+[2024-11-12 11:31:41] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
 Compile css/standalone/gridstack-grids.scss  {"user":"100111@PC140-08"} 
-[2024-11-12 09:31:10] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
-Compile css/standalone/chartist.scss  {"user":"100111@PC140-08"} 
-[2024-11-12 09:31:10] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+[2024-11-12 11:31:43] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
 Compile css/standalone/dashboard.scss  {"user":"100111@PC140-08"} 
-[2024-11-12 09:31:42] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+[2024-11-12 11:31:44] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/chartist.scss  {"user":"100111@PC140-08"} 
+[2024-11-12 11:32:04] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
 Compile css/standalone/reservations.scss  {"user":"100111@PC140-08"} 
-[2024-11-12 09:31:56] glpiphplog.WARNING:   *** PHP User Warning (512): The picture 'C:\xampp\htdocs\glpi_7_new/files/_pictures/a7/3go.png' referenced by the ComputerModel with ID 215 does not exist in C:\xampp\htdocs\glpi_7_new\src\CommonDBTM.php at line 6113
+[2024-11-12 11:32:18] glpiphplog.WARNING:   *** PHP User Warning (512): The picture 'C:\xampp\htdocs\glpi_7_new/files/_pictures/a7/3go.png' referenced by the ComputerModel with ID 215 does not exist in C:\xampp\htdocs\glpi_7_new\src\CommonDBTM.php at line 6113
   Backtrace :
   src\CommonDBTM.php:6113                            trigger_error()
   ...\twig\twig\src\Extension\CoreExtension.php:1635 CommonDBTM->getItemtypeOrModelPicture()
@@ -29,3 +28,4 @@ Compile css/standalone/reservations.scss  {"user":"100111@PC140-08"}
   src\CommonGLPI.php:676                             CommonDBTM->showForm()
   ajax\common.tabs.php:116                           CommonGLPI::displayStandardTab()
   
+[2024-11-12 11:32:41] glpiphplog.WARNING: Test logger  

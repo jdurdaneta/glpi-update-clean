@@ -435,7 +435,6 @@
                            field_options
                         ) }}
                      {% endif %}
-                                          
 
                      {% if item_type != 'SoftwareLicense' and item.isField('contact') %}
                         {# TODO Drop unused 'contact' field in Software License schema? #}
@@ -567,15 +566,6 @@
                         ) }}
                      {% endif %}
 
-                     {% if item.isField('tag') %}
-                        {{ fields.dropdownYesNo(
-                            'tag',
-                            item.fields['tag'],
-                            __('Tag'),
-                            field_options
-                        ) }}
-                     {% endif %}
-                     
                      {% if item.isField('comment') %}
                         {{ fields.textareaField(
                            'comment',

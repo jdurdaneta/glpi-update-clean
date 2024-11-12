@@ -1,29 +1,29 @@
-1731400317
+1731407549
 9887b5b4ba51b643ce7eabe4809a3200636a7633
-a:1:{s:64:"bn_count_QueuedNotification_097849ef-378d-4faf-a55c-a528b2a94155";s:1117:"      <style>
-         #bn_366886235 {
+a:1:{s:64:"bn_count_QueuedNotification_097849ef-378d-4faf-a55c-a528b2a94155";s:1122:"      <style>
+         #bn_1540778851 {
             background-color: #fafafa;
             color: #949494;
          }
 
-         #bn_366886235:hover {
+         #bn_1540778851:hover {
             background-color: #d4d4d4;
             border: 1px solid #aeaeae;
          }
 
-         .theme-dark #bn_366886235 {
+         .theme-dark #bn_1540778851 {
             background-color: #949494;
             color: #fafafa;
          }
 
-         .theme-dark #bn_366886235:hover {
+         .theme-dark #bn_1540778851:hover {
             background-color: #d4d4d4;
             color: #949494;
             border: 1px solid #aeaeae;
          }
       </style>
       <a href='/glpi_7_new/front/queuednotification.php?reset=reset'
-         id="bn_366886235"
+         id="bn_1540778851"
          class="card big-number  filter-dates filter-dates_mod"
          title="">
          <span class="content">            <span title="7"

@@ -123,13 +123,6 @@ class Enclosure extends CommonDBTM
             'name'               => _n('Model', 'Models', 1),
             'datatype'           => 'dropdown'
         ];
-        $tab[] = [
-            'id' => '500',
-            'table' => 'glpi_enclosuremodels',
-            'field' => 'picture_front',
-            'name' => _n('Image', 'Images', 1),
-            'datatype' => 'string'
-        ];
 
         $tab[] = [
             'id'                 => '31',
@@ -164,15 +157,6 @@ class Enclosure extends CommonDBTM
             'datatype'           => 'text'
         ];
 
-        $tab[] = [
-            'id' => '210',
-            'table' => $this->getTable(),
-            'field' => 'tag',
-            'name' => __('Tag'),
-            'datatype' => 'bool',
-            'autocomplete' => true,
-        ];
-        
         $tab[] = [
             'id'                 => '19',
             'table'              => $this->getTable(),

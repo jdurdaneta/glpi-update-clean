@@ -160,320 +160,310 @@ class __TwigTemplate_7e3fcc19690705bc537bd8c717f56590 extends Template
                      ";
             // line 112
             echo "                     ";
-            echo twig_call_macro($macros["fields"], "macro_largeTitle", [__("Warranty information"), "fas fa-file-contract"], 112, $context, $this->getSourceContext());
+            echo twig_call_macro($macros["fields"], "macro_largeTitle", [__("Financial and administrative information"), "fas fa-coins"], 112, $context, $this->getSourceContext());
             // line 115
             echo "
 
                      ";
             // line 117
-            echo twig_call_macro($macros["fields"], "macro_dateField", ["warranty_date", (($__internal_compile_9 = twig_get_attribute($this->env, $this->source,             // line 119
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 119)) && is_array($__internal_compile_9) || $__internal_compile_9 instanceof ArrayAccess ? ($__internal_compile_9["warranty_date"] ?? null) : null), __("Start date of warranty"), ["disabled" =>             // line 121
+            echo twig_call_macro($macros["fields"], "macro_dropdownField", ["Supplier", "suppliers_id", (($__internal_compile_9 = twig_get_attribute($this->env, $this->source,             // line 120
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 120)) && is_array($__internal_compile_9) || $__internal_compile_9 instanceof ArrayAccess ? ($__internal_compile_9["suppliers_id"] ?? null) : null), $this->extensions['Glpi\Application\View\Extension\ItemtypeExtension']->getItemtypeName("Supplier"), ["entity" => (($__internal_compile_10 = twig_get_attribute($this->env, $this->source,             // line 123
+($context["item"] ?? null), "fields", [], "any", false, false, false, 123)) && is_array($__internal_compile_10) || $__internal_compile_10 instanceof ArrayAccess ? ($__internal_compile_10["entities_id"] ?? null) : null), "disabled" =>             // line 124
 ($context["disabled"] ?? null)]], 117, $context, $this->getSourceContext());
-            // line 122
+            // line 126
             echo "
 
                      ";
-            // line 124
-            if ((($context["withtemplate"] ?? null) == 2)) {
-                // line 125
+            // line 128
+            if ($this->extensions['Glpi\Application\View\Extension\SessionExtension']->hasItemtypeRight("Budget", twig_constant("READ"))) {
+                // line 129
                 echo "                        ";
-                if (((($__internal_compile_10 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 125)) && is_array($__internal_compile_10) || $__internal_compile_10 instanceof ArrayAccess ? ($__internal_compile_10["warranty_duration"] ?? null) : null) ==  -1)) {
-                    // line 126
-                    echo "                           ";
-                    echo twig_escape_filter($this->env, __("Lifelong"), "html", null, true);
-                    echo "
-                        ";
-                } else {
-                    // line 128
-                    echo "                           ";
-                    echo twig_escape_filter($this->env, twig_sprintf(_n("%d month", "%d months", (($__internal_compile_11 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 128)) && is_array($__internal_compile_11) || $__internal_compile_11 instanceof ArrayAccess ? ($__internal_compile_11["warranty_duration"] ?? null) : null)), (($__internal_compile_12 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 128)) && is_array($__internal_compile_12) || $__internal_compile_12 instanceof ArrayAccess ? ($__internal_compile_12["warranty_duration"] ?? null) : null)), "html", null, true);
-                    echo "
-                        ";
-                }
-                // line 130
-                echo "                     ";
-            } else {
-                // line 131
-                echo "                        ";
-                $context["warrantyexpir"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getWarrantyExpir", [0 => (($__internal_compile_13 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 131)) && is_array($__internal_compile_13) || $__internal_compile_13 instanceof ArrayAccess ? ($__internal_compile_13["warranty_date"] ?? null) : null), 1 => (($__internal_compile_14 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 131)) && is_array($__internal_compile_14) || $__internal_compile_14 instanceof ArrayAccess ? ($__internal_compile_14["warranty_duration"] ?? null) : null), 2 => 0, 3 => true], "method", false, false, false, 131);
-                // line 132
-                echo "                        ";
-                echo twig_call_macro($macros["fields"], "macro_dropdownNumberField", ["warranty_duration", (($__internal_compile_15 = twig_get_attribute($this->env, $this->source,                 // line 134
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 134)) && is_array($__internal_compile_15) || $__internal_compile_15 instanceof ArrayAccess ? ($__internal_compile_15["warranty_duration"] ?? null) : null), __("Warranty duration"), ["min" => 0, "max" => 120, "step" => 1, "toadd" => ["-1" => __("Lifelong")], "unit" => "month", "disabled" =>                 // line 142
-($context["disabled"] ?? null), "add_field_html" => (("<span class=\"text-muted\">" . twig_sprintf(__("Valid to %s"),                 // line 143
-($context["warrantyexpir"] ?? null))) . "</span>")]], 132, $context, $this->getSourceContext());
-                // line 145
+                echo twig_call_macro($macros["fields"], "macro_dropdownField", ["Budget", "budgets_id", (($__internal_compile_11 = twig_get_attribute($this->env, $this->source,                 // line 132
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 132)) && is_array($__internal_compile_11) || $__internal_compile_11 instanceof ArrayAccess ? ($__internal_compile_11["budgets_id"] ?? null) : null), $this->extensions['Glpi\Application\View\Extension\ItemtypeExtension']->getItemtypeName("Budget"), ["entity" => (($__internal_compile_12 = twig_get_attribute($this->env, $this->source,                 // line 135
+($context["item"] ?? null), "fields", [], "any", false, false, false, 135)) && is_array($__internal_compile_12) || $__internal_compile_12 instanceof ArrayAccess ? ($__internal_compile_12["entities_id"] ?? null) : null), "comments" => 1, "disabled" =>                 // line 137
+($context["disabled"] ?? null)]], 129, $context, $this->getSourceContext());
+                // line 139
                 echo "
                      ";
             }
+            // line 141
+            echo "
+                     ";
+            // line 142
+            echo twig_call_macro($macros["fields"], "macro_textField", ["order_number", (($__internal_compile_13 = twig_get_attribute($this->env, $this->source,             // line 144
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 144)) && is_array($__internal_compile_13) || $__internal_compile_13 instanceof ArrayAccess ? ($__internal_compile_13["order_number"] ?? null) : null), __("Order number"), ["disabled" =>             // line 146
+($context["disabled"] ?? null)]], 142, $context, $this->getSourceContext());
             // line 147
             echo "
-                     ";
-            // line 148
-            echo twig_call_macro($macros["fields"], "macro_textField", ["warranty_info", (($__internal_compile_16 = twig_get_attribute($this->env, $this->source,             // line 150
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 150)) && is_array($__internal_compile_16) || $__internal_compile_16 instanceof ArrayAccess ? ($__internal_compile_16["warranty_info"] ?? null) : null), __("Warranty information"), ["disabled" =>             // line 152
-($context["disabled"] ?? null)]], 148, $context, $this->getSourceContext());
-            // line 153
-            echo "
 
                      ";
+            // line 149
+            echo twig_call_macro($macros["fields"], "macro_autoNameField", ["immo_number",             // line 151
+($context["infocom"] ?? null), __("Immobilization number"),             // line 153
+($context["withtemplate"] ?? null), ["disabled" =>             // line 154
+($context["disabled"] ?? null), "value" => (($__internal_compile_14 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 154)) && is_array($__internal_compile_14) || $__internal_compile_14 instanceof ArrayAccess ? ($__internal_compile_14["immo_number"] ?? null) : null)]], 149, $context, $this->getSourceContext());
             // line 155
-            if ($this->extensions['Glpi\Application\View\Extension\ConfigExtension']->config("use_notifications")) {
-                // line 156
-                echo "                        ";
-                ob_start();
-                // line 157
-                echo "                           ";
-                $this->extensions['Glpi\Application\View\Extension\PhpExtension']->call("Alert::displayLastAlert", [0 => "Infocom", 1 => (($__internal_compile_17 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 157)) && is_array($__internal_compile_17) || $__internal_compile_17 instanceof ArrayAccess ? ($__internal_compile_17["id"] ?? null) : null)]);
-                // line 158
-                echo "                        ";
-                $context["alert_html"] = ('' === $tmp = ob_get_clean()) ? '' : new Markup($tmp, $this->env->getCharset());
-                // line 159
-                echo "
-                        ";
-                // line 160
-                $context["alert_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "dropdownAlert", [0 => ["name" => "alert", "value" => (($__internal_compile_18 = twig_get_attribute($this->env, $this->source,                 // line 162
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 162)) && is_array($__internal_compile_18) || $__internal_compile_18 instanceof ArrayAccess ? ($__internal_compile_18["alert"] ?? null) : null), "display" => false, "width" => "100%", "class" => "form-select"]], "method", false, false, false, 160);
-                // line 167
-                echo "
-                        ";
-                // line 168
-                echo twig_call_macro($macros["fields"], "macro_field", ["alert",                 // line 170
-($context["alert_field"] ?? null), __("Alarms on financial and administrative information"), ["add_field_html" => (("<span class=\"text-muted\">" .                 // line 172
-($context["alert_html"] ?? null)) . "</span>")]], 168, $context, $this->getSourceContext());
-                // line 173
-                echo "
-                     ";
-            }
-            // line 175
-            echo "                     
-                     ";
-            // line 177
-            echo "                     ";
-            echo twig_call_macro($macros["fields"], "macro_largeTitle", [__("Financial and administrative information"), "fas fa-coins"], 177, $context, $this->getSourceContext());
-            // line 180
             echo "
 
                      ";
-            // line 182
-            echo twig_call_macro($macros["fields"], "macro_textField", ["casefile", (($__internal_compile_19 = twig_get_attribute($this->env, $this->source,             // line 184
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 184)) && is_array($__internal_compile_19) || $__internal_compile_19 instanceof ArrayAccess ? ($__internal_compile_19["casefile"] ?? null) : null), __("Case file"), ["disabled" =>             // line 186
-($context["disabled"] ?? null)]], 182, $context, $this->getSourceContext());
-            // line 187
+            // line 157
+            echo twig_call_macro($macros["fields"], "macro_textField", ["bill", (($__internal_compile_15 = twig_get_attribute($this->env, $this->source,             // line 159
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 159)) && is_array($__internal_compile_15) || $__internal_compile_15 instanceof ArrayAccess ? ($__internal_compile_15["bill"] ?? null) : null), __("Invoice number"), ["disabled" =>             // line 161
+($context["disabled"] ?? null)]], 157, $context, $this->getSourceContext());
+            // line 162
             echo "
-                     
+
                      ";
+            // line 164
+            echo twig_call_macro($macros["fields"], "macro_textField", ["delivery_number", (($__internal_compile_16 = twig_get_attribute($this->env, $this->source,             // line 166
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 166)) && is_array($__internal_compile_16) || $__internal_compile_16 instanceof ArrayAccess ? ($__internal_compile_16["delivery_number"] ?? null) : null), __("Delivery form"), ["disabled" =>             // line 168
+($context["disabled"] ?? null)]], 164, $context, $this->getSourceContext());
+            // line 169
+            echo "
+
+                     ";
+            // line 171
+            echo twig_call_macro($macros["fields"], "macro_numberField", ["value", (($__internal_compile_17 = twig_get_attribute($this->env, $this->source,             // line 173
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 173)) && is_array($__internal_compile_17) || $__internal_compile_17 instanceof ArrayAccess ? ($__internal_compile_17["value"] ?? null) : null), _x("price", "Value"), ["disabled" =>             // line 176
+($context["disabled"] ?? null), "step" => "any"]], 171, $context, $this->getSourceContext());
+            // line 179
+            echo "
+
+                     ";
+            // line 181
+            echo twig_call_macro($macros["fields"], "macro_numberField", ["warranty_value", (($__internal_compile_18 = twig_get_attribute($this->env, $this->source,             // line 183
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 183)) && is_array($__internal_compile_18) || $__internal_compile_18 instanceof ArrayAccess ? ($__internal_compile_18["warranty_value"] ?? null) : null), __("Warranty extension value"), ["disabled" =>             // line 186
+($context["disabled"] ?? null), "step" => "any"]], 181, $context, $this->getSourceContext());
             // line 189
-            echo twig_call_macro($macros["fields"], "macro_dropdownField", ["Supplier", "suppliers_id", (($__internal_compile_20 = twig_get_attribute($this->env, $this->source,             // line 192
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 192)) && is_array($__internal_compile_20) || $__internal_compile_20 instanceof ArrayAccess ? ($__internal_compile_20["suppliers_id"] ?? null) : null), $this->extensions['Glpi\Application\View\Extension\ItemtypeExtension']->getItemtypeName("Supplier"), ["entity" => (($__internal_compile_21 = twig_get_attribute($this->env, $this->source,             // line 195
-($context["item"] ?? null), "fields", [], "any", false, false, false, 195)) && is_array($__internal_compile_21) || $__internal_compile_21 instanceof ArrayAccess ? ($__internal_compile_21["entities_id"] ?? null) : null), "disabled" =>             // line 196
-($context["disabled"] ?? null)]], 189, $context, $this->getSourceContext());
-            // line 198
+            echo "
+
+
+                     ";
+            // line 192
+            $context["amort"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "Amort", [0 => (($__internal_compile_19 = twig_get_attribute($this->env, $this->source,             // line 193
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 193)) && is_array($__internal_compile_19) || $__internal_compile_19 instanceof ArrayAccess ? ($__internal_compile_19["sink_type"] ?? null) : null), 1 => (($__internal_compile_20 = twig_get_attribute($this->env, $this->source,             // line 194
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 194)) && is_array($__internal_compile_20) || $__internal_compile_20 instanceof ArrayAccess ? ($__internal_compile_20["value"] ?? null) : null), 2 => (($__internal_compile_21 = twig_get_attribute($this->env, $this->source,             // line 195
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 195)) && is_array($__internal_compile_21) || $__internal_compile_21 instanceof ArrayAccess ? ($__internal_compile_21["sink_time"] ?? null) : null), 3 => (($__internal_compile_22 = twig_get_attribute($this->env, $this->source,             // line 196
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 196)) && is_array($__internal_compile_22) || $__internal_compile_22 instanceof ArrayAccess ? ($__internal_compile_22["sink_coeff"] ?? null) : null), 4 => (($__internal_compile_23 = twig_get_attribute($this->env, $this->source,             // line 197
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 197)) && is_array($__internal_compile_23) || $__internal_compile_23 instanceof ArrayAccess ? ($__internal_compile_23["buy_date"] ?? null) : null), 5 => (($__internal_compile_24 = twig_get_attribute($this->env, $this->source,             // line 198
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 198)) && is_array($__internal_compile_24) || $__internal_compile_24 instanceof ArrayAccess ? ($__internal_compile_24["use_date"] ?? null) : null), 6 => $this->extensions['Glpi\Application\View\Extension\ConfigExtension']->config("date_tax"), 7 => "n"], "method", false, false, false, 192);
+            // line 202
+            echo "                     ";
+            echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["", $this->extensions['Glpi\Application\View\Extension\DataHelpersExtension']->getFormattedNumber(            // line 204
+($context["amort"] ?? null)), __("Account net value")], 202, $context, $this->getSourceContext());
+            // line 206
             echo "
 
                      ";
-            // line 200
-            if ($this->extensions['Glpi\Application\View\Extension\SessionExtension']->hasItemtypeRight("Budget", twig_constant("READ"))) {
-                // line 201
+            // line 208
+            if (((($context["withtemplate"] ?? null) == 2) || (($context["disabled"] ?? null) == true))) {
+                // line 209
                 echo "                        ";
-                echo twig_call_macro($macros["fields"], "macro_dropdownField", ["Budget", "budgets_id", (($__internal_compile_22 = twig_get_attribute($this->env, $this->source,                 // line 204
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 204)) && is_array($__internal_compile_22) || $__internal_compile_22 instanceof ArrayAccess ? ($__internal_compile_22["budgets_id"] ?? null) : null), $this->extensions['Glpi\Application\View\Extension\ItemtypeExtension']->getItemtypeName("Budget"), ["entity" => (($__internal_compile_23 = twig_get_attribute($this->env, $this->source,                 // line 207
-($context["item"] ?? null), "fields", [], "any", false, false, false, 207)) && is_array($__internal_compile_23) || $__internal_compile_23 instanceof ArrayAccess ? ($__internal_compile_23["entities_id"] ?? null) : null), "comments" => 1, "disabled" =>                 // line 209
-($context["disabled"] ?? null)]], 201, $context, $this->getSourceContext());
+                $context["sink_type_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getAmortTypeName", [0 => (($__internal_compile_25 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 209)) && is_array($__internal_compile_25) || $__internal_compile_25 instanceof ArrayAccess ? ($__internal_compile_25["sink_type"] ?? null) : null)], "method", false, false, false, 209);
+                // line 210
+                echo "                     ";
+            } else {
                 // line 211
-                echo "
-                     ";
+                echo "                        ";
+                $context["sink_type_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "dropdownAmortType", [0 => "sink_type", 1 => (($__internal_compile_26 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 211)) && is_array($__internal_compile_26) || $__internal_compile_26 instanceof ArrayAccess ? ($__internal_compile_26["sink_type"] ?? null) : null), 2 => false], "method", false, false, false, 211);
+                // line 212
+                echo "                     ";
             }
             // line 213
             echo "
                      ";
             // line 214
-            echo twig_call_macro($macros["fields"], "macro_textField", ["order_number", (($__internal_compile_24 = twig_get_attribute($this->env, $this->source,             // line 216
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 216)) && is_array($__internal_compile_24) || $__internal_compile_24 instanceof ArrayAccess ? ($__internal_compile_24["order_number"] ?? null) : null), __("Order number"), ["disabled" =>             // line 218
-($context["disabled"] ?? null)]], 214, $context, $this->getSourceContext());
-            // line 219
+            echo twig_call_macro($macros["fields"], "macro_field", ["",             // line 216
+($context["sink_type_field"] ?? null), __("Amortization type")], 214, $context, $this->getSourceContext());
+            // line 218
             echo "
 
                      ";
-            // line 221
-            echo twig_call_macro($macros["fields"], "macro_autoNameField", ["immo_number",             // line 223
-($context["infocom"] ?? null), __("Immobilization number"),             // line 225
-($context["withtemplate"] ?? null), ["disabled" =>             // line 226
-($context["disabled"] ?? null), "value" => (($__internal_compile_25 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 226)) && is_array($__internal_compile_25) || $__internal_compile_25 instanceof ArrayAccess ? ($__internal_compile_25["immo_number"] ?? null) : null)]], 221, $context, $this->getSourceContext());
-            // line 227
-            echo "
-
-                     ";
+            // line 220
+            echo twig_call_macro($macros["fields"], "macro_dropdownNumberField", ["sink_time", (($__internal_compile_27 = twig_get_attribute($this->env, $this->source,             // line 222
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 222)) && is_array($__internal_compile_27) || $__internal_compile_27 instanceof ArrayAccess ? ($__internal_compile_27["sink_time"] ?? null) : null), __("Amortization duration"), ["max" => 15, "unit" => "year", "disabled" =>             // line 227
+($context["disabled"] ?? null)]], 220, $context, $this->getSourceContext());
             // line 229
-            echo twig_call_macro($macros["fields"], "macro_textField", ["bill", (($__internal_compile_26 = twig_get_attribute($this->env, $this->source,             // line 231
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 231)) && is_array($__internal_compile_26) || $__internal_compile_26 instanceof ArrayAccess ? ($__internal_compile_26["bill"] ?? null) : null), __("Invoice number"), ["disabled" =>             // line 233
-($context["disabled"] ?? null)]], 229, $context, $this->getSourceContext());
-            // line 234
             echo "
 
                      ";
+            // line 231
+            echo twig_call_macro($macros["fields"], "macro_numberField", ["sink_coeff", (($__internal_compile_28 = twig_get_attribute($this->env, $this->source,             // line 233
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 233)) && is_array($__internal_compile_28) || $__internal_compile_28 instanceof ArrayAccess ? ($__internal_compile_28["sink_coeff"] ?? null) : null), __("Amortization coefficient"), ["disabled" =>             // line 235
+($context["disabled"] ?? null)]], 231, $context, $this->getSourceContext());
             // line 236
-            echo twig_call_macro($macros["fields"], "macro_textField", ["delivery_number", (($__internal_compile_27 = twig_get_attribute($this->env, $this->source,             // line 238
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 238)) && is_array($__internal_compile_27) || $__internal_compile_27 instanceof ArrayAccess ? ($__internal_compile_27["delivery_number"] ?? null) : null), __("Delivery form"), ["disabled" =>             // line 240
-($context["disabled"] ?? null)]], 236, $context, $this->getSourceContext());
-            // line 241
             echo "
 
                      ";
-            // line 243
-            echo twig_call_macro($macros["fields"], "macro_numberField", ["value", (($__internal_compile_28 = twig_get_attribute($this->env, $this->source,             // line 245
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 245)) && is_array($__internal_compile_28) || $__internal_compile_28 instanceof ArrayAccess ? ($__internal_compile_28["value"] ?? null) : null), _x("price", "Value"), ["disabled" =>             // line 248
-($context["disabled"] ?? null), "step" => "any"]], 243, $context, $this->getSourceContext());
-            // line 251
+            // line 238
+            if (!twig_in_filter(twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "getType", [], "method", false, false, false, 238), twig_array_merge(twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getExcludedTypes", [], "method", false, false, false, 238), [0 => "Cartridge", 1 => "Consumable", 2 => "SoftwareLicense"]))) {
+                // line 239
+                echo "                        ";
+                $context["ticket_tco_value"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "showTco", [0 => (($__internal_compile_29 = twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "fields", [], "any", false, false, false, 239)) && is_array($__internal_compile_29) || $__internal_compile_29 instanceof ArrayAccess ? ($__internal_compile_29["ticket_tco"] ?? null) : null), 1 => (($__internal_compile_30 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 239)) && is_array($__internal_compile_30) || $__internal_compile_30 instanceof ArrayAccess ? ($__internal_compile_30["value"] ?? null) : null)], "method", false, false, false, 239);
+                // line 240
+                echo "                        ";
+                echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["ticket_tco",                 // line 242
+($context["ticket_tco_value"] ?? null), __("TCO (value + tracking cost)"), ["disabled" =>                 // line 244
+($context["disabled"] ?? null)]], 240, $context, $this->getSourceContext());
+                // line 245
+                echo "
+
+                        ";
+                // line 247
+                $context["ticket_tco2_value"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "showTco", [0 => (($__internal_compile_31 = twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "fields", [], "any", false, false, false, 247)) && is_array($__internal_compile_31) || $__internal_compile_31 instanceof ArrayAccess ? ($__internal_compile_31["ticket_tco"] ?? null) : null), 1 => (($__internal_compile_32 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 247)) && is_array($__internal_compile_32) || $__internal_compile_32 instanceof ArrayAccess ? ($__internal_compile_32["value"] ?? null) : null), 2 => (($__internal_compile_33 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 247)) && is_array($__internal_compile_33) || $__internal_compile_33 instanceof ArrayAccess ? ($__internal_compile_33["buy_date"] ?? null) : null)], "method", false, false, false, 247);
+                // line 248
+                echo "                        ";
+                echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["ticket_tco",                 // line 250
+($context["ticket_tco2_value"] ?? null), __("Monthly TCO"), ["disabled" =>                 // line 252
+($context["disabled"] ?? null)]], 248, $context, $this->getSourceContext());
+                // line 253
+                echo "
+                     ";
+            }
+            // line 255
             echo "
 
                      ";
-            // line 253
-            echo twig_call_macro($macros["fields"], "macro_numberField", ["warranty_value", (($__internal_compile_29 = twig_get_attribute($this->env, $this->source,             // line 255
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 255)) && is_array($__internal_compile_29) || $__internal_compile_29 instanceof ArrayAccess ? ($__internal_compile_29["warranty_value"] ?? null) : null), __("Warranty extension value"), ["disabled" =>             // line 258
-($context["disabled"] ?? null), "step" => "any"]], 253, $context, $this->getSourceContext());
-            // line 261
+            // line 257
+            echo twig_call_macro($macros["fields"], "macro_dropdownField", ["BusinessCriticity", "businesscriticities_id", (($__internal_compile_34 = twig_get_attribute($this->env, $this->source,             // line 260
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 260)) && is_array($__internal_compile_34) || $__internal_compile_34 instanceof ArrayAccess ? ($__internal_compile_34["businesscriticities_id"] ?? null) : null), _n("Business criticity", "Business criticities", 1), ["disabled" =>             // line 263
+($context["disabled"] ?? null)]], 257, $context, $this->getSourceContext());
+            // line 265
             echo "
 
+                     ";
+            // line 267
+            echo twig_call_macro($macros["fields"], "macro_textareaField", ["comment", (($__internal_compile_35 = twig_get_attribute($this->env, $this->source,             // line 269
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 269)) && is_array($__internal_compile_35) || $__internal_compile_35 instanceof ArrayAccess ? ($__internal_compile_35["comment"] ?? null) : null), _n("Comment", "Comments", Session::getPluralNumber()), ["disabled" =>             // line 271
+($context["disabled"] ?? null)]], 267, $context, $this->getSourceContext());
+            // line 272
+            echo "
 
                      ";
-            // line 264
-            $context["amort"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "Amort", [0 => (($__internal_compile_30 = twig_get_attribute($this->env, $this->source,             // line 265
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 265)) && is_array($__internal_compile_30) || $__internal_compile_30 instanceof ArrayAccess ? ($__internal_compile_30["sink_type"] ?? null) : null), 1 => (($__internal_compile_31 = twig_get_attribute($this->env, $this->source,             // line 266
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 266)) && is_array($__internal_compile_31) || $__internal_compile_31 instanceof ArrayAccess ? ($__internal_compile_31["value"] ?? null) : null), 2 => (($__internal_compile_32 = twig_get_attribute($this->env, $this->source,             // line 267
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 267)) && is_array($__internal_compile_32) || $__internal_compile_32 instanceof ArrayAccess ? ($__internal_compile_32["sink_time"] ?? null) : null), 3 => (($__internal_compile_33 = twig_get_attribute($this->env, $this->source,             // line 268
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 268)) && is_array($__internal_compile_33) || $__internal_compile_33 instanceof ArrayAccess ? ($__internal_compile_33["sink_coeff"] ?? null) : null), 4 => (($__internal_compile_34 = twig_get_attribute($this->env, $this->source,             // line 269
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 269)) && is_array($__internal_compile_34) || $__internal_compile_34 instanceof ArrayAccess ? ($__internal_compile_34["buy_date"] ?? null) : null), 5 => (($__internal_compile_35 = twig_get_attribute($this->env, $this->source,             // line 270
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 270)) && is_array($__internal_compile_35) || $__internal_compile_35 instanceof ArrayAccess ? ($__internal_compile_35["use_date"] ?? null) : null), 6 => $this->extensions['Glpi\Application\View\Extension\ConfigExtension']->config("date_tax"), 7 => "n"], "method", false, false, false, 264);
-            // line 274
+            // line 275
             echo "                     ";
-            echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["", $this->extensions['Glpi\Application\View\Extension\DataHelpersExtension']->getFormattedNumber(            // line 276
-($context["amort"] ?? null)), __("Account net value")], 274, $context, $this->getSourceContext());
+            echo twig_call_macro($macros["fields"], "macro_largeTitle", [__("Warranty information"), "fas fa-file-contract"], 275, $context, $this->getSourceContext());
             // line 278
             echo "
 
                      ";
             // line 280
-            if (((($context["withtemplate"] ?? null) == 2) || (($context["disabled"] ?? null) == true))) {
-                // line 281
-                echo "                        ";
-                $context["sink_type_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getAmortTypeName", [0 => (($__internal_compile_36 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 281)) && is_array($__internal_compile_36) || $__internal_compile_36 instanceof ArrayAccess ? ($__internal_compile_36["sink_type"] ?? null) : null)], "method", false, false, false, 281);
-                // line 282
-                echo "                     ";
-            } else {
-                // line 283
-                echo "                        ";
-                $context["sink_type_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "dropdownAmortType", [0 => "sink_type", 1 => (($__internal_compile_37 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 283)) && is_array($__internal_compile_37) || $__internal_compile_37 instanceof ArrayAccess ? ($__internal_compile_37["sink_type"] ?? null) : null), 2 => false], "method", false, false, false, 283);
-                // line 284
-                echo "                     ";
-            }
+            echo twig_call_macro($macros["fields"], "macro_dateField", ["warranty_date", (($__internal_compile_36 = twig_get_attribute($this->env, $this->source,             // line 282
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 282)) && is_array($__internal_compile_36) || $__internal_compile_36 instanceof ArrayAccess ? ($__internal_compile_36["warranty_date"] ?? null) : null), __("Start date of warranty"), ["disabled" =>             // line 284
+($context["disabled"] ?? null)]], 280, $context, $this->getSourceContext());
             // line 285
             echo "
-                     ";
-            // line 286
-            echo twig_call_macro($macros["fields"], "macro_field", ["",             // line 288
-($context["sink_type_field"] ?? null), __("Amortization type")], 286, $context, $this->getSourceContext());
-            // line 290
-            echo "
 
                      ";
-            // line 292
-            echo twig_call_macro($macros["fields"], "macro_dropdownNumberField", ["sink_time", (($__internal_compile_38 = twig_get_attribute($this->env, $this->source,             // line 294
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 294)) && is_array($__internal_compile_38) || $__internal_compile_38 instanceof ArrayAccess ? ($__internal_compile_38["sink_time"] ?? null) : null), __("Amortization duration"), ["max" => 15, "unit" => "year", "disabled" =>             // line 299
-($context["disabled"] ?? null)]], 292, $context, $this->getSourceContext());
-            // line 301
-            echo "
-
-                     ";
-            // line 303
-            echo twig_call_macro($macros["fields"], "macro_numberField", ["sink_coeff", (($__internal_compile_39 = twig_get_attribute($this->env, $this->source,             // line 305
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 305)) && is_array($__internal_compile_39) || $__internal_compile_39 instanceof ArrayAccess ? ($__internal_compile_39["sink_coeff"] ?? null) : null), __("Amortization coefficient"), ["disabled" =>             // line 307
-($context["disabled"] ?? null)]], 303, $context, $this->getSourceContext());
-            // line 308
-            echo "
-
-                     ";
-            // line 310
-            if (!twig_in_filter(twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "getType", [], "method", false, false, false, 310), twig_array_merge(twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getExcludedTypes", [], "method", false, false, false, 310), [0 => "Cartridge", 1 => "Consumable", 2 => "SoftwareLicense"]))) {
-                // line 311
+            // line 287
+            if ((($context["withtemplate"] ?? null) == 2)) {
+                // line 288
                 echo "                        ";
-                $context["ticket_tco_value"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "showTco", [0 => (($__internal_compile_40 = twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "fields", [], "any", false, false, false, 311)) && is_array($__internal_compile_40) || $__internal_compile_40 instanceof ArrayAccess ? ($__internal_compile_40["ticket_tco"] ?? null) : null), 1 => (($__internal_compile_41 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 311)) && is_array($__internal_compile_41) || $__internal_compile_41 instanceof ArrayAccess ? ($__internal_compile_41["value"] ?? null) : null)], "method", false, false, false, 311);
-                // line 312
-                echo "                        ";
-                echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["ticket_tco",                 // line 314
-($context["ticket_tco_value"] ?? null), __("TCO (value + tracking cost)"), ["disabled" =>                 // line 316
-($context["disabled"] ?? null)]], 312, $context, $this->getSourceContext());
-                // line 317
-                echo "
-
+                if (((($__internal_compile_37 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 288)) && is_array($__internal_compile_37) || $__internal_compile_37 instanceof ArrayAccess ? ($__internal_compile_37["warranty_duration"] ?? null) : null) ==  -1)) {
+                    // line 289
+                    echo "                           ";
+                    echo twig_escape_filter($this->env, __("Lifelong"), "html", null, true);
+                    echo "
                         ";
-                // line 319
-                $context["ticket_tco2_value"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "showTco", [0 => (($__internal_compile_42 = twig_get_attribute($this->env, $this->source, ($context["item"] ?? null), "fields", [], "any", false, false, false, 319)) && is_array($__internal_compile_42) || $__internal_compile_42 instanceof ArrayAccess ? ($__internal_compile_42["ticket_tco"] ?? null) : null), 1 => (($__internal_compile_43 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 319)) && is_array($__internal_compile_43) || $__internal_compile_43 instanceof ArrayAccess ? ($__internal_compile_43["value"] ?? null) : null), 2 => (($__internal_compile_44 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 319)) && is_array($__internal_compile_44) || $__internal_compile_44 instanceof ArrayAccess ? ($__internal_compile_44["buy_date"] ?? null) : null)], "method", false, false, false, 319);
-                // line 320
+                } else {
+                    // line 291
+                    echo "                           ";
+                    echo twig_escape_filter($this->env, twig_sprintf(_n("%d month", "%d months", (($__internal_compile_38 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 291)) && is_array($__internal_compile_38) || $__internal_compile_38 instanceof ArrayAccess ? ($__internal_compile_38["warranty_duration"] ?? null) : null)), (($__internal_compile_39 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 291)) && is_array($__internal_compile_39) || $__internal_compile_39 instanceof ArrayAccess ? ($__internal_compile_39["warranty_duration"] ?? null) : null)), "html", null, true);
+                    echo "
+                        ";
+                }
+                // line 293
+                echo "                     ";
+            } else {
+                // line 294
                 echo "                        ";
-                echo twig_call_macro($macros["fields"], "macro_readOnlyField", ["ticket_tco",                 // line 322
-($context["ticket_tco2_value"] ?? null), __("Monthly TCO"), ["disabled" =>                 // line 324
-($context["disabled"] ?? null)]], 320, $context, $this->getSourceContext());
-                // line 325
+                $context["warrantyexpir"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "getWarrantyExpir", [0 => (($__internal_compile_40 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 294)) && is_array($__internal_compile_40) || $__internal_compile_40 instanceof ArrayAccess ? ($__internal_compile_40["warranty_date"] ?? null) : null), 1 => (($__internal_compile_41 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 294)) && is_array($__internal_compile_41) || $__internal_compile_41 instanceof ArrayAccess ? ($__internal_compile_41["warranty_duration"] ?? null) : null), 2 => 0, 3 => true], "method", false, false, false, 294);
+                // line 295
+                echo "                        ";
+                echo twig_call_macro($macros["fields"], "macro_dropdownNumberField", ["warranty_duration", (($__internal_compile_42 = twig_get_attribute($this->env, $this->source,                 // line 297
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 297)) && is_array($__internal_compile_42) || $__internal_compile_42 instanceof ArrayAccess ? ($__internal_compile_42["warranty_duration"] ?? null) : null), __("Warranty duration"), ["min" => 0, "max" => 120, "step" => 1, "toadd" => ["-1" => __("Lifelong")], "unit" => "month", "disabled" =>                 // line 305
+($context["disabled"] ?? null), "add_field_html" => (("<span class=\"text-muted\">" . twig_sprintf(__("Valid to %s"),                 // line 306
+($context["warrantyexpir"] ?? null))) . "</span>")]], 295, $context, $this->getSourceContext());
+                // line 308
                 echo "
                      ";
             }
-            // line 327
+            // line 310
+            echo "
+                     ";
+            // line 311
+            echo twig_call_macro($macros["fields"], "macro_textField", ["warranty_info", (($__internal_compile_43 = twig_get_attribute($this->env, $this->source,             // line 313
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 313)) && is_array($__internal_compile_43) || $__internal_compile_43 instanceof ArrayAccess ? ($__internal_compile_43["warranty_info"] ?? null) : null), __("Warranty information"), ["disabled" =>             // line 315
+($context["disabled"] ?? null)]], 311, $context, $this->getSourceContext());
+            // line 316
             echo "
 
                      ";
-            // line 329
-            echo twig_call_macro($macros["fields"], "macro_dropdownField", ["BusinessCriticity", "businesscriticities_id", (($__internal_compile_45 = twig_get_attribute($this->env, $this->source,             // line 332
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 332)) && is_array($__internal_compile_45) || $__internal_compile_45 instanceof ArrayAccess ? ($__internal_compile_45["businesscriticities_id"] ?? null) : null), _n("Business criticity", "Business criticities", 1), ["disabled" =>             // line 335
-($context["disabled"] ?? null)]], 329, $context, $this->getSourceContext());
-            // line 337
+            // line 318
+            if ($this->extensions['Glpi\Application\View\Extension\ConfigExtension']->config("use_notifications")) {
+                // line 319
+                echo "                        ";
+                ob_start();
+                // line 320
+                echo "                           ";
+                $this->extensions['Glpi\Application\View\Extension\PhpExtension']->call("Alert::displayLastAlert", [0 => "Infocom", 1 => (($__internal_compile_44 = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "fields", [], "any", false, false, false, 320)) && is_array($__internal_compile_44) || $__internal_compile_44 instanceof ArrayAccess ? ($__internal_compile_44["id"] ?? null) : null)]);
+                // line 321
+                echo "                        ";
+                $context["alert_html"] = ('' === $tmp = ob_get_clean()) ? '' : new Markup($tmp, $this->env->getCharset());
+                // line 322
+                echo "
+                        ";
+                // line 323
+                $context["alert_field"] = twig_get_attribute($this->env, $this->source, ($context["infocom"] ?? null), "dropdownAlert", [0 => ["name" => "alert", "value" => (($__internal_compile_45 = twig_get_attribute($this->env, $this->source,                 // line 325
+($context["infocom"] ?? null), "fields", [], "any", false, false, false, 325)) && is_array($__internal_compile_45) || $__internal_compile_45 instanceof ArrayAccess ? ($__internal_compile_45["alert"] ?? null) : null), "display" => false, "width" => "100%", "class" => "form-select"]], "method", false, false, false, 323);
+                // line 330
+                echo "
+                        ";
+                // line 331
+                echo twig_call_macro($macros["fields"], "macro_field", ["alert",                 // line 333
+($context["alert_field"] ?? null), __("Alarms on financial and administrative information"), ["add_field_html" => (("<span class=\"text-muted\">" .                 // line 335
+($context["alert_html"] ?? null)) . "</span>")]], 331, $context, $this->getSourceContext());
+                // line 336
+                echo "
+                     ";
+            }
+            // line 338
             echo "
-
                      ";
             // line 339
-            echo twig_call_macro($macros["fields"], "macro_textareaField", ["comment", (($__internal_compile_46 = twig_get_attribute($this->env, $this->source,             // line 341
-($context["infocom"] ?? null), "fields", [], "any", false, false, false, 341)) && is_array($__internal_compile_46) || $__internal_compile_46 instanceof ArrayAccess ? ($__internal_compile_46["comment"] ?? null) : null), _n("Comment", "Comments", Session::getPluralNumber()), ["disabled" =>             // line 343
-($context["disabled"] ?? null)]], 339, $context, $this->getSourceContext());
-            // line 344
-            echo "
-
-                     
-
-                     ";
-            // line 348
             $this->extensions['Glpi\Application\View\Extension\PluginExtension']->callPluginHookFunction(twig_constant("Glpi\\Plugin\\Hooks::INFOCOM"), ($context["item"] ?? null));
-            // line 349
+            // line 340
             echo "
                      <div class=\"card-body mx-n2 mb-4  border-top\">
                         ";
-            // line 351
+            // line 342
             if (($context["can_global_update"] ?? null)) {
-                // line 352
+                // line 343
                 echo "                           <button class=\"btn btn-primary me-2\" type=\"submit\" name=\"update\">
                               <i class=\"far fa-save\"></i>
                               <span>";
-                // line 354
+                // line 345
                 echo twig_escape_filter($this->env, _x("button", "Save"), "html", null, true);
                 echo "</span>
                            </button>
                         ";
             }
-            // line 357
+            // line 348
             echo "
                         ";
-            // line 358
+            // line 349
             if (($context["can_global_purge"] ?? null)) {
-                // line 359
+                // line 350
                 echo "                           <button class=\"btn btn-outline-danger me-2\" type=\"submit\" name=\"purge\">
                               <i class=\"fas fa-trash-alt\"></i>
                               <span>";
-                // line 361
+                // line 352
                 echo twig_escape_filter($this->env, _x("button", "Delete permanently"), "html", null, true);
                 echo "</span>
                            </button>
                         ";
             }
-            // line 364
+            // line 355
             echo "                     </div>
                   </div>
                </div>
@@ -483,19 +473,19 @@ class __TwigTemplate_7e3fcc19690705bc537bd8c717f56590 extends Template
 
    ";
         }
-        // line 372
+        // line 363
         echo "
    ";
-        // line 373
+        // line 364
         if ((($context["can_edit"] ?? null) || ($context["can_create"] ?? null))) {
-            // line 374
+            // line 365
             echo "      <input type=\"hidden\" name=\"_glpi_csrf_token\" value=\"";
             echo twig_escape_filter($this->env, Session::getNewCSRFToken(), "html", null, true);
             echo "\" />
    </form>
    ";
         }
-        // line 377
+        // line 368
         echo "</div>
 ";
     }
@@ -512,7 +502,7 @@ class __TwigTemplate_7e3fcc19690705bc537bd8c717f56590 extends Template
 
     public function getDebugInfo()
     {
-        return array (  499 => 377,  492 => 374,  490 => 373,  487 => 372,  477 => 364,  471 => 361,  467 => 359,  465 => 358,  462 => 357,  456 => 354,  452 => 352,  450 => 351,  446 => 349,  444 => 348,  438 => 344,  436 => 343,  435 => 341,  434 => 339,  430 => 337,  428 => 335,  427 => 332,  426 => 329,  422 => 327,  418 => 325,  416 => 324,  415 => 322,  413 => 320,  411 => 319,  407 => 317,  405 => 316,  404 => 314,  402 => 312,  399 => 311,  397 => 310,  393 => 308,  391 => 307,  390 => 305,  389 => 303,  385 => 301,  383 => 299,  382 => 294,  381 => 292,  377 => 290,  375 => 288,  374 => 286,  371 => 285,  368 => 284,  365 => 283,  362 => 282,  359 => 281,  357 => 280,  353 => 278,  351 => 276,  349 => 274,  347 => 270,  346 => 269,  345 => 268,  344 => 267,  343 => 266,  342 => 265,  341 => 264,  336 => 261,  334 => 258,  333 => 255,  332 => 253,  328 => 251,  326 => 248,  325 => 245,  324 => 243,  320 => 241,  318 => 240,  317 => 238,  316 => 236,  312 => 234,  310 => 233,  309 => 231,  308 => 229,  304 => 227,  302 => 226,  301 => 225,  300 => 223,  299 => 221,  295 => 219,  293 => 218,  292 => 216,  291 => 214,  288 => 213,  284 => 211,  282 => 209,  281 => 207,  280 => 204,  278 => 201,  276 => 200,  272 => 198,  270 => 196,  269 => 195,  268 => 192,  267 => 189,  263 => 187,  261 => 186,  260 => 184,  259 => 182,  255 => 180,  252 => 177,  249 => 175,  245 => 173,  243 => 172,  242 => 170,  241 => 168,  238 => 167,  236 => 162,  235 => 160,  232 => 159,  229 => 158,  226 => 157,  223 => 156,  221 => 155,  217 => 153,  215 => 152,  214 => 150,  213 => 148,  210 => 147,  206 => 145,  204 => 143,  203 => 142,  202 => 134,  200 => 132,  197 => 131,  194 => 130,  188 => 128,  182 => 126,  179 => 125,  177 => 124,  173 => 122,  171 => 121,  170 => 119,  169 => 117,  165 => 115,  162 => 112,  158 => 109,  156 => 108,  155 => 106,  154 => 104,  150 => 102,  148 => 101,  147 => 99,  146 => 97,  142 => 95,  140 => 94,  139 => 92,  138 => 90,  134 => 88,  132 => 87,  131 => 85,  130 => 83,  126 => 81,  124 => 80,  123 => 78,  122 => 76,  118 => 74,  116 => 73,  115 => 71,  114 => 69,  110 => 67,  107 => 63,  99 => 57,  94 => 56,  91 => 55,  88 => 54,  85 => 53,  82 => 52,  75 => 48,  69 => 45,  65 => 44,  62 => 43,  59 => 42,  57 => 41,  54 => 40,  48 => 38,  46 => 37,  42 => 35,  40 => 34,  37 => 33,);
+        return array (  489 => 368,  482 => 365,  480 => 364,  477 => 363,  467 => 355,  461 => 352,  457 => 350,  455 => 349,  452 => 348,  446 => 345,  442 => 343,  440 => 342,  436 => 340,  434 => 339,  431 => 338,  427 => 336,  425 => 335,  424 => 333,  423 => 331,  420 => 330,  418 => 325,  417 => 323,  414 => 322,  411 => 321,  408 => 320,  405 => 319,  403 => 318,  399 => 316,  397 => 315,  396 => 313,  395 => 311,  392 => 310,  388 => 308,  386 => 306,  385 => 305,  384 => 297,  382 => 295,  379 => 294,  376 => 293,  370 => 291,  364 => 289,  361 => 288,  359 => 287,  355 => 285,  353 => 284,  352 => 282,  351 => 280,  347 => 278,  344 => 275,  340 => 272,  338 => 271,  337 => 269,  336 => 267,  332 => 265,  330 => 263,  329 => 260,  328 => 257,  324 => 255,  320 => 253,  318 => 252,  317 => 250,  315 => 248,  313 => 247,  309 => 245,  307 => 244,  306 => 242,  304 => 240,  301 => 239,  299 => 238,  295 => 236,  293 => 235,  292 => 233,  291 => 231,  287 => 229,  285 => 227,  284 => 222,  283 => 220,  279 => 218,  277 => 216,  276 => 214,  273 => 213,  270 => 212,  267 => 211,  264 => 210,  261 => 209,  259 => 208,  255 => 206,  253 => 204,  251 => 202,  249 => 198,  248 => 197,  247 => 196,  246 => 195,  245 => 194,  244 => 193,  243 => 192,  238 => 189,  236 => 186,  235 => 183,  234 => 181,  230 => 179,  228 => 176,  227 => 173,  226 => 171,  222 => 169,  220 => 168,  219 => 166,  218 => 164,  214 => 162,  212 => 161,  211 => 159,  210 => 157,  206 => 155,  204 => 154,  203 => 153,  202 => 151,  201 => 149,  197 => 147,  195 => 146,  194 => 144,  193 => 142,  190 => 141,  186 => 139,  184 => 137,  183 => 135,  182 => 132,  180 => 129,  178 => 128,  174 => 126,  172 => 124,  171 => 123,  170 => 120,  169 => 117,  165 => 115,  162 => 112,  158 => 109,  156 => 108,  155 => 106,  154 => 104,  150 => 102,  148 => 101,  147 => 99,  146 => 97,  142 => 95,  140 => 94,  139 => 92,  138 => 90,  134 => 88,  132 => 87,  131 => 85,  130 => 83,  126 => 81,  124 => 80,  123 => 78,  122 => 76,  118 => 74,  116 => 73,  115 => 71,  114 => 69,  110 => 67,  107 => 63,  99 => 57,  94 => 56,  91 => 55,  88 => 54,  85 => 53,  82 => 52,  75 => 48,  69 => 45,  65 => 44,  62 => 43,  59 => 42,  57 => 41,  54 => 40,  48 => 38,  46 => 37,  42 => 35,  40 => 34,  37 => 33,);
     }
 
     public function getSourceContext()
@@ -627,84 +617,12 @@ class __TwigTemplate_7e3fcc19690705bc537bd8c717f56590 extends Template
                         {'disabled': disabled}
                      ) }}
 
-                     {# ## WARRANTY PART ## #}
-                     {{ fields.largeTitle(
-                        __('Warranty information'),
-                        'fas fa-file-contract'
-                     ) }}
-
-                     {{ fields.dateField(
-                        'warranty_date',
-                        infocom.fields['warranty_date'],
-                        __('Start date of warranty'),
-                        {'disabled': disabled}
-                     ) }}
-
-                     {% if withtemplate == 2 %}
-                        {% if infocom.fields['warranty_duration'] == -1 %}
-                           {{ __('Lifelong') }}
-                        {% else %}
-                           {{ _n('%d month', '%d months', infocom.fields['warranty_duration'])|format(infocom.fields['warranty_duration']) }}
-                        {% endif %}
-                     {% else %}
-                        {% set warrantyexpir = infocom.getWarrantyExpir(infocom.fields['warranty_date'], infocom.fields['warranty_duration'], 0, true) %}
-                        {{ fields.dropdownNumberField(
-                           'warranty_duration',
-                           infocom.fields['warranty_duration'],
-                           __('Warranty duration'),
-                           {
-                              'min'            : 0,
-                              'max'            : 120,
-                              'step'           : 1,
-                              'toadd'          : {'-1': __('Lifelong')},
-                              'unit'           : 'month',
-                              'disabled'       : disabled,
-                              'add_field_html' : '<span class=\"text-muted\">' ~ __('Valid to %s')|format(warrantyexpir) ~ '</span>'
-                           }
-                        ) }}
-                     {% endif %}
-
-                     {{ fields.textField(
-                        'warranty_info',
-                        infocom.fields['warranty_info'],
-                        __('Warranty information'),
-                        {'disabled': disabled}
-                     ) }}
-
-                     {% if config('use_notifications') %}
-                        {% set alert_html %}
-                           {% do call('Alert::displayLastAlert', ['Infocom', infocom.fields['id']]) %}
-                        {% endset %}
-
-                        {% set alert_field = infocom.dropdownAlert({
-                              'name'   : 'alert',
-                              'value'  : infocom.fields['alert'],
-                              'display': false,
-                              'width'  : '100%',
-                              'class'  : 'form-select'
-                           }) %}
-
-                        {{ fields.field(
-                           'alert',
-                           alert_field,
-                           __('Alarms on financial and administrative information'),
-                           {'add_field_html': '<span class=\"text-muted\">' ~ alert_html ~ '</span>'}
-                        ) }}
-                     {% endif %}
-                     
                      {# ## FINANCIAL PART ## #}
                      {{ fields.largeTitle(
                         __('Financial and administrative information'),
                         'fas fa-coins'
                      ) }}
 
-                     {{ fields.textField(
-                        'casefile',
-                        infocom.fields['casefile'],
-                        __('Case file'),
-                        {'disabled': disabled}
-                     ) }}
-                     
                      {{ fields.dropdownField(
                         'Supplier',
                         'suppliers_id',
@@ -862,7 +780,70 @@ class __TwigTemplate_7e3fcc19690705bc537bd8c717f56590 extends Template
                         {'disabled': disabled}
                      ) }}
 
-                     
+                     {# ## WARRANTY PART ## #}
+                     {{ fields.largeTitle(
+                        __('Warranty information'),
+                        'fas fa-file-contract'
+                     ) }}
+
+                     {{ fields.dateField(
+                        'warranty_date',
+                        infocom.fields['warranty_date'],
+                        __('Start date of warranty'),
+                        {'disabled': disabled}
+                     ) }}
+
+                     {% if withtemplate == 2 %}
+                        {% if infocom.fields['warranty_duration'] == -1 %}
+                           {{ __('Lifelong') }}
+                        {% else %}
+                           {{ _n('%d month', '%d months', infocom.fields['warranty_duration'])|format(infocom.fields['warranty_duration']) }}
+                        {% endif %}
+                     {% else %}
+                        {% set warrantyexpir = infocom.getWarrantyExpir(infocom.fields['warranty_date'], infocom.fields['warranty_duration'], 0, true) %}
+                        {{ fields.dropdownNumberField(
+                           'warranty_duration',
+                           infocom.fields['warranty_duration'],
+                           __('Warranty duration'),
+                           {
+                              'min'            : 0,
+                              'max'            : 120,
+                              'step'           : 1,
+                              'toadd'          : {'-1': __('Lifelong')},
+                              'unit'           : 'month',
+                              'disabled'       : disabled,
+                              'add_field_html' : '<span class=\"text-muted\">' ~ __('Valid to %s')|format(warrantyexpir) ~ '</span>'
+                           }
+                        ) }}
+                     {% endif %}
+
+                     {{ fields.textField(
+                        'warranty_info',
+                        infocom.fields['warranty_info'],
+                        __('Warranty information'),
+                        {'disabled': disabled}
+                     ) }}
+
+                     {% if config('use_notifications') %}
+                        {% set alert_html %}
+                           {% do call('Alert::displayLastAlert', ['Infocom', infocom.fields['id']]) %}
+                        {% endset %}
+
+                        {% set alert_field = infocom.dropdownAlert({
+                              'name'   : 'alert',
+                              'value'  : infocom.fields['alert'],
+                              'display': false,
+                              'width'  : '100%',
+                              'class'  : 'form-select'
+                           }) %}
+
+                        {{ fields.field(
+                           'alert',
+                           alert_field,
+                           __('Alarms on financial and administrative information'),
+                           {'add_field_html': '<span class=\"text-muted\">' ~ alert_html ~ '</span>'}
+                        ) }}
+                     {% endif %}
 
                      {% do call_plugin_hook_func(constant('Glpi\\\\Plugin\\\\Hooks::INFOCOM'), item) %}
 

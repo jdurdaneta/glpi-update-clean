@@ -1,29 +1,29 @@
-1731400315
+1731407548
 ed57ee96507e2fac4b905066fd313f2640f16d81
-a:1:{s:53:"bn_count_Printer_517684b0-b064-49dd-943e-fcb6f915e453";s:1167:"      <style>
-         #bn_651822557 {
+a:1:{s:53:"bn_count_Printer_517684b0-b064-49dd-943e-fcb6f915e453";s:1172:"      <style>
+         #bn_1779897052 {
             background-color: #365a8f;
             color: #b0c4e1;
          }
 
-         #bn_651822557:hover {
+         #bn_1779897052:hover {
             background-color: #537fbe;
             border: 1px solid #8ba8d3;
          }
 
-         .theme-dark #bn_651822557 {
+         .theme-dark #bn_1779897052 {
             background-color: #b0c4e1;
             color: #365a8f;
          }
 
-         .theme-dark #bn_651822557:hover {
+         .theme-dark #bn_1779897052:hover {
             background-color: #537fbe;
             color: #b0c4e1;
             border: 1px solid #8ba8d3;
          }
       </style>
       <a href='/glpi_7_new/front/printer.php?reset=reset'
-         id="bn_651822557"
+         id="bn_1779897052"
          class="card big-number  filter-dates filter-dates_mod filter-location filter-manufacturer filter-group_tech filter-user_tech filter-state"
          title="">
          <span class="content">            <span title="1083"

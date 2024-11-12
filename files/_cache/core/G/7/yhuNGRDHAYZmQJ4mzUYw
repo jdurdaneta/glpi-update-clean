@@ -1,29 +1,29 @@
-1731400317
+1731407550
 5c673e4566f29487cf0cae9ecca7b2cf5b2b0372
-a:1:{s:60:"bn_count_tickets_closed_f6045274-e487-4ab5-aa22-a43be88d8cda";s:1296:"      <style>
-         #bn_1716848148 {
+a:1:{s:60:"bn_count_tickets_closed_f6045274-e487-4ab5-aa22-a43be88d8cda";s:1291:"      <style>
+         #bn_931182650 {
             background-color: #515151;
             color: #b7b7b7;
          }
 
-         #bn_1716848148:hover {
+         #bn_931182650:hover {
             background-color: #777777;
             border: 1px solid #9e9e9e;
          }
 
-         .theme-dark #bn_1716848148 {
+         .theme-dark #bn_931182650 {
             background-color: #b7b7b7;
             color: #515151;
          }
 
-         .theme-dark #bn_1716848148:hover {
+         .theme-dark #bn_931182650:hover {
             background-color: #777777;
             color: #b7b7b7;
             border: 1px solid #9e9e9e;
          }
       </style>
       <a href='/glpi_7_new/front/ticket.php?criteria%5B0%5D%5Bfield%5D=12&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=6&reset=reset'
-         id="bn_1716848148"
+         id="bn_931182650"
          class="card big-number  filter-dates filter-dates_mod filter-itilcategory filter-group_tech filter-user_tech filter-requesttype filter-location"
          title="">
          <span class="content">            <span title="26778"

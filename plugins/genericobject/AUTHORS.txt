@@ -1,9 +1,0 @@
-Plugin Genericobject developers :
-
-Walid Nouh, Teclib'
-Alexandre Delaunay, Teclib' 
-
-Occasional contributors :
-François Legastelois, Teclib'
-Jean-Max Reymond, CSK Solutions
-Xavier Caillaud, Infotel

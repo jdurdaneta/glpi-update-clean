@@ -203,9 +203,9 @@ abstract class CommonDCModelDropdown extends CommonDropdown
             case 'picture_rear':
                 if (isset($options['html']) && $options['html']) {
                     return Html::image(Toolbox::getPictureUrl($values[$field]), [
-                        //'alt'   => $options['searchopt']['name'], //Comentado por INTEF
-                        'style' => 'width: 50%;', //Modificado por INTEF original height:30px
-                    ]); 
+                        'alt'   => $options['searchopt']['name'],
+                        'style' => 'height: 30px;',
+                    ]);
                 }
         }
 
