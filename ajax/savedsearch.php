@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -92,7 +92,7 @@ if ($action == 'display_mine') {
 }
 
 if ($action == 'reorder') {
-    $savedsearch->saveOrder($_GET['ids']);
+    $savedsearch->saveOrder($_POST['ids']);
     header("Content-Type: application/json; charset=UTF-8");
     echo json_encode(['res' => true]);
 }

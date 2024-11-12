@@ -5,7 +5,7 @@
  #
  # http://glpi-project.org
  #
- # @copyright 2015-2023 Teclib' and contributors.
+ # @copyright 2015-2024 Teclib' and contributors.
  # @copyright 2003-2014 by the INDEPNET Development Team.
  # @licence   https://www.gnu.org/licenses/gpl-3.0.html
  #
@@ -374,7 +374,7 @@
                            'User',
                            'users_id_tech',
                            item.fields['users_id_tech'],
-                           __('Technician in charge of the hardware'),
+                           __('Technician in charge'),
                            field_options|merge({
                               'entity': item.fields['entities_id'],
                               'right': 'own_ticket',
@@ -397,7 +397,7 @@
                            'Group',
                            'groups_id_tech',
                            item.fields['groups_id_tech'],
-                           __('Group in charge of the hardware'),
+                           __('Group in charge'),
                            field_options|merge({
                               'entity': item.fields['entities_id'],
                               'condition': {'is_assign': 1},
@@ -435,7 +435,6 @@
                            field_options
                         ) }}
                      {% endif %}
-                                          
 
                      {% if item_type != 'SoftwareLicense' and item.isField('contact') %}
                         {# TODO Drop unused 'contact' field in Software License schema? #}
@@ -575,7 +574,7 @@
                             field_options
                         ) }}
                      {% endif %}
-                     
+
                      {% if item.isField('comment') %}
                         {{ fields.textareaField(
                            'comment',

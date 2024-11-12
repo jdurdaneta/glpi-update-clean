@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -72,8 +72,11 @@ class Item_Disk extends CommonDBChild
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
 
-       // can exists for template
-        if ($item::canView()) {
+        // can exists for template
+        if (
+            ($item instanceof CommonDBTM)
+            && $item::canView()
+        ) {
             $nb = 0;
             if ($_SESSION['glpishow_count_on_tabs']) {
                 $nb = countElementsInTable(
@@ -124,7 +127,7 @@ class Item_Disk extends CommonDBChild
      *     - itemtype type of the item for add process
      *     - items_id ID of the item for add process
      *
-     * @return true if displayed  false if item not found or not right to display
+     * @return boolean true if displayed  false if item not found or not right to display
      **/
     public function showForm($ID, array $options = [])
     {
@@ -175,6 +178,7 @@ class Item_Disk extends CommonDBChild
      */
     public static function getFromItem(CommonDBTM $item, $sort = null, $order = null): DBmysqlIterator
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([
@@ -203,12 +207,13 @@ class Item_Disk extends CommonDBChild
      * Print the disks
      *
      * @param CommonDBTM $item          Item object
-     * @param boolean    $withtemplate  Template or basic item (default 0)
+     * @param integer    $withtemplate  Template or basic item (default 0)
      *
      * @return void
      **/
     public static function showForItem(CommonDBTM $item, $withtemplate = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ID = $item->fields['id'];

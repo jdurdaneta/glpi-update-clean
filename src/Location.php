@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -387,6 +387,7 @@ class Location extends CommonTreeDropdown
     {
 
         if ($item->getType() == __CLASS__) {
+            /** @var Location $item */
             switch ($tabnum) {
                 case 1:
                     $item->showChildren();
@@ -409,7 +410,11 @@ class Location extends CommonTreeDropdown
      **/
     public function showItems()
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $locations_id = $this->fields['id'];
         $current_itemtype     = Session::getSavedOption(__CLASS__, 'criterion', '');

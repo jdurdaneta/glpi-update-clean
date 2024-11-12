@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -60,7 +60,7 @@ class PrinterLog extends CommonDBChild
     /**
      * Get the tab name used for item
      *
-     * @param object $item the item object
+     * @param CommonGLPI $item the item object
      * @param integer $withtemplate 1 if is a template form
      * @return string|array name of the tab
      */
@@ -69,7 +69,7 @@ class PrinterLog extends CommonDBChild
 
         $array_ret = [];
 
-        if ($item->getType() == 'Printer') {
+        if ($item instanceof Printer) {
             $cnt = countElementsInTable([static::getTable()], [static::$items_id => $item->getField('id')]);
             $array_ret[] = self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $cnt);
         }
@@ -80,14 +80,14 @@ class PrinterLog extends CommonDBChild
     /**
      * Display the content of the tab
      *
-     * @param object $item
+     * @param CommonGLPI $item
      * @param integer $tabnum number of the tab to display
      * @param integer $withtemplate 1 if is a template form
      * @return boolean
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item->getType() == Printer::getType() && $item->getID() > 0) {
+        if (get_class($item) == Printer::class && $item->getID() > 0) {
             $printerlog = new self();
             $printerlog->showMetrics($item);
             return true;
@@ -105,6 +105,7 @@ class PrinterLog extends CommonDBChild
      */
     public function getMetrics(Printer $printer, $user_filters = []): array
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $bdate = new DateTime();
@@ -179,15 +180,22 @@ class PrinterLog extends CommonDBChild
             $labels[] = $fmt->format($date);
             unset($metrics['id'], $metrics['date'], $metrics['printers_id']);
 
+            // Keep values if at least 1 label is greater than 0
+            $valuesum = array_sum($metrics);
             foreach ($metrics as $key => $value) {
                 $label = $this->getLabelFor($key);
-                if ($label && $value > 0) {
+                if ($label && $valuesum > 0) {
                     $series[$key]['name'] = $label;
                     $series[$key]['data'][] = $value;
                 }
             }
         }
-
+        // If the metric has a value of 0 for all dates, remove it from the data set
+        foreach ($series as $key => $value) {
+            if (array_sum($value['data']) == 0) {
+                unset($series[$key]);
+            }
+        }
         $bar_conf = [
             'data'  => [
                 'labels' => $labels,

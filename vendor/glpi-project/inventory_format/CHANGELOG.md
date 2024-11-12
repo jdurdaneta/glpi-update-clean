@@ -3,6 +3,33 @@
 The present file will list all changes made to the project; according to the
 [Keep a Changelog](http://keepachangelog.com/) project.
 
+## [1.1.36] - 2024-11-05
+
+Support ofr IPs and Operating System in virtual machines
+
+## [1.1.35] - 2024-09-11
+
+Capacity to add new itemtypes on schema
+
+## [1.1.34] - 2024-02-08
+
+Fix network equipments memory conversion
+
+## [1.1.33] - 2024-02-06
+
+Handle units with memories
+
+## [1.1.32] - 2024-01-23
+
+Drive keyword for SNMP devices
+
+## [1.1.31] - 2023-09-08
+No longer required description property on slots
+Fix battery power conversion issues
+Some clarification in examples and descriptions in schema
+Add susbscriber_id property on simacrd for smartphones inventory
+Handle old ERROR node from netinventory
+
 ## [1.1.30] - 2023-03-30
 Several fixes
 

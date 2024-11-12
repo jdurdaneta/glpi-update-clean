@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -231,7 +231,7 @@ class AppliancesPluginToCoreCommand extends AbstractCommand
         ];
 
         foreach ($core_tables as $table) {
-            $result = $this->db->query('TRUNCATE ' . $this->db->quoteName($table));
+            $result = $this->db->doQuery('TRUNCATE ' . $this->db->quoteName($table));
 
             if (!$result) {
                 throw new \Symfony\Component\Console\Exception\RuntimeException(
@@ -259,6 +259,7 @@ class AppliancesPluginToCoreCommand extends AbstractCommand
      */
     private function migratePlugin(): bool
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
        //prevent infocom creation from general setup
@@ -289,7 +290,7 @@ class AppliancesPluginToCoreCommand extends AbstractCommand
         );
 
         $table  = Profile::getTable();
-        $result = $this->db->query(
+        $result = $this->db->doQuery(
             sprintf(
                 "UPDATE %s SET helpdesk_item_type = REPLACE(helpdesk_item_type, '%s', '%s')",
                 $this->db->quoteName($table),
@@ -714,7 +715,7 @@ class AppliancesPluginToCoreCommand extends AbstractCommand
      *
      * @return void
      */
-    private function outputImportError($message, ProgressBar $progress_bar = null)
+    private function outputImportError($message, ?ProgressBar $progress_bar = null)
     {
 
         $skip_errors = $this->input->getOption('skip-errors');

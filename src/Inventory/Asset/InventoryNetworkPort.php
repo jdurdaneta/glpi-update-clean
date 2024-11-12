@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
@@ -136,6 +136,7 @@ trait InventoryNetworkPort
      */
     private function cleanUnmanageds()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $networkport = new NetworkPort();
@@ -188,6 +189,7 @@ trait InventoryNetworkPort
      */
     private function handleIpNetworks()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ipnetwork = new IPNetwork();
@@ -238,7 +240,8 @@ trait InventoryNetworkPort
                      'name'         => sprintf('%s/%s - %s', $port->subnet, $port->netmask, $port->gateway),
                      'network'      => sprintf('%s/%s', $port->subnet, $port->netmask),
                      'gateway'      => $port->gateway,
-                     'entities_id'  => $this->entities_id
+                     'entities_id'  => $this->entities_id,
+                     '_no_message'  => true //to prevent 'Network already defined in visible entities' message on add
                  ];
                  $ipnetwork->add(Sanitizer::sanitize($input));
             }
@@ -336,12 +339,13 @@ trait InventoryNetworkPort
      */
     private function handleUpdates()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $db_ports = [];
         $networkport = new NetworkPort();
 
-        $np_dyn_props = ['logical_number', 'ifstatus', 'ifinternalstatus'];
+        $np_dyn_props = ['logical_number', 'ifstatus', 'ifinternalstatus', 'ifalias'];
         $iterator = $DB->request([
             'SELECT' => array_merge(['id', 'name', 'mac', 'instantiation_type'], $np_dyn_props),
             'FROM'   => 'glpi_networkports',
@@ -455,6 +459,9 @@ trait InventoryNetworkPort
                     } else {
                         if (!empty($datadb['name'])) {
                             $netname = \Toolbox::slugify($datadb['name']);
+                            if (!\FQDNLabel::checkFQDNLabel($netname)) {
+                                $netname = null;
+                            }
                         } else {
                             $netname = null;
                         }
@@ -487,7 +494,7 @@ trait InventoryNetworkPort
                         }
                     }
 
-                    if (!$this->isMainPartial() && count($db_addresses) && count($ips)) {
+                    if (count($db_addresses) && count($ips)) {
                         $ipaddress = new IPAddress();
                         //deleted IP addresses
                         foreach (array_keys($db_addresses) as $id_ipa) {
@@ -514,7 +521,7 @@ trait InventoryNetworkPort
         }
 
         //delete remaining network ports, if any
-        if (!$this->isMainPartial() && count($db_ports)) {
+        if (count($db_ports)) {
             foreach ($db_ports as $netpid => $netpdata) {
                 if ($netpdata['name'] != 'management') { //prevent removing internal management port
                     $networkport->delete(['id' => $netpid], true);
@@ -540,6 +547,7 @@ trait InventoryNetworkPort
      */
     private function handleInstantiation($type, $data, $ports_id, $load)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (!in_array($type, ['NetworkPortEthernet', 'NetworkPortFiberchannel'])) {
@@ -619,6 +627,9 @@ trait InventoryNetworkPort
             if (count(($port->ipaddress ?? []))) {
                 if (property_exists($port, 'name')) {
                     $netname = \Toolbox::slugify($port->name);
+                    if (!\FQDNLabel::checkFQDNLabel($netname)) {
+                        $netname = null;
+                    }
                 } else {
                     $netname = null;
                 }

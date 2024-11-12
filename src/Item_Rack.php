@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -52,26 +52,25 @@ class Item_Rack extends CommonDBRelation
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $nb = 0;
-        switch ($item->getType()) {
-            default:
-                if ($_SESSION['glpishow_count_on_tabs']) {
-                    $nb = countElementsInTable(
-                        self::getTable(),
-                        ['racks_id'  => $item->getID()]
-                    );
-                    $nb += countElementsInTable(
-                        PDU_Rack::getTable(),
-                        ['racks_id'  => $item->getID()]
-                    );
-                }
-                return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
+        if (
+            $_SESSION['glpishow_count_on_tabs']
+            && ($item instanceof CommonDBTM)
+        ) {
+            $nb = countElementsInTable(
+                self::getTable(),
+                ['racks_id'  => $item->getID()]
+            );
+            $nb += countElementsInTable(
+                PDU_Rack::getTable(),
+                ['racks_id'  => $item->getID()]
+            );
         }
-        return '';
+        return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        self::showItems($item, $withtemplate);
+        self::showItems($item);
         return true;
     }
 
@@ -85,6 +84,39 @@ class Item_Rack extends CommonDBRelation
         return $forbidden;
     }
 
+    public static function processMassiveActionsForOneItemtype(
+        MassiveAction $ma,
+        CommonDBTM $item,
+        array $ids
+    ) {
+        switch ($ma->getAction()) {
+            case 'delete':
+                $input = $ma->getInput();
+                $item_rack = new Item_Rack();
+                foreach ($ids as $id) {
+                    if ($item->can($id, UPDATE, $input)) {
+                        $relation_criteria = [
+                            'itemtype' => $item->getType(),
+                            'items_id' => $item->getID()
+                        ];
+                        if (countElementsInTable(Item_Rack::getTable(), $relation_criteria) > 0) {
+                            if ($item_rack->deleteByCriteria($relation_criteria)) {
+                                $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                            } else {
+                                $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                                $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
+                            }
+                        }
+                    } else {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                        $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
+                    }
+                }
+                return;
+        }
+        parent::processMassiveActionsForOneItemtype($ma, $item, $ids);
+    }
+
     /**
      * Print racks items
      * @param  Rack   $rack the current rack instance
@@ -92,7 +124,11 @@ class Item_Rack extends CommonDBRelation
      */
     public static function showItems(Rack $rack)
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $ID = $rack->getID();
         $rand = mt_rand();
@@ -411,6 +447,7 @@ JAVASCRIPT;
      */
     public static function showStats(Rack $rack)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $items = $DB->request([
@@ -500,7 +537,11 @@ JAVASCRIPT;
 
     public function showForm($ID, array $options = [])
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $colspan = 4;
 
@@ -531,6 +572,7 @@ JAVASCRIPT;
         } else {
             $types = array_combine($CFG_GLPI['rackable_types'], $CFG_GLPI['rackable_types']);
             foreach ($types as $type => &$text) {
+                /** @var class-string $type */
                 $text = $type::getTypeName(1);
             }
             Dropdown::showFromArray(
@@ -547,28 +589,23 @@ JAVASCRIPT;
        //get all used items
         $used = $used_reserved = [];
         $iterator = $DB->request([
-            'FROM' => $this->getTable()
+            'SELECT' => ['itemtype', 'items_id', 'is_reserved'],
+            'FROM' => static::getTable()
         ]);
         foreach ($iterator as $row) {
+            if ($row['is_reserved']) {
+                $used_reserved[$row['itemtype']][] = $row['items_id'];
+            }
             $used[$row['itemtype']][] = $row['items_id'];
         }
-       // find used pdu (not racked)
-        foreach (PDU_Rack::getUsed() as $used_pdu) {
+        // find used pdu (not racked)
+        foreach (PDU_Rack::getUsed(['pdus_id']) as $used_pdu) {
             $used['PDU'][] = $used_pdu['pdus_id'];
-        }
-       // get all reserved items
-        $iterator = $DB->request([
-            'FROM'  => $this->getTable(),
-            'WHERE' => [
-                'is_reserved' => true
-            ]
-        ]);
-        foreach ($iterator as $row) {
-            $used_reserved[$row['itemtype']][] = $row['items_id'];
         }
 
        //items part of an enclosure should not be listed
         $iterator = $DB->request([
+            'SELECT' => ['itemtype', 'items_id'],
             'FROM'   => Item_Enclosure::getTable()
         ]);
         foreach ($iterator as $row) {
@@ -857,7 +894,7 @@ JAVASCRIPT;
          </div>";
         }
 
-        return false;
+        return '';
     }
 
 
@@ -904,7 +941,7 @@ JAVASCRIPT;
      *
      * @param array $input Input data
      *
-     * @return array
+     * @return false|array
      */
     private function prepareInput($input)
     {
@@ -1001,6 +1038,10 @@ JAVASCRIPT;
                 }
             }
 
+            /**
+             * @var int $position
+             * @var int $required_units
+             */
             if (
                 $position > $rack->fields['number_units'] ||
                 $position + $required_units  > $rack->fields['number_units'] + 1

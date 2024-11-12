@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
@@ -65,7 +65,7 @@ class RuleMatchedLog extends CommonDBTM
     /**
      * Count number of elements
      *
-     * @param object $item
+     * @param CommonDBTM $item
      *
      * @return integer
      */
@@ -84,7 +84,7 @@ class RuleMatchedLog extends CommonDBTM
     /**
      * Get the tab name used for item
      *
-     * @param object $item the item object
+     * @param CommonGLPI $item the item object
      * @param integer $withtemplate 1 if is a template form
      * @return string|array name of the tab
      */
@@ -100,10 +100,12 @@ class RuleMatchedLog extends CommonDBTM
 
             switch ($item->getType()) {
                 case 'Agent':
+                    /** @var Agent $item */
                     $array_ret[0] = self::createTabEntry(__('Import information'));
                     break;
 
                 case 'Unmanaged':
+                    /** @var Unmanaged $item */
                     $cnt = self::countForItem($item);
                     $array_ret[1] = self::createTabEntry(__('Import information'), $cnt);
                     break;
@@ -114,6 +116,7 @@ class RuleMatchedLog extends CommonDBTM
                 case 'Peripheral':
                 case 'Phone':
                 case 'Printer':
+                    /** @var Computer|Monitor|NetworkEquipment|Peripheral|Phone|Printer $item */
                     $continue = $item->isDynamic();
                     break;
                 default:
@@ -130,27 +133,21 @@ class RuleMatchedLog extends CommonDBTM
     }
 
 
-    /**
-     * Display the content of the tab
-     *
-     * @param object $item
-     * @param integer $tabnum number of the tab to display
-     * @param integer $withtemplate 1 if is a template form
-     * @return boolean
-     */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
-        $rulematched = new self();
-        if ($tabnum == '0') {
-            if ($item->getID() > 0) {
-                $rulematched->showFormAgent($item->getID());
-                return true;
-            }
-        } else if ($tabnum == '1') {
-            if ($item->getID() > 0) {
-                $rulematched->showItemForm($item->getID(), $item->getType());
-                return true;
+        if ($item instanceof CommonDBTM) {
+            $rulematched = new self();
+            if ($tabnum == '0') {
+                if ($item->getID() > 0) {
+                    $rulematched->showFormAgent($item->getID());
+                    return true;
+                }
+            } else if ($tabnum == '1') {
+                if ($item->getID() > 0) {
+                    $rulematched->showItemForm($item->getID(), $item->getType());
+                    return true;
+                }
             }
         }
         return false;
@@ -166,6 +163,7 @@ class RuleMatchedLog extends CommonDBTM
      */
     public function cleanOlddata($items_id, $itemtype)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([
@@ -194,6 +192,7 @@ class RuleMatchedLog extends CommonDBTM
      */
     public function showItemForm($items_id, $itemtype)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $rule    = new RuleImportAsset();

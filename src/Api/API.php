@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -137,13 +137,11 @@ abstract class API
     /**
      * Constructor
      *
-     * @var array $CFG_GLPI
-     * @var DBmysql $DB
-     *
      * @return void
      */
     public function initApi()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
        // Load GLPI configuration
@@ -250,6 +248,7 @@ abstract class API
      */
     protected function initSession($params = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $this->checkAppToken();
@@ -579,6 +578,10 @@ abstract class API
      */
     protected function getItem($itemtype, $id, $params = [])
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
         global $CFG_GLPI, $DB;
 
         $itemtype = $this->handleDepreciation($itemtype);
@@ -1080,6 +1083,7 @@ abstract class API
      */
     protected function getItems($itemtype, $params = [], &$totalcount = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $itemtype = $this->handleDepreciation($itemtype);
@@ -1111,7 +1115,7 @@ abstract class API
         if (preg_match("/^[0-9]+-[0-9]+\$/", $params['range'])) {
             $range = explode("-", $params['range']);
             $params['start']      = $range[0];
-            $params['list_limit'] = $range[1] - $range[0] + 1;
+            $params['list_limit'] = (int)$range[1] - (int)$range[0] + 1;
             $params['range']      = $range;
         } else {
             $this->returnError("range must be in format : [start-end] with integers");
@@ -1208,8 +1212,19 @@ abstract class API
                 }
             }
 
-           // make text search
-            foreach ($params['searchText'] as $filter_field => $filter_value) {
+            // ensure search feature is not used to enumerate sensitive fields value
+            $search_values = $params['searchText'];
+            $item::unsetUndisclosedFields($search_values);
+
+            // make text search
+            foreach ($search_values as $filter_field => $filter_value) {
+                if (!$DB->fieldExists($table, $filter_field)) {
+                    $this->returnError(
+                        sprintf(__('Field %s is not valid for %s item.'), $filter_field, $item->getType()),
+                        400,
+                        "ERROR_FIELD_NOT_FOUND"
+                    );
+                }
                 if (!empty($filter_value)) {
                     $search_value = Search::makeTextSearch($DB->escape($filter_value));
                     $where .= " AND (" . $DB->quoteName("$table.$filter_field") . " $search_value)";
@@ -1244,14 +1259,14 @@ abstract class API
        // Check if we need to add raw names later on
         $add_keys_names = count($params['add_keys_names']) > 0;
 
-       // build query
+        // build query
         $query = "SELECT DISTINCT " . $DB->quoteName("$table.id") . ",  " . $DB->quoteName("$table.*") . "
                 FROM " . $DB->quoteName($table) . "
                 $join
                 WHERE $where
                 ORDER BY " . $DB->quoteName($params['sort']) . " " . $params['order'] . "
                 LIMIT " . (int)$params['start'] . ", " . (int)$params['list_limit'];
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             while ($data = $DB->fetchAssoc($result)) {
                 if ($add_keys_names) {
                     // Insert raw names into the data row
@@ -1268,11 +1283,21 @@ abstract class API
 
                 $found[] = $data;
             }
+        } else {
+            $message = __('An error occurred during the items search.');
+            if ($_SESSION['glpi_use_mode'] === \Session::DEBUG_MODE) {
+                $message .= " " . __('For more information, check the GLPI logs.');
+            }
+            $this->returnError(
+                $message,
+                500,
+                "ERROR_UNKNOWN",
+            );
         }
 
        // get result full row counts
         $count_query = "SELECT COUNT(*) FROM {$DB->quoteName($table)} $join WHERE $where";
-        $totalcount = $DB->query($count_query)->fetch_row()[0];
+        $totalcount = $DB->doQuery($count_query)->fetch_row()[0];
 
         if ($params['range'][0] > $totalcount) {
             $this->returnError(
@@ -1429,6 +1454,9 @@ abstract class API
                     $option
                 );
             } else {
+                if (is_string($option)) {
+                    $option = ['name' => $option];
+                }
                 $cleaned_soptions[$sID] = $option;
             }
         }
@@ -1552,6 +1580,7 @@ abstract class API
      */
     protected function searchItems($itemtype, $params = [])
     {
+        /** @var array $DEBUG_SQL */
         global $DEBUG_SQL;
 
         $itemtype = $this->handleDepreciation($itemtype);
@@ -1643,7 +1672,7 @@ abstract class API
             if (preg_match("/^[0-9]+-[0-9]+\$/", $params['range'])) {
                 $range = explode("-", $params['range']);
                 $params['start']      = $range[0];
-                $params['list_limit'] = $range[1] - $range[0] + 1;
+                $params['list_limit'] = (int)$range[1] - (int)$range[0] + 1;
                 $params['range']      = $range;
             } else {
                 $this->returnError("range must be in format : [start-end] with integers");
@@ -1710,12 +1739,6 @@ abstract class API
             $raw = $row['raw'];
             $id = $raw['id'];
 
-           // keep row itemtype for all asset
-            if ($itemtype == AllAssets::getType()) {
-                $current_id       = $raw['id'];
-                $current_itemtype = $raw['TYPE'];
-            }
-
            // retrive value (and manage multiple values)
             $clean_values = [];
             foreach ($rawdata['data']['cols'] as $col) {
@@ -1730,6 +1753,25 @@ abstract class API
                     $current_values = $current_values[0];
                 }
 
+                // Undisclose sensitive fields
+                // Pass any additional field listed by the corresponding search option
+                $col_ref_table    = $col['searchopt']['table'] ?? '';
+                $col_ref_field    = $col['searchopt']['field'] ?? '';
+                $col_ref_itemtype = $col_ref_table !== '' && $col_ref_field !== ''
+                    ? \getItemTypeForTable($col['searchopt']['table'] ?? '')
+                    : null;
+                if ($col_ref_itemtype !== null && \is_a($col_ref_itemtype, CommonDBTM::class, true)) {
+                    $tmp_fields = [$col_ref_field => $current_values];
+                    if (array_key_exists('additionalfields', $col['searchopt'])) {
+                        foreach ($col['searchopt']['additionalfields'] as $field_name) {
+                            $field_value_key = 'ITEM_' . $col['itemtype'] . '_' . $col['id'] . '_' . $field_name;
+                            $tmp_fields[$field_name] = $raw[$field_value_key];
+                        }
+                    }
+                    $col_ref_itemtype::unsetUndisclosedFields($tmp_fields);
+                    $current_values = $tmp_fields[$col_ref_field] ?? null;
+                }
+
                 $clean_values[] = $current_values;
             }
 
@@ -1742,8 +1784,8 @@ abstract class API
 
            // if all asset, provide type in returned data
             if ($itemtype == AllAssets::getType()) {
-                $current_line['id']       = $current_id;
-                $current_line['itemtype'] = $current_itemtype;
+                $current_line['id']       = $raw['id'];
+                $current_line['itemtype'] = $raw['TYPE'];
             }
 
            // append to final array
@@ -1805,7 +1847,6 @@ abstract class API
         $itemtype = $this->handleDepreciation($itemtype);
 
         $input    = isset($params['input']) ? $params["input"] : null;
-        $item     = new $itemtype();
 
         if (is_object($input)) {
             $input = [$input];
@@ -1825,6 +1866,8 @@ abstract class API
             $failed       = 0;
             $index        = 0;
             foreach ($input as $object) {
+                // Use a new instance each time to avoid side effects with data from a previous item (See #14490)
+                $item     = new $itemtype();
                 $object      = $this->inputObjectToArray($object);
                 $current_res = [];
 
@@ -1933,9 +1976,7 @@ abstract class API
     protected function updateItems($itemtype, $params = [])
     {
         $itemtype = $this->handleDepreciation($itemtype);
-
         $input    = isset($params['input']) ? $params["input"] : null;
-        $item     = new $itemtype();
 
         if (is_object($input)) {
             $input = [$input];
@@ -1955,6 +1996,8 @@ abstract class API
             $failed       = 0;
             $index        = 0;
             foreach ($input as $object) {
+                // Use a new instance each time to avoid side effects with data from a previous item (See #14490)
+                $item     = new $itemtype();
                 $current_res = [];
                 if (isset($object->id)) {
                     if (!$item->getFromDB($object->id)) {
@@ -1972,16 +2015,16 @@ abstract class API
                             'message'    => __("You don't have permission to perform this action.")
                         ];
                     } else {
-                     // if parent key not provided in input and present in parameter
-                     // (detected from url for example), try to appent it do input
-                     // This is usefull to have logs in parent (and avoid some warnings in commonDBTM)
+                        // if parent key not provided in input and present in parameter
+                        // (detected from url for example), try to appent it do input
+                        // This is usefull to have logs in parent (and avoid some warnings in commonDBTM)
                         if (
                             isset($params['parent_itemtype'])
                             && isset($params['parent_id'])
                         ) {
-                              $fk_parent = getForeignKeyFieldForItemType($params['parent_itemtype']);
-                            if (!property_exists($input, $fk_parent)) {
-                                $input->$fk_parent = $params['parent_id'];
+                            $fk_parent = getForeignKeyFieldForItemType($params['parent_itemtype']);
+                            if (!property_exists($object, $fk_parent)) {
+                                $object->$fk_parent = $params['parent_id'];
                             }
                         }
 
@@ -2149,6 +2192,7 @@ abstract class API
      */
     protected function lostPassword($params = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if ($CFG_GLPI['use_notifications'] == '0' || $CFG_GLPI['notifications_mailing'] == '0') {
@@ -2345,6 +2389,7 @@ abstract class API
      */
     private function getGlpiLastMessage()
     {
+        /** @var array $DEBUG_SQL */
         global $DEBUG_SQL;
 
         $all_messages             = [];
@@ -2509,14 +2554,14 @@ abstract class API
                 }
 
                 if (
-                    !empty($value)
-                    || $key == 'entities_id' && $value >= 0
+                    is_integer($value)
+                    && ($value > 0 || ($key === 'entities_id' && $value >= 0))
                 ) {
                     $tablename = getTableNameForForeignKeyField($key);
                     $itemtype = getItemTypeForTable($tablename);
 
                    // get hateoas
-                    if ($params['get_hateoas'] && is_integer($value)) {
+                    if ($params['get_hateoas']) {
                         $fields['links'][] = ['rel'  => $itemtype,
                             'href' => self::$api_url . "/$itemtype/" . $value
                         ];
@@ -2542,6 +2587,7 @@ abstract class API
      */
     public static function getHatoasClasses($itemtype)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $hclasses = [];
@@ -2873,6 +2919,7 @@ abstract class API
         int $id,
         string $itemtype
     ): array {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $_networkports = [];
@@ -2882,6 +2929,8 @@ abstract class API
         } else {
             $networkport_types = NetworkPort::getNetworkPortInstantiations();
             foreach ($networkport_types as $networkport_type) {
+                $_networkports[$networkport_type] = [];
+
                 $netport_table = $networkport_type::getTable();
                 $netp_iterator = $DB->request([
                     'SELECT'    => [
@@ -3337,12 +3386,14 @@ abstract class API
 
         if ($results['ok'] == 0 && $results['noaction'] == 0 && $results['ko'] == 0 && $results['noright'] == 0) {
            // No items were processed, invalid action key -> 400
-            $this->returnError(
+            return $this->returnError(
                 "Invalid action key parameter, run 'getMassiveActions' endpoint to see available keys",
                 400,
                 "ERROR_MASSIVEACTION_KEY"
             );
-        } else if ($results['ok'] > 0 && $results['ko'] == 0) {
+        }
+
+        if ($results['ok'] > 0 && $results['ko'] == 0) {
            // Success -> 200
             $code = 200;
         } else if ($results['ko'] > 0 && $results['ok'] > 0) {

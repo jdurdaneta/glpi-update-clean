@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -115,7 +115,7 @@ class NetworkPortInstantiation extends CommonDBChild
         $this->manageSocket();
     }
 
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
         $this->manageSocket();
     }
@@ -178,7 +178,7 @@ class NetworkPortInstantiation extends CommonDBChild
      * Get HTMLTable columns headers for a given item type
      * Beware : the internet information are "sons" of each instantiation ...
      *
-     * @param HTMLTableSuperHeader $group           HTMLTableGroup object
+     * @param HTMLTableGroup       $group           HTMLTableGroup object
      * @param HTMLTableSuperHeader $super           HTMLTableSuperHeader object
      * @param HTMLTableSuperHeader $internet_super  HTMLTableSuperHeader object for the internet sub part (default NULL)
      * @param HTMLTableHeader      $father          HTMLTableHeader object (default NULL)
@@ -190,8 +190,8 @@ class NetworkPortInstantiation extends CommonDBChild
     public function getInstantiationHTMLTableHeaders(
         HTMLTableGroup $group,
         HTMLTableSuperHeader $super,
-        HTMLTableSuperHeader $internet_super = null,
-        HTMLTableHeader $father = null,
+        ?HTMLTableSuperHeader $internet_super = null,
+        ?HTMLTableHeader $father = null,
         array $options = []
     ) {
 
@@ -238,7 +238,7 @@ class NetworkPortInstantiation extends CommonDBChild
     protected function getPeerInstantiationHTMLTable(
         NetworkPort $netport,
         HTMLTableRow $row,
-        HTMLTableCell $father = null,
+        ?HTMLTableCell $father = null,
         array $options = []
     ) {
 
@@ -265,7 +265,7 @@ class NetworkPortInstantiation extends CommonDBChild
     public function getInstantiationHTMLTableWithPeer(
         NetworkPort $netport,
         HTMLTableRow $row,
-        HTMLTableCell $father = null,
+        ?HTMLTableCell $father = null,
         array $options = []
     ) {
 
@@ -334,9 +334,10 @@ class NetworkPortInstantiation extends CommonDBChild
     public function getInstantiationHTMLTable(
         NetworkPort $netport,
         HTMLTableRow $row,
-        HTMLTableCell $father = null,
+        ?HTMLTableCell $father = null,
         array $options = []
     ) {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $display_options = $options['display_options'];
@@ -432,6 +433,7 @@ class NetworkPortInstantiation extends CommonDBChild
      **/
     public static function getItemsByMac($mac, $wildcard_search = false)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $mac = strtolower($mac);
@@ -543,6 +545,10 @@ class NetworkPortInstantiation extends CommonDBChild
      **/
     public function showNetworkCardField(NetworkPort $netport, $options = [], $recursiveItems = [])
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
         global $CFG_GLPI, $DB;
 
         echo "<td>" . DeviceNetworkCard::getTypeName(1) . "</td>\n";
@@ -744,6 +750,7 @@ class NetworkPortInstantiation extends CommonDBChild
      **/
     public function showNetworkPortSelector($recursiveItems, $origin)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (count($recursiveItems) == 0) {
@@ -772,6 +779,10 @@ class NetworkPortInstantiation extends CommonDBChild
                 $selectOptions['multiple']        = true;
                 $selectOptions['size']            = 4;
                 $netport_types[]                  = 'NetworkPortAlias';
+                break;
+
+            default:
+                throw new \RuntimeException(sprintf('Unexpected origin `%s`.', $origin));
                 break;
         }
 
@@ -844,7 +855,7 @@ class NetworkPortInstantiation extends CommonDBChild
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
 
-        if ($item->getType() == "NetworkPort") {
+        if (get_class($item) == NetworkPort::class) {
             $instantiation = $item->getInstantiation();
             if ($instantiation !== false) {
                 $log = new Log();
@@ -863,7 +874,7 @@ class NetworkPortInstantiation extends CommonDBChild
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
-        if ($item->getType() == "NetworkPort") {
+        if (get_class($item) == NetworkPort::class) {
             $instantiation = $item->getInstantiation();
             if ($instantiation !== false) {
                 Log::displayTabContentForItem($instantiation, $tabnum, $withtemplate);
@@ -987,6 +998,7 @@ class NetworkPortInstantiation extends CommonDBChild
      **/
     public static function dropdownConnect($ID, $options = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $p['name']        = 'networkports_id';
@@ -1013,7 +1025,7 @@ class NetworkPortInstantiation extends CommonDBChild
         $rand = Dropdown::showItemTypes('NetworkPortConnect_itemtype', $CFG_GLPI["networkport_types"]);
 
         $params = ['itemtype'           => '__VALUE__',
-            'entity_restrict'    => $p['entity'],
+            'entity_restrict'    => Session::getMatchingActiveEntities($p['entity']),
             'networkports_id'    => $ID,
             'comments'           => $p['comments'],
             'myname'             => $p['name'],

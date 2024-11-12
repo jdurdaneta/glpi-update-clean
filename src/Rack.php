@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -32,88 +32,95 @@
  *
  * ---------------------------------------------------------------------
  */
+
 use Glpi\Application\View\TemplateRenderer;
 
 /**
  * Rack Class
- * */
-class Rack extends CommonDBTM {
-
+ **/
+class Rack extends CommonDBTM
+{
     use Glpi\Features\DCBreadcrumb;
 
-    const FRONT = 0;
-    const REAR = 1;
+    const FRONT    = 0;
+    const REAR     = 1;
+
     const POS_NONE = 0;
     const POS_LEFT = 1;
     const POS_RIGHT = 2;
-    // orientation in room
+
+   // orientation in room
     const ROOM_O_NORTH = 1;
-    const ROOM_O_EAST = 2;
+    const ROOM_O_EAST  = 2;
     const ROOM_O_SOUTH = 3;
-    const ROOM_O_WEST = 4;
+    const ROOM_O_WEST  = 4;
 
-    // From CommonDBTM
-    public $dohistory = true;
-    public static $rightname = 'datacenter';
+   // From CommonDBTM
+    public $dohistory                   = true;
+    public static $rightname                   = 'datacenter';
 
-    public static function getTypeName($nb = 0) {
-        //TRANS: Test of comment for translation (mark : //TRANS)
+    public static function getTypeName($nb = 0)
+    {
+       //TRANS: Test of comment for translation (mark : //TRANS)
         return _n('Rack', 'Racks', $nb);
     }
 
-    public function defineTabs($options = []) {
+    public function defineTabs($options = [])
+    {
         $ong = [];
         $this
-                ->addStandardTab('Item_Rack', $ong, $options)
-                ->addDefaultFormTab($ong)
-                ->addImpactTab($ong, $options)
-                ->addStandardTab('Infocom', $ong, $options)
-                ->addStandardTab('Contract_Item', $ong, $options)
-                ->addStandardTab('Document_Item', $ong, $options)
-                ->addStandardTab('Ticket', $ong, $options)
-                ->addStandardTab('Item_Problem', $ong, $options)
-                ->addStandardTab('Change_Item', $ong, $options)
-                ->addStandardTab('Log', $ong, $options);
+         ->addStandardTab('Item_Rack', $ong, $options)
+         ->addDefaultFormTab($ong)
+         ->addImpactTab($ong, $options)
+         ->addStandardTab('Infocom', $ong, $options)
+         ->addStandardTab('Contract_Item', $ong, $options)
+         ->addStandardTab('Document_Item', $ong, $options)
+         ->addStandardTab('Ticket', $ong, $options)
+         ->addStandardTab('Item_Problem', $ong, $options)
+         ->addStandardTab('Change_Item', $ong, $options)
+         ->addStandardTab('Log', $ong, $options);
         return $ong;
     }
 
-    public static function rawSearchOptionsToAdd($itemtype) {
+    public static function rawSearchOptionsToAdd($itemtype)
+    {
         return [
             [
-                'id' => 'rack',
-                'name' => _n('Rack', 'Racks', Session::getPluralNumber())
+                'id'                 => 'rack',
+                'name'               => _n('Rack', 'Racks', Session::getPluralNumber())
             ],
             [
-                'id' => '180',
-                'table' => Rack::getTable(),
-                'field' => 'name',
-                'name' => __('Name'),
-                'datatype' => 'dropdown',
-                'massiveaction' => false,
-                'joinparams' => [
-                    'beforejoin' => [
-                        'table' => Item_Rack::getTable(),
-                        'joinparams' => [
-                            'jointype' => 'itemtype_item',
-                            'specific_itemtype' => $itemtype
+                'id'                 => '180',
+                'table'              => Rack::getTable(),
+                'field'              => 'name',
+                'name'               => __('Name'),
+                'datatype'           => 'dropdown',
+                'massiveaction'      => false,
+                'joinparams'         => [
+                    'beforejoin'         => [
+                        'table'              => Item_Rack::getTable(),
+                        'joinparams'         => [
+                            'jointype'           => 'itemtype_item',
+                            'specific_itemtype'  => $itemtype
                         ]
                     ]
                 ]
             ],
             [
-                'id' => '181',
-                'table' => Item_Rack::getTable(),
-                'field' => 'position',
-                'name' => __('Position'),
-                'datatype' => 'number',
-                'massiveaction' => false,
-                'joinparams' => [
-                    'jointype' => 'itemtype_item',
-                    'specific_itemtype' => $itemtype
+                'id'                 => '181',
+                'table'              => Item_Rack::getTable(),
+                'field'              => 'position',
+                'name'               => __('Position'),
+                'datatype'           => 'number',
+                'massiveaction'      => false,
+                'joinparams'         => [
+                    'jointype'           => 'itemtype_item',
+                    'specific_itemtype'  => $itemtype
                 ]
             ],
         ];
     }
+
 
     /**
      * Print the rack form
@@ -124,45 +131,49 @@ class Rack extends CommonDBTM {
      *     - withtemplate boolean : template or basic item
      *
      * @return boolean item found
-     * */
-    public function showForm($ID, array $options = []) {
+     **/
+    public function showForm($ID, array $options = [])
+    {
         $this->initForm($ID, $options);
         TemplateRenderer::getInstance()->display('pages/assets/rack.html.twig', [
-            'item' => $this,
+            'item'   => $this,
             'params' => $options,
         ]);
         return true;
     }
 
-    public function rawSearchOptions() {
+
+    public function rawSearchOptions()
+    {
         $tab = parent::rawSearchOptions();
 
         $tab[] = [
-            'id' => '2',
-            'table' => $this->getTable(),
-            'field' => 'id',
-            'name' => __('ID'),
-            'massiveaction' => false, // implicit field is id
-            'datatype' => 'number'
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
         ];
 
         $tab = array_merge($tab, Location::rawSearchOptionsToAdd());
 
         $tab[] = [
-            'id' => '4',
-            'table' => 'glpi_racktypes',
-            'field' => 'name',
-            'name' => _n('Type', 'Types', 1),
-            'datatype' => 'dropdown'
+            'id'                 => '4',
+            'table'              => 'glpi_racktypes',
+            'field'              => 'name',
+            'name'               => _n('Type', 'Types', 1),
+            'datatype'           => 'dropdown'
         ];
 
         $tab[] = [
-            'id' => '40',
-            'table' => 'glpi_rackmodels',
-            'field' => 'name',
-            'name' => _n('Model', 'Models', 1),
-            'datatype' => 'dropdown'
+            'id'                 => '40',
+            'table'              => 'glpi_rackmodels',
+            'field'              => 'name',
+            'name'               => _n('Model', 'Models', 1),
+            'datatype'           => 'dropdown'
         ];
+
         $tab[] = [
             'id' => '500',
             'table' => 'glpi_rackmodels',
@@ -172,125 +183,130 @@ class Rack extends CommonDBTM {
         ];
 
         $tab[] = [
-            'id' => '31',
-            'table' => 'glpi_states',
-            'field' => 'completename',
-            'name' => __('Status'),
-            'datatype' => 'dropdown',
-            'condition' => ['is_visible_rack' => 1]
+            'id'                 => '31',
+            'table'              => 'glpi_states',
+            'field'              => 'completename',
+            'name'               => __('Status'),
+            'datatype'           => 'dropdown',
+            'condition'          => ['is_visible_rack' => 1]
         ];
 
         $tab[] = [
-            'id' => '5',
-            'table' => $this->getTable(),
-            'field' => 'serial',
-            'name' => __('Serial number'),
-            'datatype' => 'string',
+            'id'                 => '5',
+            'table'              => $this->getTable(),
+            'field'              => 'serial',
+            'name'               => __('Serial number'),
+            'datatype'           => 'string',
         ];
 
         $tab[] = [
-            'id' => '6',
-            'table' => $this->getTable(),
-            'field' => 'otherserial',
-            'name' => __('Inventory number'),
-            'datatype' => 'string',
+            'id'                 => '6',
+            'table'              => $this->getTable(),
+            'field'              => 'otherserial',
+            'name'               => __('Inventory number'),
+            'datatype'           => 'string',
         ];
 
         $tab[] = [
-            'id' => '7',
-            'table' => DCRoom::getTable(),
-            'field' => 'name',
-            'name' => DCRoom::getTypeName(1),
-            'datatype' => 'dropdown'
+            'id'                 => '7',
+            'table'              => DCRoom::getTable(),
+            'field'              => 'name',
+            'name'               => DCRoom::getTypeName(1),
+            'datatype'           => 'dropdown'
         ];
 
         $tab[] = [
-            'id' => '8',
-            'table' => $this->getTable(),
-            'field' => 'number_units',
-            'name' => __('Number of units'),
-            'datatype' => 'number'
+            'id'                 => '8',
+            'table'              => $this->getTable(),
+            'field'              => 'number_units',
+            'name'               => __('Number of units'),
+            'datatype'           => 'number'
         ];
 
         $tab[] = [
-            'id' => '16',
-            'table' => $this->getTable(),
-            'field' => 'comment',
-            'name' => __('Comments'),
-            'datatype' => 'text'
+            'id'                 => '16',
+            'table'              => $this->getTable(),
+            'field'              => 'comment',
+            'name'               => __('Comments'),
+            'datatype'           => 'text'
         ];
 
         $tab[] = [
-            'id' => '210',
-            'table' => $this->getTable(),
-            'field' => 'tag',
-            'name' => __('Tag'),
-            'datatype' => 'bool',
-            'autocomplete' => true,
-        ];
-        $tab[] = [
-            'id' => '19',
-            'table' => $this->getTable(),
-            'field' => 'date_mod',
-            'name' => __('Last update'),
-            'datatype' => 'datetime',
-            'massiveaction' => false
+            'id'                 => '19',
+            'table'              => $this->getTable(),
+            'field'              => 'date_mod',
+            'name'               => __('Last update'),
+            'datatype'           => 'datetime',
+            'massiveaction'      => false
         ];
 
         $tab[] = [
-            'id' => '121',
-            'table' => $this->getTable(),
-            'field' => 'date_creation',
-            'name' => __('Creation date'),
-            'datatype' => 'datetime',
-            'massiveaction' => false
+            'id'                 => '121',
+            'table'              => $this->getTable(),
+            'field'              => 'date_creation',
+            'name'               => __('Creation date'),
+            'datatype'           => 'datetime',
+            'massiveaction'      => false
         ];
 
         $tab[] = [
-            'id' => '23',
-            'table' => 'glpi_manufacturers',
-            'field' => 'name',
-            'name' => Manufacturer::getTypeName(1),
-            'datatype' => 'dropdown'
+            'id'                 => '23',
+            'table'              => 'glpi_manufacturers',
+            'field'              => 'name',
+            'name'               => Manufacturer::getTypeName(1),
+            'datatype'           => 'dropdown'
         ];
 
         $tab[] = [
-            'id' => '24',
-            'table' => 'glpi_users',
-            'field' => 'name',
-            'linkfield' => 'users_id_tech',
-            'name' => __('Technician in charge of the hardware'),
-            'datatype' => 'dropdown',
-            'right' => 'own_ticket'
+            'id'                 => '24',
+            'table'              => 'glpi_users',
+            'field'              => 'name',
+            'linkfield'          => 'users_id_tech',
+            'name'               => __('Technician in charge'),
+            'datatype'           => 'dropdown',
+            'right'              => 'own_ticket'
         ];
 
         $tab[] = [
-            'id' => '49',
-            'table' => 'glpi_groups',
-            'field' => 'completename',
-            'linkfield' => 'groups_id_tech',
-            'name' => __('Group in charge of the hardware'),
-            'condition' => ['is_assign' => 1],
-            'datatype' => 'dropdown'
+            'id'                 => '49',
+            'table'              => 'glpi_groups',
+            'field'              => 'completename',
+            'linkfield'          => 'groups_id_tech',
+            'name'               => __('Group in charge'),
+            'condition'          => ['is_assign' => 1],
+            'datatype'           => 'dropdown'
         ];
 
         $tab[] = [
-            'id' => '61',
-            'table' => $this->getTable(),
-            'field' => 'template_name',
-            'name' => __('Template name'),
-            'datatype' => 'text',
-            'massiveaction' => false,
-            'nosearch' => true,
-            'nodisplay' => true,
+            'id'                 => '61',
+            'table'              => $this->getTable(),
+            'field'              => 'template_name',
+            'name'               => __('Template name'),
+            'datatype'           => 'text',
+            'massiveaction'      => false,
+            'nosearch'           => true,
+            'nodisplay'          => true,
         ];
 
         $tab[] = [
-            'id' => '80',
-            'table' => 'glpi_entities',
-            'field' => 'completename',
-            'name' => Entity::getTypeName(1),
-            'datatype' => 'dropdown'
+            'id'                 => '80',
+            'table'              => 'glpi_entities',
+            'field'              => 'completename',
+            'name'               => Entity::getTypeName(1),
+            'datatype'           => 'dropdown'
+        ];
+
+        $tab[] = [
+            'id'                 => '81',
+            'table'              => Datacenter::getTable(),
+            'field'              => 'name',
+            'name'               => Datacenter::getTypeName(1),
+            'datatype'           => 'dropdown',
+            'joinparams'         => [
+                'beforejoin'         => [
+                    'table'              => DCRoom::getTable(),
+                ]
+            ]
         ];
 
         $tab = array_merge($tab, Notepad::rawSearchOptionsToAdd());
@@ -300,30 +316,32 @@ class Rack extends CommonDBTM {
         return $tab;
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
 
-        switch ($item->getType()) {
-            case DCRoom::getType():
+        switch (get_class($item)) {
+            case DCRoom::class:
                 $nb = 0;
                 if ($_SESSION['glpishow_count_on_tabs']) {
                     $nb = countElementsInTable(
-                            self::getTable(),
-                            [
-                                'dcrooms_id' => $item->getID(),
-                                'is_deleted' => 0
-                            ]
+                        self::getTable(),
+                        [
+                            'dcrooms_id'   => $item->getID(),
+                            'is_deleted'   => 0
+                        ]
                     );
                 }
                 return self::createTabEntry(
-                                self::getTypeName(Session::getPluralNumber()),
-                                $nb
+                    self::getTypeName(Session::getPluralNumber()),
+                    $nb
                 );
-                break;
+             break;
         }
         return '';
     }
 
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
         switch ($item->getType()) {
             case DCRoom::getType():
                 self::showForRoom($item);
@@ -338,37 +356,43 @@ class Rack extends CommonDBTM {
      * @param DCRoom $room DCRoom object
      *
      * @return void
-     * */
-    public static function showForRoom(DCRoom $room) {
-        global $DB, $CFG_GLPI;
+     **/
+    public static function showForRoom(DCRoom $room)
+    {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $room_id = $room->getID();
         $rand = mt_rand();
 
         if (
-                !$room->getFromDB($room_id) || !$room->can($room_id, READ)
+            !$room->getFromDB($room_id)
+            || !$room->can($room_id, READ)
         ) {
             return false;
         }
         $canedit = $room->canEdit($room_id);
 
         $racks = $DB->request([
-            'FROM' => self::getTable(),
-            'WHERE' => [
-                'dcrooms_id' => $room->getID(),
-                'is_deleted' => 0
+            'FROM'   => self::getTable(),
+            'WHERE'  => [
+                'dcrooms_id'   => $room->getID(),
+                'is_deleted'   => 0
             ]
         ]);
 
         Session::initNavigateListItems(
-                self::getType(),
-                //TRANS : %1$s is the itemtype name,
-                //        %2$s is the name of the item (used for headings of a list)
-                sprintf(
-                        __('%1$s = %2$s'),
-                        $room->getTypeName(1),
-                        $room->getName()
-                )
+            self::getType(),
+            //TRANS : %1$s is the itemtype name,
+            //        %2$s is the name of the item (used for headings of a list)
+            sprintf(
+                __('%1$s = %2$s'),
+                $room->getTypeName(1),
+                $room->getName()
+            )
         );
 
         echo "<div id='switchview'>";
@@ -387,8 +411,8 @@ class Rack extends CommonDBTM {
             if ($canedit) {
                 Html::openMassiveActionsForm('mass' . __CLASS__ . $rand);
                 $massiveactionparams = [
-                    'num_displayed' => min($_SESSION['glpilist_limit'], count($racks)),
-                    'container' => 'mass' . __CLASS__ . $rand
+                    'num_displayed'   => min($_SESSION['glpilist_limit'], count($racks)),
+                    'container'       => 'mass' . __CLASS__ . $rand
                 ];
                 Html::showMassiveActions($massiveactionparams);
             }
@@ -430,17 +454,17 @@ class Rack extends CommonDBTM {
 
         echo "<div id='viewgraph'>";
 
-        $rows = (int) $room->fields['vis_rows'];
-        $cols = (int) $room->fields['vis_cols'];
-        $w_prct = 100 / $cols;
-        $cell_w = 40;
-        $cell_h = 39;
-        $grid_w = $cell_w * $cols;
-        $grid_h = $cell_h * $rows;
+        $rows     = (int) $room->fields['vis_rows'];
+        $cols     = (int) $room->fields['vis_cols'];
+        $w_prct   = 100 / $cols;
+        $cell_w   = 40;
+        $cell_h   = 39;
+        $grid_w   = $cell_w * $cols;
+        $grid_h   = $cell_h * $rows;
         $ajax_url = $CFG_GLPI['root_doc'] . "/ajax/rack.php";
 
         //fill rows
-        $cells = [];
+        $cells    = [];
         $outbound = [];
         foreach ($racks as &$item) {
             $rack->getFromResultSet($item);
@@ -450,8 +474,8 @@ class Rack extends CommonDBTM {
             $coord = explode(',', $item['position']);
             if (is_array($coord) && count($coord) == 2) {
                 list($x, $y) = $coord;
-                $item['_x'] = $x - 1;
-                $item['_y'] = $y - 1;
+                $item['_x'] = (int)$x - 1;
+                $item['_y'] = (int)$y - 1;
             } else {
                 $item['_x'] = null;
                 $item['_y'] = null;
@@ -484,7 +508,7 @@ class Rack extends CommonDBTM {
                 --dcroom-grid-cellh: {$cell_h}px;
             }";
         for ($i = 0; $i < $cols; $i++) {
-            $left = $i * $w_prct;
+            $left  = $i * $w_prct;
             $width = ($i + 1) * $w_prct;
             echo "
          .grid-stack > .grid-stack-item[gs-x='$i'] { left: $left%;}
@@ -693,24 +717,33 @@ JAVASCRIPT;
         echo Html::scriptBlock($js);
     }
 
-    public function prepareInputForAdd($input) {
+    public function prepareInputForAdd($input)
+    {
         if ($this->prepareInput($input)) {
             if (isset($input["id"]) && ($input["id"] > 0)) {
                 $input["_oldID"] = $input["id"];
             }
             unset($input['id']);
             unset($input['withtemplate']);
+            if (!isset($input['bgcolor']) || empty($input['bgcolor'])) {
+                $input['bgcolor'] = '#FEC95C';
+            }
 
             return $input;
         }
         return false;
     }
 
-    public function prepareInputForUpdate($input) {
+    public function prepareInputForUpdate($input)
+    {
+        if (array_key_exists('bgcolor', $input) && empty($input['bgcolor'])) {
+            $input['bgcolor'] = '#FEC95C';
+        }
         return $this->prepareInput($input);
     }
 
-    public function post_getEmpty() {
+    public function post_getEmpty()
+    {
         $this->fields['bgcolor'] = '#FEC95C';
     }
 
@@ -719,29 +752,29 @@ JAVASCRIPT;
      *
      * @param array $input Input data
      *
-     * @return array
+     * @return false|array
      */
-    private function prepareInput($input) {
+    private function prepareInput($input)
+    {
 
         if (!array_key_exists('dcrooms_id', $input) || $input['dcrooms_id'] == 0) {
-            // Position is not set if room not selected
+           // Position is not set if room not selected
             return $input;
         }
 
         if ($input['position'] == 0) {
-            return $input;
             Session::addMessageAfterRedirect(
-                    __('Position must be set'),
-                    true,
-                    ERROR
+                __('Position must be set'),
+                true,
+                ERROR
             );
             return false;
         }
 
         $where = [
-            'dcrooms_id' => $input['dcrooms_id'],
-            'position' => $input['position'],
-            'is_deleted' => false
+            'dcrooms_id'   => $input['dcrooms_id'],
+            'position'     => $input['position'],
+            'is_deleted'   => false
         ];
 
         if (!$this->isNewItem()) {
@@ -751,12 +784,12 @@ JAVASCRIPT;
 
         if ($existing > 0) {
             Session::addMessageAfterRedirect(
-                    sprintf(
-                            __('%1$s position is not available'),
-                            $input['position']
-                    ),
-                    true,
-                    ERROR
+                sprintf(
+                    __('%1$s position is not available'),
+                    $input['position']
+                ),
+                true,
+                ERROR
             );
             return false;
         }
@@ -766,17 +799,20 @@ JAVASCRIPT;
     /**
      * Get already filled places
      *
-     * @param string $current Current position to exclude; defaults to null
+     * @param string $itemtype Item type
+     * @param int    $items_id Item ID
      *
      * @return array [x => [left => [depth, depth, depth, depth]], [right => [depth, depth, depth, depth]]]
      */
-    public function getFilled($itemtype = null, $items_id = null) {
+    public function getFilled($itemtype = null, $items_id = null)
+    {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([
-            'FROM' => Item_Rack::getTable(),
-            'WHERE' => [
-                'racks_id' => $this->getID()
+            'FROM'   => Item_Rack::getTable(),
+            'WHERE'  => [
+                'racks_id'   => $this->getID()
             ]
         ]);
 
@@ -801,12 +837,13 @@ JAVASCRIPT;
             }
             $position = $row['position'];
             if (
-                    empty($itemtype) || empty($items_id) || $itemtype != $row['itemtype'] || $items_id != $row['items_id']
+                empty($itemtype) || empty($items_id)
+                || $itemtype != $row['itemtype'] || $items_id != $row['items_id']
             ) {
                 while (--$units >= 0) {
                     $content_filled = [
-                        self::POS_LEFT => [0, 0, 0, 0],
-                        self::POS_RIGHT => [0, 0, 0, 0]
+                        self::POS_LEFT    => [0, 0, 0, 0],
+                        self::POS_RIGHT   => [0, 0, 0, 0]
                     ];
 
                     if (isset($filled[$position + $units])) {
@@ -849,7 +886,8 @@ JAVASCRIPT;
         return $filled;
     }
 
-    public function getEmpty() {
+    public function getEmpty()
+    {
         if (!parent::getEmpty()) {
             return false;
         }
@@ -857,13 +895,14 @@ JAVASCRIPT;
         return true;
     }
 
-    public function cleanDBonPurge() {
+    public function cleanDBonPurge()
+    {
 
         $this->deleteChildrenAndRelationsFromDb(
-                [
-                    Item_Rack::class,
-                    PDU_Rack::class,
-                ]
+            [
+                Item_Rack::class,
+                PDU_Rack::class,
+            ]
         );
     }
 
@@ -875,7 +914,8 @@ JAVASCRIPT;
      *
      * @return string
      */
-    private static function getCell(Rack $rack, $cell) {
+    private static function getCell(Rack $rack, $cell)
+    {
         $bgcolor = $rack->getField('bgcolor');
         $fgcolor = Html::getInvertedColor($bgcolor);
         return "<div class='grid-stack-item room_orientation_" . $cell['room_orientation'] . "'
@@ -890,27 +930,28 @@ JAVASCRIPT;
                         color: $fgcolor;'>
                <a href='" . $rack->getLinkURL() . "'
                   style='color: $fgcolor'>" .
-                $cell['name'] . "</a>
+                  $cell['name'] . "</a>
                <span class='tipcontent'>
                   <span>
                      <label>" . __('name') . ":</label>" .
-                $cell['name'] . "
+                     $cell['name'] . "
                   </span>
                   <span>
                      <label>" . __('serial') . ":</label>" .
-                $cell['serial'] . "
+                     $cell['serial'] . "
                   </span>
                   <span>
                      <label>" . __('Inventory number') . ":</label>" .
-                $cell['otherserial'] . "
+                     $cell['otherserial'] . "
                   </span>
                </span>
             </div><!-- // .grid-stack-item-content -->
          </div>"; // .grid-stack-item
     }
 
-    public static function getIcon() {
+
+    public static function getIcon()
+    {
         return "ti ti-server";
     }
-
 }

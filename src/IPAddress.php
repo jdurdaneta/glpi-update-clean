@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -181,7 +181,7 @@ class IPAddress extends CommonDBChild
     }
 
 
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
 
         if (
@@ -218,9 +218,10 @@ class IPAddress extends CommonDBChild
 
     public static function showForItem(CommonGLPI $item, $withtemplate = 0)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-        if ($item->getType() == 'IPNetwork') {
+        if ($item instanceof IPNetwork) {
             if (isset($_GET["start"])) {
                 $start = $_GET["start"];
             } else {
@@ -327,6 +328,7 @@ class IPAddress extends CommonDBChild
      **/
     public static function countForItem(CommonDBTM $item)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         switch ($item->getType()) {
@@ -342,18 +344,12 @@ class IPAddress extends CommonDBChild
         }
     }
 
-
-    /**
-     * @param $item           CommonGLPI object
-     * @param $withtemplate   (default 0)
-     *
-     * @return string
-     **/
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
 
         if (
-            $item->getID()
+            ($item instanceof CommonDBTM)
+            && $item->getID()
             && $item->can($item->getField('id'), READ)
         ) {
             $nb = 0;
@@ -445,7 +441,7 @@ class IPAddress extends CommonDBChild
      *
      * If the field name is empty, then, the field is not set
      *
-     * @return true is succeffully defined
+     * @return boolean successfully defined
      **/
     public function setAddressFromArray(array $array, $versionField, $textualField, $binaryField)
     {
@@ -555,7 +551,7 @@ class IPAddress extends CommonDBChild
      *
      * @param integer[] $address (bytes[4]) the address to check
      *
-     * @return true if the address is IPv4 mapped to IPv6
+     * @return boolean
      **/
     public static function isIPv4MappedToIPv6Address($address)
     {
@@ -592,10 +588,11 @@ class IPAddress extends CommonDBChild
      * @param string  $itemtype  type of the item this address has to be attached (default '')
      * @param integer $items_id  id of the item this address has to be attached (default -1)
      *
-     * @return true if the address is valid.
+     * @return boolean address is valid
      **/
     public function setAddressFromString($address, $itemtype = "", $items_id = -1)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $this->disableAddress();
@@ -776,10 +773,11 @@ class IPAddress extends CommonDBChild
      * @param string    $itemtype  type of the item this address has to be attached (default '')
      * @param integer   $items_id  id of the item this address has to be attached (default -1)
      *
-     * @return true if the address is valid.
+     * @return boolean address is valid
      **/
     public function setAddressFromBinary($address, $itemtype = "", $items_id = -1)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $this->disableAddress();
@@ -840,7 +838,7 @@ class IPAddress extends CommonDBChild
             }
         }
 
-        if (isset($binary) && (count($binary) == 4)) {
+        if (count($binary) == 4) {
             if (self::isIPv4MappedToIPv6Address($binary)) {
                 $this->version = 4;
             } else {
@@ -884,7 +882,7 @@ class IPAddress extends CommonDBChild
 
         $prefix = "";
 
-       //If it a special format, add prefix previsouly removed (to manage IPV4 part)
+       //If it is a special format, add prefix previously removed (to manage IPV4 part)
         if ($this->isDottedQuoadFormat) {
             $prefix = "::ffff:";
         }
@@ -900,7 +898,7 @@ class IPAddress extends CommonDBChild
      * @param integer[] $address   (in and out) the address to increment or decrement
      * @param integer   $value     the value to add or remove. Must be betwwen -0xffffffff and +0xffffffff
      *
-     * @return true if the increment is valid
+     * @return boolean true if the increment is valid
      **/
     public static function addValueToAddress(&$address, $value)
     {
@@ -963,6 +961,7 @@ class IPAddress extends CommonDBChild
      **/
     public static function getItemsByIPAddress($IPaddress)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
        // We must resolv binary address :
@@ -1090,8 +1089,8 @@ class IPAddress extends CommonDBChild
     public static function getHTMLTableHeader(
         $itemtype,
         HTMLTableBase $base,
-        HTMLTableSuperHeader $super = null,
-        HTMLTableHeader $father = null,
+        ?HTMLTableSuperHeader $super = null,
+        ?HTMLTableHeader $father = null,
         array $options = []
     ) {
 
@@ -1136,12 +1135,16 @@ class IPAddress extends CommonDBChild
      * @param $options   array
      **/
     public static function getHTMLTableCellsForItem(
-        HTMLTableRow $row = null,
-        CommonDBTM $item = null,
-        HTMLTableCell $father = null,
+        ?HTMLTableRow $row = null,
+        ?CommonDBTM $item = null,
+        ?HTMLTableCell $father = null,
         array $options = []
     ) {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         if (
             ($item !== null)

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -205,6 +205,7 @@ $empty_data_builder = new class
             'is_location_autoclean' => '0',
             'state_autoclean_mode' => '0',
             'use_flat_dropdowntree' => '0',
+            'use_flat_dropdowntree_on_search_result' => '1',
             'use_autoname_by_entity' => '1',
             'softwarecategories_id_ondelete' => '1',
             'x509_email_field' => '',
@@ -270,7 +271,7 @@ $empty_data_builder = new class
             'translate_kb' => '0',
             'translate_dropdowns' => '0',
             'translate_reminders' => '0',
-            'pdffont' => 'helvetica',
+            'pdffont' => 'dejavusans',
             'keep_devices_when_purging_item' => '0',
             'maintenance_mode' => '0',
             'maintenance_text' => '',
@@ -308,8 +309,6 @@ $empty_data_builder = new class
             'dbversion' => 'FILLED AT INSTALL',
             'smtp_max_retries' => '5',
             'smtp_sender' => null,
-            'from_email' => null,
-            'from_email_name' => null,
             'instance_uuid' => null,
             'registration_uuid' => null,
             'smtp_retry_time' => '5',
@@ -2207,7 +2206,11 @@ $empty_data_builder = new class
                 'use_infocoms_alert' => 0,
                 'send_infocoms_alert_before_delay' => 0,
                 'use_reservations_alert' => 0,
+                'use_domains_alert' => 0,
+                'send_domains_alert_close_expiries_delay' => 30,
+                'send_domains_alert_expired_delay' => 1,
                 'autoclose_delay' => -10,
+                'autopurge_delay' => -10,
                 'notclosed_delay' => 0,
                 'calendars_strategy' => 0,
                 'auto_assign_mode' => -10,
@@ -2236,6 +2239,7 @@ $empty_data_builder = new class
                 'autofill_decommission_date' => 0,
                 'suppliers_as_private' => 0,
                 'enable_custom_css' => 0,
+                'custom_css_code' => '',
                 'anonymize_support_agents' => 0,
                 'display_users_initials' => 1,
                 'contracts_strategy_default' => 0,
@@ -2865,7 +2869,7 @@ $empty_data_builder = new class
                 'is_active' => 1,
             ], [
                 'id' => 72,
-                'name' => 'New user mentionned',
+                'name' => 'New user mentioned',
                 'itemtype' => 'Ticket',
                 'event' => 'user_mention',
                 'is_recursive' => 1,
@@ -5031,7 +5035,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
             ], [
                 'profiles_id' => self::PROFILE_SUPERVISOR,
                 'name' => 'domain',
-                'rights' => READ | UPDATE | CREATE | PURGE,
+                'rights' => READ | UPDATE | CREATE | DELETE | PURGE,
             ], [
                 'profiles_id' => self::PROFILE_SELF_SERVICE,
                 'name' => 'profile',
@@ -5900,7 +5904,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
             ], [
                 'profiles_id' => self::PROFILE_SUPER_ADMIN,
                 'name' => 'domain',
-                'rights' => READ | UPDATE | CREATE | PURGE,
+                'rights' => READ | UPDATE | CREATE | DELETE | PURGE,
             ], [
                 'profiles_id' => self::PROFILE_SUPER_ADMIN,
                 'name' => 'profile',
@@ -6199,7 +6203,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
             ], [
                 'profiles_id' => self::PROFILE_ADMIN,
                 'name' => 'domain',
-                'rights' => READ | UPDATE | CREATE | PURGE,
+                'rights' => READ | UPDATE | CREATE | DELETE | PURGE,
             ], [
                 'profiles_id' => self::PROFILE_HOTLINER,
                 'name' => 'profile',
@@ -7980,6 +7984,12 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
                 'rights' => self::RIGHT_NONE,
 
             ],
+            [
+                'profiles_id' => self::PROFILE_SUPER_ADMIN,
+                'name' => 'system_logs',
+                'rights' => READ,
+
+            ],
         ];
 
 
@@ -8387,7 +8397,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
                 'id' => self::USER_GLPI,
                 'name' => 'glpi',
                 'realname' => null,
-                'password' => '$2y$10$rXXzbc2ShaiCldwkw4AZL.n.9QSH7c0c9XJAyyjrbL9BwmWditAYm',
+                'password' => password_hash('glpi', PASSWORD_DEFAULT),
                 'language' => null,
                 'list_limit' => '20',
                 'authtype' => '1',
@@ -8395,7 +8405,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
                 'id' => self::USER_POST_ONLY,
                 'name' => 'post-only',
                 'realname' => null,
-                'password' => '$2y$10$dTMar1F3ef5X/H1IjX9gYOjQWBR1K4bERGf4/oTPxFtJE/c3vXILm',
+                'password' => password_hash('postonly', PASSWORD_DEFAULT),
                 'language' => 'en_GB',
                 'list_limit' => '20',
                 'authtype' => '1',
@@ -8403,7 +8413,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
                 'id' => self::USER_TECH,
                 'name' => 'tech',
                 'realname' => null,
-                'password' => '$2y$10$.xEgErizkp6Az0z.DHyoeOoenuh0RcsX4JapBk2JMD6VI17KtB1lO',
+                'password' => password_hash('tech', PASSWORD_DEFAULT),
                 'language' => 'en_GB',
                 'list_limit' => '20',
                 'authtype' => '1',
@@ -8411,7 +8421,7 @@ style="color: #8b8c8f; font-weight: bold; text-decoration: underline;"&gt;
                 'id' => self::USER_NORMAL,
                 'name' => 'normal',
                 'realname' => null,
-                'password' => '$2y$10$Z6doq4zVHkSPZFbPeXTCluN1Q/r0ryZ3ZsSJncJqkN3.8cRiN0NV.',
+                'password' => password_hash('normal', PASSWORD_DEFAULT),
                 'language' => 'en_GB',
                 'list_limit' => '20',
                 'authtype' => '1',

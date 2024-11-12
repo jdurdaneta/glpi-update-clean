@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -47,9 +47,9 @@ class RuleDictionnaryOperatingSystemServicePack extends RuleDictionnaryDropdown
             return $criterias;
         }
 
-        $criterias['servicepack_name']['field'] = 'name';
-        $criterias['servicepack_name']['name']  = OperatingSystemServicePack::getTypeName(1);
-        $criterias['servicepack_name']['table'] = 'glpi_operatingsystemservicepacks';
+        $criterias['name']['field'] = 'name';
+        $criterias['name']['name']  = OperatingSystemServicePack::getTypeName(1);
+        $criterias['name']['table'] = 'glpi_operatingsystemservicepacks';
 
         $criterias['os_name']['field'] = 'name';
         $criterias['os_name']['name']  = OperatingSystem::getTypeName(1);

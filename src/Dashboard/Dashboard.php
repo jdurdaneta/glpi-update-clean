@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -35,6 +35,7 @@
 
 namespace Glpi\Dashboard;
 
+use Glpi\Toolbox\Sanitizer;
 use Ramsey\Uuid\Uuid;
 use Session;
 
@@ -100,6 +101,7 @@ class Dashboard extends \CommonDBTM
 
     public function getFromDB($ID)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([
@@ -143,16 +145,57 @@ class Dashboard extends \CommonDBTM
      */
     public function canViewCurrent(): bool
     {
-       // check global (admin) right
+        $this->load();
+
+        if ($this->fields['users_id'] === Session::getLoginUserID()) {
+            // User is always allowed to view its own dashboards.
+            return true;
+        }
+
+        // check global (admin) right
         if (self::canView() && !$this->isPrivate()) {
             return true;
         }
 
+        // check access rights defined using sharing feature
         $this->load();
 
-       //check shared rights
         $rights = self::convertRights($this->rights ?? []);
         return self::checkRights($rights);
+    }
+
+    /**
+     * Check if user has right to update the current dashboard.
+     *
+     * @return bool
+     */
+    public function canUpdateCurrent(): bool
+    {
+        $this->load();
+
+        if ($this->fields['users_id'] === Session::getLoginUserID()) {
+            // User is always allowed to update its own dashboards.
+            return true;
+        }
+
+        return self::canUpdate();
+    }
+
+    /**
+     * Check if user has right to detele the current dashboard.
+     *
+     * @return bool
+     */
+    public function canDeleteCurrent(): bool
+    {
+        $this->load();
+
+        if ($this->fields['users_id'] === Session::getLoginUserID()) {
+            // User is always allowed to delete its own dashboards.
+            return true;
+        }
+
+        return self::canPurge();
     }
 
 
@@ -174,6 +217,7 @@ class Dashboard extends \CommonDBTM
     ): string {
         $this->fields['name']   = $title;
         $this->fields['context'] = $context;
+        $this->fields['users_id'] = Session::getLoginUserID();
         $this->key    = \Toolbox::slugify($title);
         $this->items  = $items;
         $this->rights = $rights;
@@ -193,15 +237,24 @@ class Dashboard extends \CommonDBTM
      */
     public function save(bool $skip_child = false)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
-        $DB->updateOrInsert(self::getTable(), [
-            'key'     => $this->key,
-            'name'    => $this->fields['name'],
-            'context' => $this->fields['context']
-        ], [
-            'key'  => $this->key
-        ]);
+        $DB->updateOrInsert(
+            self::getTable(),
+            Sanitizer::dbEscapeRecursive([
+                'key'      => $this->key,
+                'name'     => $this->fields['name'],
+                'context'  => $this->fields['context'],
+                'users_id' => $this->fields['users_id'],
+            ]),
+            [
+                'key'  => $this->key
+            ]
+        );
 
        // reload dashboard
         $this->getFromDB($this->key);
@@ -215,10 +268,6 @@ class Dashboard extends \CommonDBTM
         if (!$skip_child && count($this->rights) > 0) {
             $this->saveRights($this->rights);
         }
-
-       // invalidate dashboard cache
-        $cache_key = "dashboard_card_" . $this->key;
-        $GLPI_CACHE->delete($cache_key);
     }
 
 
@@ -302,7 +351,7 @@ class Dashboard extends \CommonDBTM
     /**
      * Save filter in DB for the  curent dashboard
      *
-     * @param string $filter filter parameters in JSON format
+     * @param string $filters filter parameters in JSON format
      *
      * @return void
      */
@@ -316,8 +365,6 @@ class Dashboard extends \CommonDBTM
 
     /**
      * Save filter in DB for the  curent dashboard
-     *
-     * @param string $filter filter parameters in JSON format
      *
      * @return string
      */
@@ -339,6 +386,7 @@ class Dashboard extends \CommonDBTM
         $this->load();
 
         $this->fields['name'] = sprintf(__('Copy of %s'), $this->fields['name']);
+        $this->fields['users_id'] = Session::getLoginUserID();
         $this->key = \Toolbox::slugify($this->fields['name']);
 
        // replace gridstack_id (with uuid V4) in the copy, to avoid cache issue
@@ -371,6 +419,7 @@ class Dashboard extends \CommonDBTM
      */
     public static function getAll(bool $force = false, bool $check_rights = true, ?string $context = 'core'): array
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if ($force || count(self::$all_dashboards) == 0) {

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -97,6 +97,7 @@ class ObjectLock extends CommonDBTM
      **/
     public static function getLockableObjects()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $ret = [];
@@ -140,6 +141,7 @@ class ObjectLock extends CommonDBTM
      */
     private function getScriptToUnlock()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $ret = Html::scriptBlock("
@@ -221,6 +223,7 @@ class ObjectLock extends CommonDBTM
      **/
     private function setLockedByMessage()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
        // should get locking user info
@@ -259,7 +262,7 @@ class ObjectLock extends CommonDBTM
         $ret = Html::scriptBlock("
          $(function(){
             var lockStatusTimer;
-            $('#alertMe').change(function( eventObject ){
+            $('#alertMe').on('change',function( eventObject ){
                if( this.checked ) {
                   lockStatusTimer = setInterval( function() {
                      $.get({
@@ -283,8 +286,6 @@ class ObjectLock extends CommonDBTM
          });
       ");
 
-        echo $ret;
-
         $msg = "<strong class='nowrap'>";
         $msg .= sprintf(__('Locked by %s'), "<a href='" . $user->getLinkURL() . "'>" . $userdata['name'] . "</a>");
         $msg .= "&nbsp;" . Html::showToolTip($userdata["comment"], ['link' => $userdata['link'], 'display' => false]);
@@ -301,6 +302,8 @@ class ObjectLock extends CommonDBTM
         $msg .= $this->getForceUnlockMessage(); // will get a button to force unlock if UNLOCK rights are in the user's profile
 
         $this->displayLockMessage($msg);
+
+        echo $ret;
     }
 
 
@@ -335,6 +338,7 @@ class ObjectLock extends CommonDBTM
      **/
     private function lockObject()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $ret = false;
@@ -413,6 +417,7 @@ class ObjectLock extends CommonDBTM
      **/
     private function getLockedObjectInfo()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $ret = false;
@@ -455,7 +460,8 @@ class ObjectLock extends CommonDBTM
      **/
     public static function setReadOnlyProfile()
     {
-        global $CFG_GLPI, $_SESSION;
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
 
        // to prevent double set ReadOnlyProfile
         if (!isset($_SESSION['glpilocksavedprofile'])) {
@@ -492,8 +498,6 @@ class ObjectLock extends CommonDBTM
      **/
     public static function revertProfile()
     {
-        global $_SESSION;
-
         if (isset($_SESSION['glpilocksavedprofile'])) {
             $_SESSION['glpiactiveprofile'] = $_SESSION['glpilocksavedprofile'];
             unset($_SESSION['glpilocksavedprofile']);
@@ -510,6 +514,7 @@ class ObjectLock extends CommonDBTM
      **/
     public static function manageObjectLock($itemtype, &$options)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if (isset($options['id']) && ($options['id'] > 0)) {
@@ -526,7 +531,7 @@ class ObjectLock extends CommonDBTM
             ) {
                 if (
                     !$ol->autoLockMode()
-                    || !$ol->lockObject($options['id'])
+                    || !$ol->lockObject()
                 ) {
                     $options['locked'] = 1;
                 }
@@ -578,6 +583,7 @@ class ObjectLock extends CommonDBTM
 
     public static function rawSearchOptionsToAdd($itemtype)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
         $tab = [];
 
@@ -588,7 +594,7 @@ class ObjectLock extends CommonDBTM
             && in_array($itemtype, $CFG_GLPI['lock_item_list'])
         ) {
             $tab[] = [
-                'id' => '205',
+                'id'            => '207',
                 'table'         => 'glpi_users',
                 'field'         => 'name',
                 'datatype'      => 'dropdown',
@@ -606,7 +612,7 @@ class ObjectLock extends CommonDBTM
             ];
 
             $tab[] = [
-                'id'            => '206',
+                'id'            => '208',
                 'table'         => getTableForItemType('ObjectLock'),
                 'field'         => 'date',
                 'datatype'      => 'datetime',
@@ -631,6 +637,7 @@ class ObjectLock extends CommonDBTM
      **/
     public static function getRightsToAdd($itemtype, $interface = 'central')
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $ret = [];
@@ -675,7 +682,7 @@ class ObjectLock extends CommonDBTM
      *    >0 : done
      *    <0 : to be run again (not finished)
      *     0 : nothing to do
-     **/
+     */
     public static function cronUnlockObject($task)
     {
        // here we have to delete old locks

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -42,7 +42,11 @@ use Glpi\Cache\CacheManager;
 use Glpi\System\RequirementsManager;
 use Glpi\Toolbox\VersionParser;
 
-// Be sure to use global objects if this file is included outside normal process
+/**
+ * @var array $CFG_GLPI
+ * @var \GLPI $GLPI;
+ * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+ */
 global $CFG_GLPI, $GLPI, $GLPI_CACHE;
 
 include_once(GLPI_ROOT . "/inc/based_config.php");
@@ -65,16 +69,26 @@ $GLPI_CACHE = $cache_manager->getCoreCacheInstance();
 
 Config::detectRootDoc();
 
-if (!isset($skip_db_check) && !file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
+if ($skip_db_check ?? false) {
+    $missing_db_config = false;
+} elseif (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
+    $missing_db_config = true;
+} else {
+    include_once(GLPI_CONFIG_DIR . "/config_db.php");
+    $missing_db_config = !class_exists('DB', false);
+}
+
+if ($missing_db_config) {
     Session::loadLanguage('', false);
 
     // no translation
     $title_text        = 'GLPI seems to not be configured properly.';
-    $missing_conf_text = sprintf('Database configuration file "%s" is missing.', GLPI_CONFIG_DIR . '/config_db.php');
+    $missing_conf_text = sprintf('Database configuration file "%s" is missing or is corrupted.', GLPI_CONFIG_DIR . '/config_db.php');
     $hint_text         = 'You have to either restart the install process, either restore this file.';
 
     if (!isCommandLine()) {
         // Prevent inclusion of debug informations in footer, as they are based on vars that are not initialized here.
+        $debug_mode = $_SESSION['glpi_use_mode'];
         $_SESSION['glpi_use_mode'] = Session::NORMAL_MODE;
 
         Html::nullHeader('Missing configuration', $CFG_GLPI["root_doc"]);
@@ -96,6 +110,7 @@ if (!isset($skip_db_check) && !file_exists(GLPI_CONFIG_DIR . "/config_db.php")) 
         echo '</div>';
         echo '</div>';
         Html::nullFooter();
+        $_SESSION['glpi_use_mode'] = $debug_mode;
     } else {
         echo $title_text . "\n";
         echo $missing_conf_text . "\n";
@@ -185,6 +200,10 @@ if (!isset($skip_db_check) && !file_exists(GLPI_CONFIG_DIR . "/config_db.php")) 
     }
     // Check version
     if (!isset($_GET["donotcheckversion"]) && !Update::isDbUpToDate()) {
+        // Prevent debug bar to be displayed when an admin user was connected with debug mode when codebase was updated.
+        $debug_mode = $_SESSION['glpi_use_mode'];
+        Toolbox::setDebugMode(Session::NORMAL_MODE);
+
         Session::loadLanguage('', false);
 
         if (isCommandLine()) {
@@ -200,6 +219,7 @@ if (!isset($skip_db_check) && !file_exists(GLPI_CONFIG_DIR . "/config_db.php")) 
             echo "<div class='col-12 col-xxl-6'>";
             echo "<div class='card text-center mb-4'>";
 
+            /** @var \DBmysql $DB */
             global $DB;
             $core_requirements = (new RequirementsManager())->getCoreRequirementList($DB);
             TemplateRenderer::getInstance()->display(
@@ -248,8 +268,10 @@ if (!isset($skip_db_check) && !file_exists(GLPI_CONFIG_DIR . "/config_db.php")) 
             echo "</div>";
             echo "</div>";
             Html::nullFooter();
+            $_SESSION['glpi_use_mode'] = $debug_mode;
             exit();
         }
+        $_SESSION['glpi_use_mode'] = $debug_mode;
     }
 }
 

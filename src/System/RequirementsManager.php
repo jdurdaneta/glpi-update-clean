@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -63,11 +63,11 @@ class RequirementsManager
     /**
      * Returns core requirement list.
      *
-     * @param \DBmysql $db  DB instance (if null BD requirements will not be returned).
+     * @param \DBmysql|null $db  DB instance (if null BD requirements will not be returned).
      *
      * @return RequirementsList
      */
-    public function getCoreRequirementList(\DBmysql $db = null): RequirementsList
+    public function getCoreRequirementList(?\DBmysql $db = null): RequirementsList
     {
         $requirements = [];
 
@@ -79,10 +79,22 @@ class RequirementsManager
 
         $requirements[] = new MysqliMysqlnd();
 
-       // Mandatory PHP extensions that are defaultly enabled
-        $requirements[] = new ExtensionGroup(__('PHP core extensions'), ['dom', 'fileinfo', 'json', 'simplexml']);
+        // Mandatory PHP extensions that are defaultly enabled but can be disabled
+        $requirements[] = new ExtensionGroup(
+            __('PHP core extensions'),
+            [
+                'dom',
+                'fileinfo',
+                'filter',
+                'libxml',
+                'json',
+                'simplexml',
+                'xmlreader', // required/used by simplepie/simplepie and sabre/xml
+                'xmlwriter', // required/used by sabre/xml
+            ]
+        );
 
-       // Mandatory PHP extensions that are NOT defaultly enabled
+        // Mandatory PHP extensions that are NOT defaultly enabled
         $requirements[] = new Extension(
             'curl',
             false,
@@ -97,11 +109,6 @@ class RequirementsManager
             'intl',
             false,
             __('Required for internationalization.')
-        );
-        $requirements[] = new Extension(
-            'libxml',
-            false,
-            __('Required for XML handling.')
         );
         $requirements[] = new Extension(
             'zlib',
@@ -121,6 +128,7 @@ class RequirementsManager
 
         $requirements[] = new InstallationNotOverriden($db);
 
+        /** @var \Psr\Log\LoggerInterface $PHPLOGGER */
         global $PHPLOGGER;
         $requirements[] = new LogsWriteAccess($PHPLOGGER);
 

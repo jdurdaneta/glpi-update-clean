@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -53,6 +53,10 @@ class ProfileRight extends CommonDBChild
      */
     public static function getAllPossibleRights()
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
         $rights = $GLPI_CACHE->get('all_possible_rights', []);
@@ -76,6 +80,7 @@ class ProfileRight extends CommonDBChild
 
     public static function cleanAllPossibleRights()
     {
+        /** @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE */
         global $GLPI_CACHE;
         $GLPI_CACHE->delete('all_possible_rights');
     }
@@ -86,6 +91,7 @@ class ProfileRight extends CommonDBChild
      **/
     public static function getProfileRights($profiles_id, array $rights = [])
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (!version_compare(Config::getCurrentDBVersion(), '0.84', '>=')) {
@@ -116,6 +122,10 @@ class ProfileRight extends CommonDBChild
      **/
     public static function addProfileRights(array $rights)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
         $ok = true;
@@ -152,6 +162,10 @@ class ProfileRight extends CommonDBChild
      **/
     public static function deleteProfileRights(array $rights)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
         $GLPI_CACHE->set('all_possible_rights', []);
@@ -180,11 +194,12 @@ class ProfileRight extends CommonDBChild
      **/
     public static function updateProfileRightAsOtherRight($right, $value, $condition)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $profiles = [];
         $ok       = true;
-        foreach ($DB->request('glpi_profilerights', $condition) as $data) {
+        foreach ($DB->request(self::getTable(), $condition) as $data) {
             $profiles[] = $data['profiles_id'];
         }
         if (count($profiles)) {
@@ -217,6 +232,7 @@ class ProfileRight extends CommonDBChild
      **/
     public static function updateProfileRightsAsOtherRights($newright, $initialright, array $condition = [])
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $profiles = [];
@@ -256,6 +272,7 @@ class ProfileRight extends CommonDBChild
      **/
     public static function fillProfileRights($profiles_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $subq = new \QuerySubQuery([
@@ -336,7 +353,7 @@ class ProfileRight extends CommonDBChild
      *
      * @see CommonDBChild::post_updateItem()
      **/
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
 
        // update current profile

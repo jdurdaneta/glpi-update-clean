@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -142,7 +142,7 @@ class ErrorHandler
     /**
      * @param LoggerInterface|null $logger
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }
@@ -157,6 +157,7 @@ class ErrorHandler
         static $instance = null;
 
         if ($instance === null) {
+            /** @var \Psr\Log\LoggerInterface $PHPLOGGER */
             global $PHPLOGGER;
             $instance = new self($PHPLOGGER);
         }
@@ -224,8 +225,10 @@ class ErrorHandler
     public function register(): void
     {
         set_error_handler([$this, 'handleError']);
-        set_exception_handler([$this, 'handleException']);
-        register_shutdown_function([$this, 'handleFatalError']);
+        if (!defined('TU_USER')) {
+            set_exception_handler([$this, 'handleException']);
+            register_shutdown_function([$this, 'handleFatalError']);
+        }
         $this->reserved_memory = str_repeat('x', 50 * 1024); // reserve 50 kB of memory space
     }
 
@@ -473,10 +476,19 @@ class ErrorHandler
             return;
         }
 
-        $this->logger->log(
-            $log_level,
-            '  *** ' . $type . ': ' . $description . (!empty($trace) ? "\n" . $trace : '')
-        );
+        try {
+            $this->logger->log(
+                $log_level,
+                '  *** ' . $type . ': ' . $description . (!empty($trace) ? "\n" . $trace : '')
+            );
+        } catch (\Throwable $e) {
+            $this->outputDebugMessage(
+                'Error',
+                'An error has occurred, but the trace of this error could not recorded because of a problem accessing the log file.',
+                LogLevel::CRITICAL,
+                true
+            );
+        }
     }
 
     /**

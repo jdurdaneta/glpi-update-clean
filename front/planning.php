@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -32,6 +32,17 @@
  *
  * ---------------------------------------------------------------------
  */
+
+if (isset($_GET['genical'])) {
+    // A new sssion is generated and destroyed during the ical/webcal export.
+    // Prevent sending cookies to browser to ensure that user will not be disconnected when using the export feature.
+    // It will also prevent to send a session cookie related to another user in case an error made the script exit before session destroying.
+    ini_set('session.use_cookies', 0);
+
+    if (isset($_GET['token'])) {
+        $SECURITY_STRATEGY = 'no_check'; // Token based access for ical/webcal access can be made anonymously.
+    }
+}
 
 include('../inc/includes.php');
 
@@ -85,15 +96,6 @@ if (isset($_GET['checkavailability'])) {
                     Session::changeProfile(key($_SESSION['glpiprofiles']));
                 }
             }
-
-            // reset rights as we only need planning view (avoid giving access to other modules)
-            $_SESSION['glpiactiveprofile'] = [
-                'id'        => $_SESSION['glpiactiveprofile']['id'],
-                'name'      => $_SESSION['glpiactiveprofile']['name'],
-                'interface' => $_SESSION['glpiactiveprofile']['interface'],
-                'planning'  => $_SESSION['glpiactiveprofile']['planning'],
-            ];
-
             //// check if the request is valid: rights on uID / gID
             // First check mine : user then groups
             $ismine = false;

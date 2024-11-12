@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -197,6 +197,12 @@ class RuleTicket extends Rule
                             default:
                                 $output['_add_validation'][] = $action->fields["value"];
                                 break;
+                        }
+                        break;
+
+                    case "delete":
+                        if ($action->fields["field"]) {
+                            $output[$action->fields["field"]] = null;
                         }
                         break;
 
@@ -567,6 +573,7 @@ class RuleTicket extends Rule
         $criterias['itilcategories_id']['name']               = _n('Category', 'Categories', 1);
         $criterias['itilcategories_id']['linkfield']          = 'itilcategories_id';
         $criterias['itilcategories_id']['type']               = 'dropdown';
+        $criterias['itilcategories_id']['linked_criteria']    = 'itilcategories_id_code';
 
         $criterias['itilcategories_id_code']['table']              = 'glpi_itilcategories';
         $criterias['itilcategories_id_code']['field']              = 'code';
@@ -578,11 +585,11 @@ class RuleTicket extends Rule
         $criterias['type']['linkfield']                       = 'type';
         $criterias['type']['type']                            = 'dropdown_tickettype';
 
-        $criterias['_users_id_recipient']['table']            = 'glpi_users';
-        $criterias['_users_id_recipient']['field']            = 'name';
-        $criterias['_users_id_recipient']['name']             = __('Writer');
-        $criterias['_users_id_recipient']['linkfield']        = '_users_id_recipient';
-        $criterias['_users_id_recipient']['type']             = 'dropdown_users';
+        $criterias['users_id_recipient']['table']             = 'glpi_users';
+        $criterias['users_id_recipient']['field']             = 'name';
+        $criterias['users_id_recipient']['name']              = __('Writer');
+        $criterias['users_id_recipient']['linkfield']         = 'users_id_recipient';
+        $criterias['users_id_recipient']['type']              = 'dropdown_users';
 
         $criterias['_users_id_requester']['table']            = 'glpi_users';
         $criterias['_users_id_requester']['field']            = 'name';
@@ -913,6 +920,10 @@ class RuleTicket extends Rule
         $actions['slas_id_ttr']['type']                       = 'dropdown';
         $actions['slas_id_ttr']['condition']                  = ['glpi_slas.type' => SLM::TTR];
 
+        $actions['time_to_resolve']['name']                   = __('Time to resolve');
+        $actions['time_to_resolve']['type']                   = 'yesno';
+        $actions['time_to_resolve']['force_actions']          = ['delete'];
+
         $actions['slas_id_tto']['table']                      = 'glpi_slas';
         $actions['slas_id_tto']['field']                      = 'name';
         $actions['slas_id_tto']['name']                       = sprintf(
@@ -923,6 +934,10 @@ class RuleTicket extends Rule
         $actions['slas_id_tto']['linkfield']                  = 'slas_id_tto';
         $actions['slas_id_tto']['type']                       = 'dropdown';
         $actions['slas_id_tto']['condition']                  = ['glpi_slas.type' => SLM::TTO];
+
+        $actions['time_to_own']['name']                       = __('Time to own');
+        $actions['time_to_own']['type']                       = 'yesno';
+        $actions['time_to_own']['force_actions']              = ['delete'];
 
         $actions['olas_id_ttr']['table']                      = 'glpi_olas';
         $actions['olas_id_ttr']['field']                      = 'name';
@@ -935,6 +950,10 @@ class RuleTicket extends Rule
         $actions['olas_id_ttr']['type']                       = 'dropdown';
         $actions['olas_id_ttr']['condition']                  = ['glpi_olas.type' => SLM::TTR];
 
+        $actions['internal_time_to_resolve']['name']          = __('Internal time to resolve');
+        $actions['internal_time_to_resolve']['type']          = 'yesno';
+        $actions['internal_time_to_resolve']['force_actions'] = ['delete'];
+
         $actions['olas_id_tto']['table']                      = 'glpi_olas';
         $actions['olas_id_tto']['field']                      = 'name';
         $actions['olas_id_tto']['name']                       = sprintf(
@@ -945,6 +964,10 @@ class RuleTicket extends Rule
         $actions['olas_id_tto']['linkfield']                  = 'olas_id_tto';
         $actions['olas_id_tto']['type']                       = 'dropdown';
         $actions['olas_id_tto']['condition']                  = ['glpi_olas.type' => SLM::TTO];
+
+        $actions['internal_time_to_own']['name']              = __('Internal Time to own');
+        $actions['internal_time_to_own']['type']              = 'yesno';
+        $actions['internal_time_to_own']['force_actions']     = ['delete'];
 
         $actions['users_id_validate']['name']                 = sprintf(
             __('%1$s - %2$s'),
@@ -1044,9 +1067,8 @@ class RuleTicket extends Rule
     {
 
         $values = parent::getRights();
-       //TRANS: short for : Business rules for ticket (entity parent)
         $values[self::PARENT] = ['short' => __('Parent business'),
-            'long'  => __('Business rules for ticket (entity parent)')
+            'long'  => __('Business rules (entity parent)')
         ];
 
         return $values;

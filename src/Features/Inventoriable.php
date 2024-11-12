@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -69,22 +69,12 @@ trait Inventoriable
      *
      * @param bool $prepend_dir_path Indicated wether the GLPI_INVENTORY_DIR have to be prepend to returned value.
      *
-     * @return void|string
+     * @return string|null
      */
     public function getInventoryFileName(bool $prepend_dir_path = true): ?string
     {
-
-        if ($this->isField('autoupdatesystems_id')) {
-            $source = new \AutoUpdateSystem();
-            $source->getFromDBByCrit(['name' => AutoUpdateSystem::NATIVE_INVENTORY]);
-
-            if (
-                !$this->isDynamic()
-                || !isset($source->fields['id'])
-                || $this->fields['autoupdatesystems_id'] != $source->fields['id']
-            ) {
-                return null;
-            }
+        if (!$this->isDynamic()) {
+            return null;
         }
 
         $inventory_dir_path = GLPI_INVENTORY_DIR . '/';
@@ -111,6 +101,10 @@ trait Inventoriable
      */
     protected function showInventoryInfo()
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
         global $CFG_GLPI, $DB;
 
         if (!$this->isDynamic()) {
@@ -182,6 +176,7 @@ trait Inventoriable
      */
     protected function displayAgentInformation()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         echo '<tr class="tab_bg_1">';
@@ -243,6 +238,7 @@ JAVASCRIPT;
 
     public function getInventoryAgent(): ?Agent
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $agent = $this->getMostRecentAgent([
@@ -310,6 +306,7 @@ JAVASCRIPT;
      */
     private function getMostRecentAgent(array $conditions): ?Agent
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([

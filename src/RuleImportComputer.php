@@ -7,9 +7,8 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
- * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
  * ---------------------------------------------------------------------
@@ -53,17 +52,6 @@ class RuleImportComputer extends Rule
     {
         return __('Rules for import and link computers');
     }
-
-
-    /**
-     * @see Rule::maxActionsCount()
-     **/
-    public function maxActionsCount()
-    {
-       // Unlimited
-        return 1;
-    }
-
 
     public function getCriterias()
     {
@@ -145,9 +133,9 @@ class RuleImportComputer extends Rule
      *
      * @see Rule::displayAdditionRuleActionValue()
      *
-     * @param value the value for this action
+     * @param string $value the value for this action
      *
-     * @return the label's value or ''
+     * @return string the label's value or ''
      **/
     public function displayAdditionRuleActionValue($value)
     {
@@ -260,6 +248,10 @@ class RuleImportComputer extends Rule
      **/
     public function findWithGlobalCriteria($input)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var array $PLUGIN_HOOKS
+         */
         global $DB, $PLUGIN_HOOKS;
 
         $complex_criterias = [];

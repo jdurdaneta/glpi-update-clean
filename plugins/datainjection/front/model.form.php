@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DataInjection. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2007-2022 by DataInjection plugin team.
+ * @copyright Copyright (C) 2007-2023 by DataInjection plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/datainjection
  * -------------------------------------------------------------------------
@@ -48,14 +48,12 @@ if (isset($_POST["add"])) {
 
     //Set display to the advanced options tab
     Session::setActiveTab('PluginDatainjectionModel', 'PluginDatainjectionModel$3');
-    Html::redirect(Toolbox::getItemTypeFormURL('PluginDatainjectionModel')."?id=$newID");
-
+    Html::redirect(Toolbox::getItemTypeFormURL('PluginDatainjectionModel') . "?id=$newID");
 } else if (isset($_POST["delete"])) {
     /* delete */
     $model->check($_POST['id'], DELETE);
     $model->delete($_POST);
     $model->redirectToList();
-
 } else if (isset($_POST["update"])) {
     /* update */
     //Update model
@@ -65,33 +63,34 @@ if (isset($_POST["add"])) {
     $specific_model = PluginDatainjectionModel::getInstance('csv');
     $specific_model->saveFields($_POST);
     Html::back();
-
 } else if (isset($_POST["validate"])) {
     /* update order */
     $model->check($_POST['id'], UPDATE);
     $model->switchReadyToUse();
     Html::back();
-
 } else if (isset($_POST['upload'])) {
-   if (!empty($_FILES)) {
-      $model->check($_POST['id'], UPDATE);
+    if (!empty($_FILES)) {
+        $model->check($_POST['id'], UPDATE);
 
-      if ($model->processUploadedFile(
-          [
-             'file_encoding' => 'csv',
-            'mode'          => PluginDatainjectionModel::CREATION
-          ]
-      )) {
-         Session::setActiveTab('PluginDatainjectionModel', 'PluginDatainjectionModel$4');
-      } else {
-         Session::addMessageAfterRedirect(
-            __('The file could not be found', 'datainjection'),
-            true, ERROR, true
-         );
-      }
-   }
+        if (
+            $model->processUploadedFile(
+                [
+                    'file_encoding' => 'csv',
+                    'mode'          => PluginDatainjectionModel::CREATION
+                ]
+            )
+        ) {
+            Session::setActiveTab('PluginDatainjectionModel', 'PluginDatainjectionModel$4');
+        } else {
+            Session::addMessageAfterRedirect(
+                __('The file could not be found (Maybe it exceeds the maximum size allowed)', 'datainjection'),
+                true,
+                ERROR,
+                true
+            );
+        }
+    }
     Html::back();
-
 } else if (isset($_GET['sample'])) {
     $model->check($_GET['sample'], READ);
     $modeltype = PluginDatainjectionModel::getInstance($model->getField('filetype'));
@@ -101,10 +100,13 @@ if (isset($_POST["add"])) {
 }
 
 Html::header(
-    PluginDatainjectionModel::getTypeName(), '',
-    "tools", "plugindatainjectionmenu", "model"
+    PluginDatainjectionModel::getTypeName(),
+    '',
+    "tools",
+    "plugindatainjectionmenu",
+    "model"
 );
 
-$model->display(['id' =>$_GET["id"]]);
+$model->display(['id' => $_GET["id"]]);
 
 Html::footer();

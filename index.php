@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -37,9 +37,9 @@
 // Need to be the very fist step before any include
 if (
     version_compare(PHP_VERSION, '7.4.0', '<') ||
-    version_compare(PHP_VERSION, '8.3.0', '>=')
+    version_compare(PHP_VERSION, '8.4.0', '>=')
 ) {
-    die('PHP 7.4.0 - 8.3.0 (exclusive) required');
+    die('PHP 7.4.0 - 8.4.0 (exclusive) required');
 }
 
 use Glpi\Application\View\TemplateRenderer;
@@ -131,7 +131,11 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
         Toolbox::manageRedirect($redirect);
     }
 
+    // Random number for html id/label
+    $rand = mt_rand();
+
     TemplateRenderer::getInstance()->display('pages/login.html.twig', [
+        'rand'                => $rand,
         'card_bg_width'       => true,
         'lang'                => $CFG_GLPI["languages"][$_SESSION['glpilanguage']][3],
         'title'               => __('Authentication'),
@@ -149,6 +153,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
                               ]),
         'languages_dropdown'  => Dropdown::showLanguages('language', [
             'display'             => false,
+            'rand'                => $rand,
             'display_emptychoice' => true,
             'emptylabel'          => __('Default (from user profile)'),
             'width'               => '100%'
@@ -156,7 +161,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
         'right_panel'         => strlen($CFG_GLPI['text_login']) > 0
                                || count($PLUGIN_HOOKS[Hooks::DISPLAY_LOGIN] ?? []) > 0
                                || $CFG_GLPI["use_public_faq"],
-        'auth_dropdown_login' => Auth::dropdownLogin(false),
+        'auth_dropdown_login' => Auth::dropdownLogin(false, $rand),
         'copyright_message'   => Html::getCopyrightMessage(false),
         'errors'              => $errors
     ]);

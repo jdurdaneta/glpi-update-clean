@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -82,7 +82,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
         if (
             !$withtemplate
-            && ($item->getType() == $this->getType())
+            && ($item instanceof static)
         ) {
             $nb = 0;
             if ($_SESSION['glpishow_count_on_tabs']) {
@@ -165,6 +165,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
     public function pre_deleteItem()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
        // Not set in case of massive delete : use parent
@@ -196,6 +197,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
     public function prepareInputForUpdate($input)
     {
+        /** @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE */
         global $GLPI_CACHE;
 
         if (isset($input[$this->getForeignKeyField()])) {
@@ -232,6 +234,10 @@ abstract class CommonTreeDropdown extends CommonDropdown
      **/
     public function regenerateTreeUnderID($ID, $updateName, $changeParent)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
        //drop from sons cache when needed
@@ -296,15 +302,19 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
 
     /**
-     * Clean sons of all parents from caches
+     * Clean from database and caches the sons of the current entity and of all its parents.
      *
-     * @param null|integer $id    Parent id to clean. Default to current id
+     * @param null|integer $id    ID of the entity that have its sons cache to be cleaned.
      * @param boolean      $cache Whether to clean cache (defaults to true)
      *
      * @return void
      */
     protected function cleanParentsSons($id = null, $cache = true)
     {
+        /**
+         * @var \DBmysql $DB
+         * @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE
+         */
         global $DB, $GLPI_CACHE;
 
         if ($id === null) {
@@ -312,12 +322,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
         }
 
         $ancestors = getAncestorsOf($this->getTable(), $id);
-        if ($id != $this->getID()) {
-            $ancestors[$id] = "$id";
-        }
-        if (!count($ancestors)) {
-            return;
-        }
+        $ancestors[$id] = "$id";
 
         $DB->update(
             $this->getTable(),
@@ -329,15 +334,10 @@ abstract class CommonTreeDropdown extends CommonDropdown
             ]
         );
 
-       //drop from sons cache when needed
+        // drop from sons cache when needed
         if ($cache) {
             foreach ($ancestors as $ancestor) {
-                $ckey = 'sons_cache_' . $this->getTable() . '_' . $ancestor;
-                $sons = $GLPI_CACHE->get($ckey);
-                if ($sons !== null && isset($sons[$this->getID()])) {
-                    unset($sons[$this->getID()]);
-                    $GLPI_CACHE->set($ckey, $sons);
-                }
+                $GLPI_CACHE->delete('sons_cache_' . $this->getTable() . '_' . $ancestor);
             }
         }
     }
@@ -350,6 +350,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
      */
     protected function addSonInParents()
     {
+        /** @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE */
         global $GLPI_CACHE;
 
        //add sons cache when needed
@@ -389,7 +390,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
     }
 
 
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
 
         $ID           = $this->getID();
@@ -423,8 +424,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
             }
 
             if ($parent->getFromDB($newParentID)) {
-                $this->cleanParentsSons(null, false);
-                $this->addSonInParents();
+                $this->cleanParentsSons();
                 if ($history) {
                     $newParentNameID = $parent->getNameID(['forceid' => true]);
                     $changes = [
@@ -456,7 +456,10 @@ abstract class CommonTreeDropdown extends CommonDropdown
                     Log::HISTORY_UPDATE_SUBITEM
                 );
             }
+
+            // Force DB cache refresh
             getAncestorsOf(getTableForItemType($this->getType()), $ID);
+            getSonsOf(getTableForItemType($this->getType()), $ID);
         }
     }
 
@@ -509,6 +512,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
      */
     public function showChildren()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ID            = $this->getID();
@@ -863,6 +867,7 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
     public function findID(array &$input)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (isset($input['completename'])) {
@@ -924,17 +929,17 @@ abstract class CommonTreeDropdown extends CommonDropdown
 
     public function import(array $input)
     {
-
-        if (isset($input['name'])) {
-            return parent::import($input);
-        }
-
-        if (!isset($input['completename']) || empty($input['completename'])) {
+        if (empty($input['name']) && empty($input['completename'])) {
             return -1;
         }
 
+        if (empty($input['completename'])) {
+            $input['completename'] = $input['name'];
+            unset($input['name']);
+        }
+
        // Import a full tree from completename
-        $names  = explode('>', $input['completename']);
+        $names  = explode('>', self::unsanitizeSeparatorInCompletename($input['completename']));
         $fk     = $this->getForeignKeyField();
         $i      = count($names);
         $parent = 0;
@@ -994,7 +999,26 @@ abstract class CommonTreeDropdown extends CommonDropdown
         if (empty($completename)) {
             return $completename;
         }
-        $separator = ' > ';
+        $separator = '>';
         return implode(Sanitizer::sanitize($separator), explode($separator, $completename));
+    }
+
+    /**
+     * Separator may be encoded in input, but should sometimes be decoded to have a complename
+     * that fits the value expected to be stored in DB.
+     *
+     * This method aims to normalize the completename value.
+     *
+     * @param string|null $completename
+     *
+     * @return string|null
+     */
+    public static function unsanitizeSeparatorInCompletename(?string $completename): ?string
+    {
+        if (empty($completename)) {
+            return $completename;
+        }
+        $separator = '>';
+        return implode($separator, explode(Sanitizer::sanitize($separator), $completename));
     }
 }

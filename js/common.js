@@ -5,7 +5,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -630,7 +630,17 @@ var urlExists = function(url) {
  * @return {string}  The formated size
  */
 var getSize = function (size) {
-    var bytes   = ['o', 'Kio', 'Mio', 'Gio', 'Tio'];
+    var bytes = [
+        _x('size', 'B'),
+        _x('size', 'KiB'),
+        _x('size', 'MiB'),
+        _x('size', 'GiB'),
+        _x('size', 'TiB'),
+        _x('size', 'PiB'),
+        _x('size', 'EiB'),
+        _x('size', 'ZiB'),
+        _x('size', 'YiB'),
+    ];
     var lastval = '';
     bytes.some(function(val) {
         if (size > 1024) {
@@ -1152,23 +1162,34 @@ function onTinyMCEChange(e) {
 }
 
 function relativeDate(str) {
+    var today = new Date(),
+        strdate = new Date(str);
+    today.setHours(0, 0, 0, 0);
+    strdate.setHours(0, 0, 0, 0);
+
     var s = ( +new Date() - Date.parse(str) ) / 1e3,
         m = s / 60,
         h = m / 60,
-        d = h / 24,
-        y = d / 365.242199,
+        d = ( today - strdate ) / 864e5,
+        w = d / 7,
+        mo = d / 30.44,
+        y = d / 365.24,
         tmp;
 
     return (tmp = Math.round(s)) === 1 ? __('just now')
-        : m < 1.01 ? '%s seconds ago'.replace('%s', tmp)
+        : m < 1.01 ? __('%s seconds ago').replace('%s', tmp)
             : (tmp = Math.round(m)) === 1 ? __('a minute ago')
-                : h < 1.01 ? '%s minutes ago'.replace('%s', tmp)
+                : h < 1.01 ? __('%s minutes ago').replace('%s', tmp)
                     : (tmp = Math.round(h)) === 1 ? __('an hour ago')
-                        : d < 1.01 ? '%s hours ago'.replace('%s', tmp)
+                        : d < 1.01 ? __('%s hours ago').replace('%s', tmp)
                             : (tmp = Math.round(d)) === 1 ? __('yesterday')
-                                : y < 1.01 ? '%s days ago'.replace('%s', tmp)
-                                    : (tmp = Math.round(y)) === 1 ? __('a year ago')
-                                        : '%s years ago'.replace('%s', tmp);
+                                : w < 1.01 ? __('%s days ago').replace('%s', tmp)
+                                    : (tmp = Math.floor(w)) === 1 ? __('a week ago')
+                                        : mo < 1.01 ? __('%s weeks ago').replace('%s', tmp)
+                                            : (tmp = Math.floor(mo)) === 1 ? __('a month ago')
+                                                : y < 1 ? __('%s months ago').replace('%s', tmp)
+                                                    : (tmp = Math.floor(y)) === 1 ? __('a year ago')
+                                                        : __('%s years ago').replace('%s', tmp);
 }
 
 /**
@@ -1414,7 +1435,7 @@ function blockFormSubmit(form, e) {
 
     // if submitter is not a button, find the first submit button with add or update as the name
     if (submitter === null || !submitter.is('button')) {
-        submitter = submitter.find('button[name="add"]:first, button[name="update"]:first');
+        submitter = form.find('button[name="add"]:first, button[name="update"]:first');
         // If no submit button was found, use the first submit button
         if (submitter.length === 0) {
             submitter = form.find('button[type="submit"]:first');
@@ -1431,14 +1452,16 @@ function blockFormSubmit(form, e) {
     form.attr('data-submitted', 'true');
 }
 
-$(document.body).on('submit', 'form[data-submit-once]', (e) => {
-    const form = $(e.target).closest('form');
-    if (form.attr('data-submitted') === 'true') {
-        e.preventDefault();
-        return false;
-    } else {
-        blockFormSubmit(form, e);
-    }
+$(() => {
+    $(document.body).on('submit', 'form[data-submit-once]', (e) => {
+        const form = $(e.target).closest('form');
+        if (form.attr('data-submitted') === 'true') {
+            e.preventDefault();
+            return false;
+        } else {
+            blockFormSubmit(form, e);
+        }
+    });
 });
 
 /**
@@ -1531,8 +1554,17 @@ function initSortableTable(element_id) {
 
         const rows = element.find('tbody tr');
         const sorted_rows = rows.sort((a, b) => {
-            let a_value = $(a).find('td').eq(column_index).text();
-            let b_value = $(b).find('td').eq(column_index).text();
+            const a_cell = $(a).find('td').eq(column_index);
+            const b_cell = $(b).find('td').eq(column_index);
+            let a_value = a_cell.text();
+            let b_value = b_cell.text();
+
+            if (a_cell.attr('data-value-unit') !== undefined) {
+                a_value = a_value.replace(a_cell.attr('data-value-unit'), '').trim();
+            }
+            if (b_cell.attr('data-value-unit') !== undefined) {
+                b_value = b_value.replace(b_cell.attr('data-value-unit'), '').trim();
+            }
             // if the values are numberic, cast them to numbers to sort them correctly
             if (!isNaN(a_value) && !isNaN(b_value)) {
                 a_value = Number(a_value);

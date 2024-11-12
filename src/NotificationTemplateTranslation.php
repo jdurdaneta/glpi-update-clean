@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -72,6 +72,7 @@ class NotificationTemplateTranslation extends CommonDBChild
 
     protected function computeFriendlyName()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if ($this->getField('language') != '') {
@@ -97,6 +98,7 @@ class NotificationTemplateTranslation extends CommonDBChild
 
     public function showForm($ID, array $options = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if (!Config::canUpdate()) {
@@ -188,7 +190,11 @@ class NotificationTemplateTranslation extends CommonDBChild
      **/
     public function showSummary(NotificationTemplate $template, $options = [])
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $nID     = $template->getField('id');
         $canedit = Config::canUpdate();
@@ -303,7 +309,7 @@ class NotificationTemplateTranslation extends CommonDBChild
     }
 
 
-    public function post_addItem($history = 1)
+    public function post_addItem()
     {
         // Handle rich-text images and uploaded documents
         $this->input = $this->addFiles($this->input, [
@@ -313,11 +319,11 @@ class NotificationTemplateTranslation extends CommonDBChild
             '_add_link' => false
         ]);
 
-        parent::post_addItem($history);
+        parent::post_addItem();
     }
 
 
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
         // Handle rich-text images and uploaded documents
         $this->input = $this->addFiles($this->input, [
@@ -471,8 +477,8 @@ class NotificationTemplateTranslation extends CommonDBChild
 
         if (!$withtemplate) {
             $nb = 0;
-            switch ($item->getType()) {
-                case 'NotificationTemplate':
+            switch (get_class($item)) {
+                case NotificationTemplate::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = countElementsInTable(
                             $this->getTable(),
@@ -489,7 +495,7 @@ class NotificationTemplateTranslation extends CommonDBChild
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
-        if ($item->getType() == 'NotificationTemplate') {
+        if (get_class($item) == NotificationTemplate::class) {
             $temp = new self();
             $temp->showSummary($item);
         }

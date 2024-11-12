@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -102,6 +102,11 @@ class MailCollector extends CommonDBTM
         'passwd',
     ];
 
+    public $history_blacklist = [
+        'errors',
+        'last_collect_date',
+    ];
+
     public static function getTypeName($nb = 0)
     {
         return _n('Receiver', 'Receivers', $nb);
@@ -140,6 +145,7 @@ class MailCollector extends CommonDBTM
 
     public function post_getEmpty()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $this->fields['filesize_max'] = $CFG_GLPI['default_mailcollector_filesize_max'];
@@ -217,6 +223,7 @@ class MailCollector extends CommonDBTM
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         if ($item->getType() == __CLASS__) {
+            /** @var MailCollector $item */
             $item->showGetMessageForm($item->getID());
         }
         return true;
@@ -234,6 +241,7 @@ class MailCollector extends CommonDBTM
      **/
     public function showForm($ID, array $options = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $this->initForm($ID, $options);
@@ -358,16 +366,9 @@ class MailCollector extends CommonDBTM
 
                var li       = $(this);
                var input_id = li.data('input-id');
-               var folder   = li.children('.folder-name').html();
+               var folder   = li.find('.folder-name').data('globalname');
 
-               var _label = '';
-               var _parents = li.parents('li').children('.folder-name');
-               for (i = _parents.length -1 ; i >= 0; i--) {
-                  _label += $(_parents[i]).html() + '/';
-               }
-               _label += folder;
-
-               $('#'+input_id).val(_label);
+               $('#'+input_id).val(folder);
 
                var modalEl = $('#'+input_id+'_modal')[0];
                var modal = bootstrap.Modal.getInstance(modalEl);
@@ -427,10 +428,11 @@ class MailCollector extends CommonDBTM
      */
     private function displayFolder($folder, $input_id)
     {
-        $fname = mb_convert_encoding($folder->getLocalName(), "UTF-8", "UTF7-IMAP");
+        $fglobalname = htmlspecialchars(mb_convert_encoding($folder->getGlobalName(), "UTF-8", "UTF7-IMAP"), ENT_QUOTES);
+        $flocalname  = htmlspecialchars(mb_convert_encoding($folder->getLocalName(), "UTF-8", "UTF7-IMAP"), ENT_QUOTES);
         echo "<li class='pointer' data-input-id='$input_id'>
                <i class='fa fa-folder'></i>&nbsp;
-               <span class='folder-name'>" . $fname . "</span>";
+               <span class='folder-name' data-globalname='" . $fglobalname . "'>" . $flocalname . "</span>";
         echo "<ul>";
 
         foreach ($folder as $sfolder) {
@@ -552,6 +554,15 @@ class MailCollector extends CommonDBTM
             'datatype'           => 'integer'
         ];
 
+        $tab[] = [
+            'id'                 => '23',
+            'table'              => $this->getTable(),
+            'field'              => 'last_collect_date',
+            'name'               => __('Date of last collection'),
+            'datatype'           => 'datetime',
+            'massiveaction'      => false
+        ];
+
         return $tab;
     }
 
@@ -563,6 +574,7 @@ class MailCollector extends CommonDBTM
      **/
     public function deleteOrImportSeveralEmails($emails_ids = [], $action = 0, $entity = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $query = [
@@ -686,8 +698,12 @@ class MailCollector extends CommonDBTM
      *
      * @return string|void
      **/
-    public function collect($mailgateID, $display = 0)
+    public function collect($mailgateID, $display = false)
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \GLPI $GLPI
+         */
         global $CFG_GLPI, $GLPI;
 
         if ($this->getFromDB($mailgateID)) {
@@ -703,6 +719,15 @@ class MailCollector extends CommonDBTM
                     false,
                     ERROR
                 );
+
+                // Update last collect date even if an error occurs.
+                // This will prevent collectors that are constantly errored to be stuck at the begin of the
+                // crontask process queue.
+                $this->update([
+                    'id' => $this->getID(),
+                    'last_collect_date' => $_SESSION["glpi_currenttime"],
+                ]);
+
                 return;
             }
 
@@ -764,7 +789,7 @@ class MailCollector extends CommonDBTM
                         }
 
                         $messages[$message_id] = $message;
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         $GLPI->getErrorHandler()->handleException($e);
                         Toolbox::logInFile(
                             'mailgate',
@@ -803,6 +828,7 @@ class MailCollector extends CommonDBTM
                         $requester = $this->getRequesterEmail($message);
 
                         if (!$tkt['_blacklisted']) {
+                              /** @var \DBmysql $DB */
                               global $DB;
                               $rejinput['from']              = $requester ?? '';
                               $rejinput['to']                = $headers['to'];
@@ -960,6 +986,11 @@ class MailCollector extends CommonDBTM
                     $this->deleteMails($uid, $folder);
                 }
 
+                $this->update([
+                    'id' => $this->getID(),
+                    'last_collect_date' => $_SESSION["glpi_currenttime"],
+                ]);
+
               //TRANS: %1$d, %2$d, %3$d, %4$d %5$d and %6$d are number of messages
                 $msg = sprintf(
                     __('Number of messages: available=%1$d, already imported=%2$d, retrieved=%3$d, refused=%4$d, errors=%5$d, blacklisted=%6$d'),
@@ -1008,6 +1039,10 @@ class MailCollector extends CommonDBTM
      */
     public function buildTicket($uid, \Laminas\Mail\Storage\Message $message, $options = [])
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
         global $CFG_GLPI, $DB;
 
         $play_rules = (isset($options['play_rules']) && $options['play_rules']);
@@ -1053,7 +1088,7 @@ class MailCollector extends CommonDBTM
                 $tkt['_tag']      = $this->tags;
             } else {
                //TRANS: %s is a directory
-                Toolbox::logInFile('mailgate', sprintf(__('%s is not writable'), GLPI_TMP_DIR . "/"));
+                Toolbox::logInFile('mailgate', sprintf(__('%s is not writable'), GLPI_TMP_DIR . "/") . "\n");
             }
         }
 
@@ -1298,6 +1333,7 @@ class MailCollector extends CommonDBTM
      **/
     public function cleanContent($string)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $original = $string;
@@ -1307,7 +1343,7 @@ class MailCollector extends CommonDBTM
        // Wrap content for blacklisted items
         $cleaned_count = 0;
         $itemstoclean = [];
-        foreach ($DB->request('glpi_blacklistedmailcontents') as $data) {
+        foreach ($DB->request(BlacklistedMailContent::getTable()) as $data) {
             $toclean = trim($data['content']);
             if (!empty($toclean)) {
                 $itemstoclean[] = str_replace(["\r\n", "\n", "\r"], $br_marker, $toclean);
@@ -1393,7 +1429,7 @@ class MailCollector extends CommonDBTM
         }
 
         if (!empty($config['mailbox'])) {
-            $params['folder'] = $config['mailbox'];
+            $params['folder'] = mb_convert_encoding($config['mailbox'], 'UTF7-IMAP', 'UTF-8');
         }
 
         if ($config['validate-cert'] === false) {
@@ -1412,7 +1448,7 @@ class MailCollector extends CommonDBTM
                     'errors' => 0
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->update([
                 'id'     => $this->getID(),
                 'errors' => ($this->fields['errors'] + 1)
@@ -1608,8 +1644,7 @@ class MailCollector extends CommonDBTM
 
            // Try to get filename from Content-Disposition header
             if (
-                empty($filename)
-                && $part->getHeaders()->has('content-disposition')
+                $part->getHeaders()->has('content-disposition')
                 && ($content_disp_header = $part->getHeader('content-disposition')) instanceof ContentDisposition
             ) {
                 $filename = $content_disp_header->getParameter('filename') ?? '';
@@ -1650,11 +1685,6 @@ class MailCollector extends CommonDBTM
                 } else {
                     $filename = "msg_$subpart.EML"; // default trivial one :)!
                 }
-            }
-
-           // if no filename found, ignore this part
-            if (empty($filename)) {
-                return false;
             }
 
             $filename = Toolbox::filename($filename);
@@ -1771,13 +1801,15 @@ class MailCollector extends CommonDBTM
          : new RecursiveIteratorIterator($message);
 
         foreach ($parts as $part) {
+            // Per rfc 2045 (MIME Part One: Format of Internet Message Bodies), the default content type for Internet mail is text/plain.
+            $content_type = 'text/plain';
             if (
-                !$part->getHeaders()->has('content-type')
-                || !(($content_type = $part->getHeader('content-type')) instanceof ContentType)
+                $part->getHeaders()->has('content-type')
+                && (($content_type_obj = $part->getHeader('content-type')) instanceof ContentType)
             ) {
-                continue;
+                $content_type = strtolower($content_type_obj->getType());
             }
-            if ($content_type->getType() == 'text/html') {
+            if ($content_type === 'text/html') {
                 $this->body_is_html = true;
                 $content = $this->getDecodedContent($part);
 
@@ -1813,7 +1845,7 @@ class MailCollector extends CommonDBTM
                 // do not check for text part if we found html one.
                 break;
             }
-            if ($content_type->getType() == 'text/plain' && $content === null) {
+            if ($content_type === 'text/plain' && $content === null) {
                 $this->body_is_html = false;
                 $content = $this->getDecodedContent($part);
             }
@@ -1848,7 +1880,7 @@ class MailCollector extends CommonDBTM
             try {
                 $this->storage->moveMessage($this->storage->getNumberByUniqueId($uid), $name);
                 return true;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                // raise an error and fallback to delete
                 trigger_error(
                     sprintf(
@@ -1874,12 +1906,15 @@ class MailCollector extends CommonDBTM
      **/
     public static function cronMailgate($task)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         NotImportedEmail::deleteLog();
         $iterator = $DB->request([
             'FROM'   => 'glpi_mailcollectors',
-            'WHERE'  => ['is_active' => 1]
+            'WHERE'  => ['is_active' => 1],
+            'ORDER'  => 'last_collect_date ASC',
+            'LIMIT'  => 100,
         ]);
 
         $max = $task->fields['param'];
@@ -1906,11 +1941,11 @@ class MailCollector extends CommonDBTM
 
         if ($max == $task->fields['param']) {
             return 0; // Nothin to do
-        } else if ($max > 0) {
-            return 1; // done
+        } else if ($max === 0 || count($iterator) < countElementsInTable('glpi_mailcollectors', ['is_active' => 1])) {
+            return -1; // still messages to retrieve
         }
 
-        return -1; // still messages to retrieve
+        return 1; // done
     }
 
 
@@ -1939,7 +1974,11 @@ class MailCollector extends CommonDBTM
      **/
     public static function cronMailgateError($task)
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         if (!$CFG_GLPI["use_notifications"]) {
             return 0;
@@ -1973,6 +2012,10 @@ class MailCollector extends CommonDBTM
 
     public function showSystemInformations($width)
     {
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
         global $CFG_GLPI, $DB;
 
        // No need to translate, this part always display in english (for copy/paste to forum)
@@ -2012,7 +2055,7 @@ class MailCollector extends CommonDBTM
         echo "<tr class='tab_bg_2'><th>Mails receivers</th></tr>\n";
         echo "<tr class='tab_bg_1'><td><pre>\n&nbsp;\n";
 
-        foreach ($DB->request('glpi_mailcollectors') as $mc) {
+        foreach ($DB->request(self::getTable()) as $mc) {
             $msg  = "Name: '" . $mc['name'] . "'";
             $msg .= " Active: " . ($mc['is_active'] ? "Yes" : "No");
             echo wordwrap($msg . "\n", $width, "\n\t\t");
@@ -2032,16 +2075,17 @@ class MailCollector extends CommonDBTM
      **/
     public function sendMailRefusedResponse($to = '', $subject = '')
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $mmail = new GLPIMailer();
         $mmail->AddCustomHeader("Auto-Submitted: auto-replied");
-        $mmail->SetFrom($CFG_GLPI["admin_email"], $CFG_GLPI["admin_email_name"]);
+        $mmail->SetFrom($CFG_GLPI["admin_email"], Sanitizer::decodeHtmlSpecialChars($CFG_GLPI["admin_email_name"]));
         $mmail->AddAddress($to);
        // Normalized header, no translation
         $mmail->Subject  = 'Re: ' . $subject;
         $mmail->Body     = __("Your email could not be processed.\nIf the problem persists, contact the administrator") .
-                         "\n-- \n" . $CFG_GLPI["mailing_signature"];
+                         "\n-- \n" . Sanitizer::decodeHtmlSpecialChars($CFG_GLPI["mailing_signature"]);
         $mmail->Send();
     }
 
@@ -2086,6 +2130,7 @@ class MailCollector extends CommonDBTM
      */
     public static function countCollectors($active = false)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $criteria = [
@@ -2128,16 +2173,15 @@ class MailCollector extends CommonDBTM
             return null;
         }
 
-        $pattern = $this->getMessageIdExtractPattern();
-
         foreach (['in_reply_to', 'references'] as $header_name) {
-            $matches = [];
-            if (
-                $message->getHeaders()->has($header_name)
-                && preg_match($pattern, $message->getHeader($header_name)->getFieldValue(), $matches)
-            ) {
-                $itemtype = $matches['itemtype'] ?? '';
-                $items_id = $matches['items_id'] ?? '';
+            if (!$message->getHeaders()->has($header_name)) {
+                continue;
+            }
+
+            $matches = $this->extractValuesFromRefHeader($message->getHeader($header_name)->getFieldValue());
+            if ($matches !== null) {
+                $itemtype = $matches['itemtype'];
+                $items_id = $matches['items_id'];
 
                // Handle old format MessageId where itemtype was not in header
                 if (empty($itemtype) && !empty($items_id)) {
@@ -2170,21 +2214,19 @@ class MailCollector extends CommonDBTM
      */
     public function isMessageSentByGlpi(Message $message): bool
     {
-        $pattern = $this->getMessageIdExtractPattern();
-
         if (!$message->getHeaders()->has('message-id')) {
            // Messages sent by GLPI now have always a message-id header.
             return false;
         }
 
         $message_id = $message->getHeader('message_id')->getFieldValue();
-        $matches = [];
-        if (!preg_match($pattern, $message_id, $matches)) {
+        $matches = $this->extractValuesFromRefHeader($message_id);
+        if ($matches === null) {
            // message-id header does not match GLPI format.
             return false;
         }
 
-        $uuid = $matches['uuid'] ?? '';
+        $uuid = $matches['uuid'];
         if (empty($uuid)) {
            // message-id corresponds to old format, without uuid.
            // We assume that in most environments this message have been sent by this instance of GLPI,
@@ -2208,16 +2250,14 @@ class MailCollector extends CommonDBTM
      */
     public function isResponseToMessageSentByAnotherGlpi(Message $message): bool
     {
-        $pattern = $this->getMessageIdExtractPattern();
-
         $has_uuid_from_another_glpi = false;
         $has_uuid_from_current_glpi = false;
         foreach (['in-reply-to', 'references'] as $header_name) {
-            $matches = [];
-            if (
-                $message->getHeaders()->has($header_name)
-                && preg_match($pattern, $message->getHeader($header_name)->getFieldValue(), $matches)
-            ) {
+            if (!$message->getHeaders()->has($header_name)) {
+                continue;
+            }
+            $matches = $this->extractValuesFromRefHeader($message->getHeader($header_name)->getFieldValue());
+            if ($matches !== null) {
                 if (empty($matches['uuid'])) {
                     continue;
                 }
@@ -2236,28 +2276,77 @@ class MailCollector extends CommonDBTM
     }
 
     /**
-     * Get pattern that can be used to extract information from a GLPI MessageId (uuid, itemtype and items_id).
+     * Extract information from a `Message-Id` or `Reference` header.
+     * Headers mays contains `uuid`, `itemtype`, `items_id` and `event` values.
      *
-     * @see NotificationTarget::getMessageID()
+     * @see NotificationTarget::getMessageIdForEvent()
      *
-     * @return string
+     * @param string $header
+     *
+     * @return array|null
      */
-    private function getMessageIdExtractPattern(): string
+    private function extractValuesFromRefHeader(string $header): ?array
     {
-       // old format for tickets:           GLPI-{$items_id}.{$time}.{$rand}@{$uname}
-       // old format without related item:  GLPI.{$time}.{$rand}@{$uname}
-       // old format with related item:     GLPI-{$itemtype}-{$items_id}.{$time}.{$rand}@{$uname}
-       // new format without related item:  GLPI_{$uuid}.{$time}.{$rand}@{$uname}
-       // new format with related item:     GLPI_{$uuid}-{$itemtype}-{$items_id}.{$time}.{$rand}@{$uname}
+        $defaults = [
+            'uuid'      => null,
+            'itemtype'  => null,
+            'items_id'  => null,
+            'event'     => null,
+        ];
 
-        return '/GLPI'
-         . '(_(?<uuid>[a-z0-9]+))?' // uuid was not be present in old format
-         . '(-(?<itemtype>[a-z]+))?' // itemtype is not present if notification is not related to any object and was not present in old format
-         . '(-(?<items_id>[0-9]+))?' // items_id is not present if notification is not related to any object
-         . '\.[0-9]+' // time()
-         . '\.[0-9]+' // rand()
-         . '@\w*' // uname
-         . '/i'; // insensitive
+        $values = [];
+
+        // Message-Id generated in GLPI >= 10.0.7
+        // - without related item:                  GLPI_{$uuid}/{$event}.{$time}.{$rand}@{$uname}
+        // - with related item (reference event):   GLPI_{$uuid}-{$itemtype}-{$items_id}/{$event}@{$uname}
+        // - with related item (other events):      GLPI_{$uuid}-{$itemtype}-{$items_id}/{$event}.{$time}.{$rand}@{$uname}
+        $pattern = '/'
+            . 'GLPI'
+            . '_(?<uuid>[a-z0-9]+)' // uuid
+            . '(-(?<itemtype>[a-z]+)-(?<items_id>[0-9]+))?' // optional itemtype + items_id (only when related to an item)
+            . '\/(?<event>[a-z_]+)' // event
+            . '(\.[0-9]+\.[0-9]+)?' // optional time + rand (only when NOT related to an item OR when event is not the reference one)
+            . '@.+'     // uname
+            . '/i';
+        if (preg_match($pattern, $header, $values) === 1) {
+            $values += $defaults;
+            return $values;
+        }
+
+        // Message-Id generated by GLPI >= 10.0.0 < 10.0.7
+        // - without related item:  GLPI_{$uuid}.{$time}.{$rand}@{$uname}
+        // - with related item:     GLPI_{$uuid}-{$itemtype}-{$items_id}.{$time}.{$rand}@{$uname}
+        $pattern = '/'
+            . 'GLPI'
+            . '_(?<uuid>[a-z0-9]+)' // uuid
+            . '(-(?<itemtype>[a-z]+)-(?<items_id>[0-9]+))?' // optionnal itemtype + items_id
+            . '\.[0-9]+' // time()
+            . '\.[0-9]+' // rand()
+            . '@.+'     // uname
+            . '/i';
+        if (preg_match($pattern, $header, $values) === 1) {
+            $values += $defaults;
+            return $values;
+        }
+
+        // Message-Id generated by GLPI < 10.0.0
+        // - for tickets:           GLPI-{$items_id}.{$time}.{$rand}@{$uname}
+        // - without related item:  GLPI.{$time}.{$rand}@{$uname}
+        // - with related item:     GLPI-{$itemtype}-{$items_id}.{$time}.{$rand}@{$uname}
+        $pattern = '/'
+            . 'GLPI'
+            . '(-(?<itemtype>[a-z]+))?' // optionnal itemtype
+            . '(-(?<items_id>[0-9]+))?' // optionnal items_id
+            . '\.[0-9]+' // time()
+            . '\.[0-9]+' // rand()
+            . '@.+' // uname
+            . '/i';
+        if (preg_match($pattern, $header, $values) === 1) {
+            $values += $defaults;
+            return $values;
+        }
+
+        return null;
     }
 
     /**
@@ -2374,16 +2463,25 @@ class MailCollector extends CommonDBTM
 
         $charset = $content_type->getParameter('charset');
         if ($charset !== null && strtoupper($charset) != 'UTF-8') {
+            /* mbstring functions do not handle the 'ks_c_5601-1987' &
+             * 'ks_c_5601-1989' charsets. However, these charsets are used, for
+             * example, by various versions of Outlook to send Korean characters.
+             * Use UHC (CP949) encoding instead. See, e.g.,
+             * http://lists.w3.org/Archives/Public/ietf-charsets/2001AprJun/0030.html */
+            if (in_array(strtolower($charset), ['ks_c_5601-1987', 'ks_c_5601-1989'])) {
+                $charset = 'UHC';
+            }
+
             if (in_array(strtoupper($charset), array_map('strtoupper', mb_list_encodings()))) {
                 $contents = mb_convert_encoding($contents, 'UTF-8', $charset);
             } else {
-               // Convert Windows charsets names
+                // Convert Windows charsets names
                 if (preg_match('/^WINDOWS-\d{4}$/i', $charset)) {
                     $charset = preg_replace('/^WINDOWS-(\d{4})$/i', 'CP$1', $charset);
                 }
 
-               // Try to convert using iconv with TRANSLIT, then with IGNORE.
-               // TRANSLIT may result in failure depending on system iconv implementation.
+                // Try to convert using iconv with TRANSLIT, then with IGNORE.
+                // TRANSLIT may result in failure depending on system iconv implementation.
                 if ($converted = @iconv($charset, 'UTF-8//TRANSLIT', $contents)) {
                     $contents = $converted;
                 } else if ($converted = iconv($charset, 'UTF-8//IGNORE', $contents)) {

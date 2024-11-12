@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -93,9 +93,12 @@ class ITILFollowup extends CommonDBChild
      */
     public function canReadITILItem()
     {
-
-        $itemtype = $this->getItilObjectItemType();
-        $item     = new $itemtype();
+        if ($this->isParentAlreadyLoaded()) {
+            $item = $this->item;
+        } else {
+            $itemtype = $this->getItilObjectItemType();
+            $item     = new $itemtype();
+        }
         if (!$item->can($this->getField($item->getForeignKeyField()), READ)) {
             return false;
         }
@@ -128,7 +131,11 @@ class ITILFollowup extends CommonDBChild
     public function canViewItem()
     {
 
-        $itilobject = new $this->fields['itemtype']();
+        if ($this->isParentAlreadyLoaded()) {
+            $itilobject = $this->item;
+        } else {
+            $itilobject = new $this->fields['itemtype']();
+        }
         if (!$itilobject->can($this->getField('items_id'), READ)) {
             return false;
         }
@@ -161,7 +168,11 @@ class ITILFollowup extends CommonDBChild
             return false;
         }
 
-        $itilobject = new $this->fields['itemtype']();
+        if ($this->isParentAlreadyLoaded()) {
+            $itilobject = $this->item;
+        } else {
+            $itilobject = new $this->fields['itemtype']();
+        }
 
         if (
             !$itilobject->can($this->getField('items_id'), READ)
@@ -177,8 +188,11 @@ class ITILFollowup extends CommonDBChild
 
     public function canPurgeItem()
     {
-
-        $itilobject = new $this->fields['itemtype']();
+        if ($this->isParentAlreadyLoaded()) {
+            $itilobject = $this->item;
+        } else {
+            $itilobject = new $this->fields['itemtype']();
+        }
         if (!$itilobject->can($this->getField('items_id'), READ)) {
             return false;
         }
@@ -201,7 +215,11 @@ class ITILFollowup extends CommonDBChild
             return false;
         }
 
-        $itilobject = new $this->fields['itemtype']();
+        if ($this->isParentAlreadyLoaded()) {
+            $itilobject = $this->item;
+        } else {
+            $itilobject = new $this->fields['itemtype']();
+        }
         if (!$itilobject->can($this->getField('items_id'), READ)) {
             return false;
         }
@@ -237,6 +255,7 @@ class ITILFollowup extends CommonDBChild
     public function post_addItem()
     {
 
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         // Handle rich-text images and uploaded documents
@@ -255,7 +274,6 @@ class ITILFollowup extends CommonDBChild
             $this->input["users_id"]
         );
 
-        $this->updateParentStatus($this->input['_job'], $this->input);
 
         $donotif = !isset($this->input['_disablenotif']) && $CFG_GLPI["use_notifications"];
 
@@ -280,12 +298,16 @@ class ITILFollowup extends CommonDBChild
             Log::HISTORY_ADD_SUBITEM
         );
 
+        $this->updateParentStatus($this->input['_job'], $this->input);
+        PendingReason_Item::handlePendingReasonUpdateFromNewTimelineItem($this);
+
         parent::post_addItem();
     }
 
 
     public function post_deleteFromDB()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $donotif = $CFG_GLPI["use_notifications"];
@@ -444,8 +466,9 @@ class ITILFollowup extends CommonDBChild
     }
 
 
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $job      = new $this->fields['itemtype']();
@@ -520,12 +543,45 @@ class ITILFollowup extends CommonDBChild
         parent::post_updateItem($history);
     }
 
+    /**
+     * Check if $this->item already contains the correct parent item and thus
+     * help us to avoid reloading it for no reason
+     *
+     * @return bool
+     */
+    protected function isParentAlreadyLoaded(): bool
+    {
+        // If current item fields are not loaded, we can't know what its parent should be
+        if (!isset($this->fields['id']) || empty($this->fields['id'])) {
+            return false;
+        }
+
+        // Fail if no item are loaded un $this->item
+        if ($this->item === null) {
+            return false;
+        }
+
+        // Fail if loaded item's type doesn't match our expected parent itemtype
+        if ($this->item->getType() !== $this->fields['itemtype']) {
+            return false;
+        }
+
+        // Fail if loaded item's id is not what we expect
+        if ($this->item->getID() !== $this->fields['items_id']) {
+            return false;
+        }
+
+        return true;
+    }
 
     public function post_getFromDB()
     {
-
-        $this->item = new $this->fields['itemtype']();
-        $this->item->getFromDB($this->fields['items_id']);
+        // Bandaid to avoid loading parent item if not needed
+        // TODO: replace by proper lazy loading in GLPI 10.1
+        if (!$this->isParentAlreadyLoaded()) {
+            $this->item = new $this->fields['itemtype']();
+            $this->item->getFromDB($this->fields['items_id']);
+        }
     }
 
 
@@ -844,7 +900,10 @@ class ITILFollowup extends CommonDBChild
                 $input = $ma->getInput();
                 $fup   = new self();
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id)) {
+                    if (
+                        ($item instanceof CommonITILObject)
+                        && $item->getFromDB($id)
+                    ) {
                         if (in_array($item->fields['status'], array_merge($item->getSolvedStatusArray(), $item->getClosedStatusArray()))) {
                             $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
                             $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
@@ -969,6 +1028,7 @@ class ITILFollowup extends CommonDBChild
      */
     public function isFromSupportAgent()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
        // Get parent item
@@ -1015,5 +1075,23 @@ class ITILFollowup extends CommonDBChild
            // support agent that is no longer assigned to the ticket
             return true;
         }
+    }
+
+    /**
+     * Allow to set the parent item
+     * Some subclasses will load their parent item in their `post_getFromDB` function
+     * If the parent is already loaded, it might be useful to set it with this method
+     * before loading the item, thus avoiding one useless DB query (or many more queries
+     * when looping on children items)
+     *
+     * TODO 10.1 move method and `item` property into parent class
+     *
+     * @param CommonITILObject $parent Parent item
+     *
+     * @return void
+     */
+    final public function setParentItem(CommonITILObject $parent): void
+    {
+        $this->item = $parent;
     }
 }

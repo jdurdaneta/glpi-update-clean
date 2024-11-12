@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -36,6 +36,7 @@
 use Glpi\Application\ErrorHandler;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Features\Clonable;
+use Glpi\Toolbox\ArrayNormalizer;
 use Glpi\Toolbox\Sanitizer;
 
 /**
@@ -126,6 +127,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
         CommonDBTM $item,
         array $ids
     ) {
+        /** @var SavedSearch $item */
         $input = $ma->getInput();
         switch ($ma->getAction()) {
             case 'unset_default':
@@ -352,7 +354,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
         $this->fields["users_id"]     = Session::getLoginUserID();
         $this->fields["is_private"]   = 1;
         $this->fields["is_recursive"] = 1;
-        $this->fields["entities_id"]  = $_SESSION["glpiactive_entity"];
+        $this->fields["entities_id"]  = Session::getActiveEntity();
     }
 
 
@@ -506,12 +508,12 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
 
 
     /**
-     * Prepare query to store depending of the type
+     * Prepare query to store depending on the type
      *
      * @param integer $type      Saved search type (self::SEARCH, self::URI or self::ALERT)
      * @param array   $query_tab Parameters
      *
-     * @return clean query array
+     * @return array clean query array
      **/
     protected function prepareQueryToStore($type, $query_tab)
     {
@@ -656,7 +658,16 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
             return;
         }
 
-        $url = Toolbox::getItemTypeSearchURL($this->fields['itemtype']);
+        $itemtype = $this->fields['itemtype'];
+        $url = $itemtype::getSearchURL();
+
+        // Prevents parameter duplication
+        $parse_url = parse_url($url);
+        if (isset($parse_url['query'])) {
+            parse_str($parse_url['query'], $url_params);
+            $url = $parse_url['path'];
+            $params = array_merge($url_params, $params);
+        }
         $url .= "?" . Toolbox::append_params($params);
 
        // keep last loaded to set an active state on saved search panel
@@ -699,6 +710,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public function markDefault($ID)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (
@@ -743,6 +755,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public function unmarkDefault($ID)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (
@@ -779,6 +792,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public function unmarkDefaults(array $ids)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (Session::haveRight('config', UPDATE)) {
@@ -803,8 +817,9 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      *
      * @return array
      */
-    public function getMine(string $itemtype = null, bool $inverse = false, bool $enable_partial_warnings = true): array
+    public function getMine(?string $itemtype = null, bool $inverse = false, bool $enable_partial_warnings = true): array
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $searches = [];
@@ -847,34 +862,71 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
 
         $iterator = $DB->request($criteria);
         foreach ($iterator as $data) {
+            $error = false;
+
             if ($_SESSION['glpishow_count_on_tabs']) {
                 $this->fields = $data;
                 $count = null;
+                $search_data = null;
                 try {
                     $search_data = $this->execute(false, $enable_partial_warnings);
-                } catch (\RuntimeException $e) {
+                } catch (\Throwable $e) {
                     ErrorHandler::getInstance()->handleException($e);
-                    $search_data = false;
+                    $error = true;
                 }
-                if (isset($search_data['data']['totalcount'])) {
+
+                if ($error) {
+                    $info_message = __s('A fatal error occurred while executing this saved search. It is not able to be used.');
+                    $count = "<span class='ti ti-alert-triangle-filled' title='$info_message'></span>";
+                } elseif (isset($search_data['data']['totalcount'])) {
                     $count = $search_data['data']['totalcount'];
                 } else {
                     $info_message = ($this->fields['do_count'] == self::COUNT_NO)
                                 ? __s('Count for this saved search has been disabled.')
                                 : __s('Counting this saved search would take too long, it has been skipped.');
-                    if ($count === null) {
-                       //no count, just inform the user
-                        $count = "<span class='ti ti-info-circle' title='$info_message'></span>";
-                    }
+                    // no count, just inform the user
+                    $count = "<span class='ti ti-info-circle' title='$info_message'></span>";
                 }
 
                 $data['count'] = $count;
             }
 
+            $data['_error'] = $error;
+
             $searches[$data['id']] = $data;
         }
 
-        return $searches;
+        // get personal order
+        $user               = new User();
+        $personalorderfield = $this->getPersonalOrderField();
+        $ordered            = [];
+
+        $personalorder = [];
+        if ($user->getFromDB(Session::getLoginUserID())) {
+            $personalorder = importArrayFromDB($user->fields[$personalorderfield]);
+        }
+        if (!is_array($personalorder)) {
+            $personalorder = [];
+        }
+
+        // Add on personal order
+        if (count($personalorder)) {
+            foreach ($personalorder as $id) {
+                if (isset($searches[$id])) {
+                    $ordered[$id] = $searches[$id];
+                    unset($searches[$id]);
+                }
+            }
+        }
+
+        // Add unsaved in order
+        if (count($searches)) {
+            foreach ($searches as $id => $val) {
+                $ordered[$id] = $val;
+            }
+        }
+
+        return $ordered;
     }
 
     /**
@@ -886,7 +938,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      *
      * @return void
      */
-    public function displayMine(string $itemtype = null, bool $inverse = false, bool $enable_partial_warnings = true)
+    public function displayMine(?string $itemtype = null, bool $inverse = false, bool $enable_partial_warnings = true)
     {
         TemplateRenderer::getInstance()->display('layout/parts/saved_searches_list.html.twig', [
             'active'         => $_SESSION['glpi_loaded_savedsearch'] ?? "",
@@ -908,8 +960,11 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
             $user               = new User();
             $personalorderfield = $this->getPersonalOrderField();
 
-            $user->update(['id'                 => Session::getLoginUserID(),
-                $personalorderfield  => exportArrayToDB($items)
+            $user->update([
+                'id'                 => Session::getLoginUserID(),
+                $personalorderfield  => exportArrayToDB(
+                    ArrayNormalizer::normalizeValues($items, 'intval')
+                )
             ]);
             return true;
         }
@@ -968,6 +1023,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public static function getUsedItemtypes()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $types = [];
@@ -993,6 +1049,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public static function updateExecutionTime($id, $time)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if ($_SESSION['glpishow_count_on_tabs']) {
@@ -1095,6 +1152,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      */
     public function setDoCount(array $ids, $do_count)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $result = $DB->update(
@@ -1121,6 +1179,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      */
     public function setEntityRecur(array $ids, $eid, $recur)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $result = $DB->update(
@@ -1157,7 +1216,11 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public static function croncountAll($task)
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $cron_status = 0;
 
@@ -1210,7 +1273,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
                               $stmt->bind_param('sss', $execution_time, $now, $row['id']);
                               $DB->executeStatement($stmt);
                         }
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         ErrorHandler::getInstance()->handleException($e);
                     }
                 }
@@ -1243,6 +1306,7 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
      **/
     public function execute($force = false, bool $enable_partial_warnings = true)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if (
@@ -1349,12 +1413,12 @@ class SavedSearch extends CommonDBTM implements ExtraVisibilityCriteria
             $restrict = [
                 'OR' => [
                     $restrict,
-                    [self::getTable() . '.is_private' => 0] + getEntitiesRestrictCriteria(self::getTable(), '', '', true)
+                    [self::getTable() . '.is_private' => 0]
                 ]
             ];
         }
 
-        $criteria['WHERE'] = $restrict;
+        $criteria['WHERE'] = $restrict + getEntitiesRestrictCriteria(self::getTable(), '', '', true);
         return $criteria;
     }
 

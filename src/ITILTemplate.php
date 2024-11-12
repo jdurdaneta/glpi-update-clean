@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -70,7 +70,7 @@ abstract class ITILTemplate extends CommonDropdown
      * @param $ID                    integer  ID of the item to get
      * @param $withtypeandcategory   boolean  with type and category (true by default)
      *
-     * @return true if succeed else false
+     * @return boolean
      **/
     public function getFromDBWithData($ID, $withtypeandcategory = true)
     {
@@ -159,7 +159,7 @@ abstract class ITILTemplate extends CommonDropdown
      * @param boolean $withtypeandcategory (default 0)
      * @param boolean $withitemtype        (default 0)
      **/
-    public static function getAllowedFields($withtypeandcategory = 0, $withitemtype = 0)
+    public static function getAllowedFields($withtypeandcategory = false, $withitemtype = false)
     {
 
         static $allowed_fields = [];
@@ -288,6 +288,14 @@ abstract class ITILTemplate extends CommonDropdown
                    TaskTemplate::getTable()
                )] = '_tasktemplates_id';
 
+            // Add location
+            $allowed_fields[$itiltype][$withtypeandcategory][$withitemtype]
+                [$itil_object->getSearchOptionIDByField(
+                    'field',
+                    'completename',
+                    'glpi_locations'
+                )] = 'locations_id';
+
            //add specific itil type fields
             $allowed_fields[$itiltype][$withtypeandcategory][$withitemtype] += static::getExtraAllowedFields($withtypeandcategory, $withitemtype);
         }
@@ -307,7 +315,7 @@ abstract class ITILTemplate extends CommonDropdown
      *
      * @see self::getAllowedFields()
      */
-    public static function getExtraAllowedFields($withtypeandcategory = 0, $withitemtype = 0)
+    public static function getExtraAllowedFields($withtypeandcategory = false, $withitemtype = false)
     {
         return [];
     }
@@ -362,7 +370,7 @@ abstract class ITILTemplate extends CommonDropdown
                 'glpi_itilcategories'
             ),
             $ticket->getSearchOptionIDByField('field', 'type', 'glpi_tickets'),
-            $ticket->getSearchOptionIDByField('field', 'items_id', 'glpi_tickets'),
+            $ticket->getSearchOptionIDByField('field', 'items_id', 'glpi_items_tickets'),
             $ticket->getSearchOptionIDByField('field', 'name', 'glpi_documents'),
             66 // users_id_observer
         ];
@@ -559,7 +567,10 @@ abstract class ITILTemplate extends CommonDropdown
         switch ($ma->getAction()) {
             case 'merge':
                 foreach ($ids as $key) {
-                    if ($item->can($key, UPDATE)) {
+                    if (
+                        ($item instanceof ITILTemplate)
+                        && $item->can($key, UPDATE)
+                    ) {
                         if ($item->getEntityID() == $_SESSION['glpiactive_entity']) {
                             if (
                                 $item->update(['id'           => $key,
@@ -606,6 +617,7 @@ abstract class ITILTemplate extends CommonDropdown
      **/
     public function mergeTemplateFields($target_id, $source_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
        // Tables linked to ticket template
@@ -663,6 +675,7 @@ abstract class ITILTemplate extends CommonDropdown
      */
     public function mergeTemplateITILCategories($target_id, $source_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $to_merge = [];

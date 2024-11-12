@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -67,7 +67,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
 
         if (!$withtemplate && Notification::canView()) {
             $nb = 0;
-            switch ($item->getType()) {
+            switch (get_class($item)) {
                 case Notification::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = countElementsInTable(
@@ -76,7 +76,6 @@ class Notification_NotificationTemplate extends CommonDBRelation
                         );
                     }
                     return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
-                break;
                 case NotificationTemplate::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = countElementsInTable(
@@ -85,7 +84,6 @@ class Notification_NotificationTemplate extends CommonDBRelation
                         );
                     }
                     return self::createTabEntry(Notification::getTypeName(Session::getPluralNumber()), $nb);
-                break;
             }
         }
         return '';
@@ -93,7 +91,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        switch ($item->getType()) {
+        switch (get_class($item)) {
             case Notification::class:
                 self::showForNotification($item, $withtemplate);
                 break;
@@ -110,12 +108,13 @@ class Notification_NotificationTemplate extends CommonDBRelation
      * Print the notification templates
      *
      * @param Notification $notif        Notification object
-     * @param boolean      $withtemplate Template or basic item (default '')
+     * @param integer      $withtemplate Template or basic item (default '')
      *
      * @return void
      **/
     public static function showForNotification(Notification $notif, $withtemplate = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ID = $notif->getID();
@@ -209,12 +208,13 @@ class Notification_NotificationTemplate extends CommonDBRelation
      * Print associated notifications
      *
      * @param NotificationTemplate $template     Notification template object
-     * @param boolean              $withtemplate Template or basic item (default '')
+     * @param integer              $withtemplate Template or basic item (default '')
      *
      * @return void
      */
     public static function showForNotificationTemplate(NotificationTemplate $template, $withtemplate = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ID = $template->getID();
@@ -318,7 +318,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
      *     - target for the Form
      *     - computers_id ID of the computer for add process
      *
-     * @return true if displayed  false if item not found or not right to display
+     * @return boolean true if displayed  false if item not found or not right to display
      **/
     public function showForm($ID, array $options = [])
     {
@@ -373,7 +373,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
      *
      * @param string $mode the mode to use
      *
-     * @return array
+     * @return string
      **/
     public static function getMode($mode)
     {
@@ -395,6 +395,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
      */
     public static function registerMode($mode, $label, $from)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         self::getModes();
@@ -405,14 +406,13 @@ class Notification_NotificationTemplate extends CommonDBRelation
     }
 
     /**
-     * Get notification method label
+     * Get modes
      *
-     * @since 0.84
-     *
-     * @return the mode's label
+     * @return array
      **/
     public static function getModes()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $core_modes = [
@@ -531,7 +531,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
             $classname = 'Notification' . ucfirst($mode) . 'Setting';
         } else {
             if ($extratype != '') {
-                trigger_error("Unknown type $extratype", E_USER_ERROR);
+                throw new \LogicException(sprintf('Unknown type `%s`.', $extratype));
             }
             $classname = 'Notification' . ucfirst($mode);
         }
@@ -549,6 +549,7 @@ class Notification_NotificationTemplate extends CommonDBRelation
      */
     public static function hasActiveMode()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
         foreach (array_keys(self::getModes()) as $mode) {
             if ($CFG_GLPI['notifications_' . $mode]) {

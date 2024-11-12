@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -37,11 +37,12 @@ namespace Glpi\Console\Migration;
 
 use DBConnection;
 use Glpi\Console\AbstractCommand;
+use Glpi\Console\Command\ConfigurationCommandInterface;
 use Glpi\System\Requirement\DbTimezones;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TimestampsCommand extends AbstractCommand
+class TimestampsCommand extends AbstractCommand implements ConfigurationCommandInterface
 {
     /**
      * Error code returned when failed to migrate one table.
@@ -182,7 +183,7 @@ class TimestampsCommand extends AbstractCommand
                // apply alter to table
                 $query = "ALTER TABLE " . $this->db->quoteName($table) . " " . $tablealter . ";\n";
 
-                $result = $this->db->query($query);
+                $result = $this->db->doQuery($query);
                 if (false === $result) {
                     $message = sprintf(
                         __('Migration of table "%s" failed with message "(%s) %s".'),
@@ -203,25 +204,19 @@ class TimestampsCommand extends AbstractCommand
             DBConnection::PROPERTY_ALLOW_DATETIME => false,
         ];
 
-        $timezones_requirement = new DbTimezones($this->db);
-        if ($timezones_requirement->isValidated()) {
-            $properties_to_update[DBConnection::PROPERTY_USE_TIMEZONES] = true;
-        } else {
-            $output->writeln(
-                '<error>' . __('Timezones usage cannot be activated due to following errors:') . '</error>',
-                OutputInterface::VERBOSITY_QUIET
-            );
-            foreach ($timezones_requirement->getValidationMessages() as $validation_message) {
+        if ($this->db->use_timezones !== true) {
+            $timezones_requirement = new DbTimezones($this->db);
+            if ($timezones_requirement->isValidated()) {
+                $properties_to_update[DBConnection::PROPERTY_USE_TIMEZONES] = true;
+            } else {
                 $output->writeln(
-                    '<error> - ' . $validation_message . '</error>',
+                    [
+                        '<comment>' . __('Timezones usage cannot be activated due to missing requirements.') . '</comment>',
+                        '<comment>' . sprintf(__('Run the "%1$s" command for more details.'), 'php bin/console database:enable_timezones') . '</comment>',
+                    ],
                     OutputInterface::VERBOSITY_QUIET
                 );
             }
-            $message = sprintf(
-                __('Fix them and run the "%1$s" command to enable timezones.'),
-                'php bin/console database:enable_timezones'
-            );
-            $output->writeln('<error>' . $message . '</error>', OutputInterface::VERBOSITY_QUIET);
         }
 
         if (!DBConnection::updateConfigProperties($properties_to_update)) {
@@ -243,5 +238,14 @@ class TimestampsCommand extends AbstractCommand
         }
 
         return 0; // Success
+    }
+
+    public function getConfigurationFilesToUpdate(InputInterface $input): array
+    {
+        $config_files_to_update = ['config_db.php'];
+        if (file_exists(GLPI_CONFIG_DIR . '/config_db_slave.php')) {
+            $config_files_to_update[] = 'config_db_slave.php';
+        }
+        return $config_files_to_update;
     }
 }

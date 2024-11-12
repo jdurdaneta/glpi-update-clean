@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -272,7 +272,7 @@ final class StatusChecker
                         $ldap = null;
                         try {
                             if (
-                                AuthLDAP::tryToConnectToServer(
+                                @AuthLDAP::tryToConnectToServer(
                                     $method,
                                     $method['rootdn'],
                                     (new \GLPIKey())->decrypt($method['rootdn_passwd'])
@@ -381,6 +381,7 @@ final class StatusChecker
      */
     public static function getCASStatus($public_only = true): array
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         static $status = null;
@@ -445,7 +446,7 @@ final class StatusChecker
                                 $status['servers'][$mc['name']] = [
                                     'status' => self::STATUS_OK
                                 ];
-                            } catch (\Exception $e) {
+                            } catch (\Throwable $e) {
                                 $status['servers'][$mc['name']] = [
                                     'status'       => self::STATUS_PROBLEM,
                                     'error_code'   => $e->getCode(),

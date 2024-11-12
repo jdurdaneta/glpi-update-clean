@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -36,7 +36,9 @@
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Event;
 use Glpi\Plugin\Hooks;
+use Glpi\System\Requirement\PhpSupportedVersion;
 use Glpi\System\Requirement\SafeDocumentRoot;
+use Glpi\System\Requirement\SessionsSecurityConfiguration;
 
 /**
  * Central class
@@ -86,7 +88,7 @@ class Central extends CommonGLPI
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
-        if ($item->getType() == __CLASS__) {
+        if ($item instanceof self) {
             switch ($tabnum) {
                 case 0:
                     $item->showGlobalDashboard();
@@ -150,7 +152,7 @@ class Central extends CommonGLPI
         if (Contract::canView()) {
             $grid_items[] = Contract::showCentral(false);
         }
-        if (Session::haveRight("logs", READ)) {
+        if (Session::haveRight(Log::$rightname, READ)) {
            //Show last add events
             $grid_items[] = Event::showForUser($_SESSION["glpiname"], false);
         }
@@ -445,17 +447,18 @@ class Central extends CommonGLPI
 
     private static function getMessages(): array
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $messages = [];
 
         $user = new User();
         $user->getFromDB(Session::getLoginUserID());
-        if ($user->fields['authtype'] == Auth::DB_GLPI && $user->shouldChangePassword()) {
-            $expiration_msg = sprintf(
-                __('Your password will expire on %s.'),
-                Html::convDateTime(date('Y-m-d H:i:s', $user->getPasswordExpirationTime()))
-            );
+        $expiration_msg = $user->getPasswordExpirationMessage();
+        if ($expiration_msg !== null) {
             $messages['warnings'][] = $expiration_msg
              . ' '
              . '<a href="' . $CFG_GLPI['root_doc'] . '/front/updatepassword.php">'
@@ -515,11 +518,17 @@ class Central extends CommonGLPI
                 . ' '
                 . sprintf(__('Run the "%1$s" command to migrate them.'), 'php bin/console migration:unsigned_keys');
             }
-        }
 
-        $safe_doc_root_requirement = new SafeDocumentRoot();
-        if (!$safe_doc_root_requirement->isValidated()) {
-            $messages['warnings'] = array_merge(($messages['warnings'] ?? []), $safe_doc_root_requirement->getValidationMessages());
+            $security_requirements = [
+                new PhpSupportedVersion(),
+                new SafeDocumentRoot(),
+                new SessionsSecurityConfiguration(),
+            ];
+            foreach ($security_requirements as $requirement) {
+                if (!$requirement->isValidated()) {
+                    $messages['warnings'] = array_merge(($messages['warnings'] ?? []), $requirement->getValidationMessages());
+                }
+            }
         }
 
         if ($DB->isSlave() && !$DB->first_connection) {

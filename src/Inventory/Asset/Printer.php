@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
@@ -69,6 +69,10 @@ class Printer extends NetworkEquipment
 
     public function prepare(): array
     {
+        if ($this->item->getType() != GPrinter::getType() && $this->conf->import_printer == 0) {
+            return [];
+        }
+
         parent::prepare();
 
         if (!property_exists($this->raw_data->content ?? new \stdClass(), 'network_device')) {
@@ -209,6 +213,7 @@ class Printer extends NetworkEquipment
      */
     protected function handleConnectedPrinter()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $rule = new RuleImportAssetCollection();
@@ -374,12 +379,12 @@ class Printer extends NetworkEquipment
                     //try to find IP (get from discovery) from known IP of Printer
                     //if found refuse update
                     //if no, printer IP have changed so  we allow the update from discovery
-                    $ipadress = new IPAddress($ip);
+                    $ipaddress = new IPAddress($ip);
                     $tmp['mainitems_id'] = $item->fields['id'];
                     $tmp['mainitemtype'] = $item::getType();
                     $tmp['is_dynamic']   = 1;
-                    $tmp['name']         = $ipadress->getTextual();
-                    if ($ipadress->getFromDBByCrit(Sanitizer::sanitize($tmp))) {
+                    $tmp['name']         = $ipaddress->getTextual();
+                    if ($ipaddress->getFromDBByCrit(Sanitizer::sanitize($tmp))) {
                         return false;
                     }
                     return true;

@@ -2,35 +2,70 @@
 
 ## Summary
 
-* [Glossary](#glossary)
-* [Important](#important)
-* [Init session](#init-session)
-* [Kill session](#kill-session)
-* [Lost password](#lost-password)
-* [Get my profiles](#get-my-profiles)
-* [Get active profile](#get-active-profile)
-* [Change active profile](#change-active-profile)
-* [Get my entities](#get-my-entities)
-* [Get active entities](#get-active-entities)
-* [Change active entities](#change-active-entities)
-* [Get full session](#get-full-session)
-* [Get GLPI config](#get-glpi-config)
-* [Get an item](#get-an-item)
-* [Get all items](#get-all-items)
-* [Get sub items](#get-sub-items)
-* [Get multiple items](#get-multiple-items)
-* [List searchOptions](#list-searchoptions)
-* [Search items](#search-items)
-* [Add item(s)](#add-items)
-* [Update item(s)](#update-items)
-* [Delete item(s)](#delete-items)
-* [Get available massive actions for an itemtype](#get-available-massive-actions-for-an-itemtype)
-* [Get available massive actions for an item](#get-available-massive-actions-for-an-item)
-* [Get massive action parameters](#get-massive-action-parameters)
-* [Apply massive action](#apply-massive-action)
-* [Special cases](#special-cases)
-* [Errors](#errors)
-* [Servers configuration](#servers-configuration)
+- [GLPI REST API:  Documentation](#glpi-rest-api--documentation)
+  - [Summary](#summary)
+  - [Glossary](#glossary)
+  - [Important](#important)
+  - [Init session](#init-session)
+  - [Kill session](#kill-session)
+  - [Lost password](#lost-password)
+  - [Get my profiles](#get-my-profiles)
+  - [Get active profile](#get-active-profile)
+  - [Change active profile](#change-active-profile)
+  - [Get my entities](#get-my-entities)
+  - [Get active entities](#get-active-entities)
+  - [Change active entities](#change-active-entities)
+  - [Get full session](#get-full-session)
+  - [Get GLPI config](#get-glpi-config)
+  - [Get an item](#get-an-item)
+  - [Get all items](#get-all-items)
+  - [Get sub items](#get-sub-items)
+  - [Get multiple items](#get-multiple-items)
+  - [List searchOptions](#list-searchoptions)
+  - [Search items](#search-items)
+  - [Add item(s)](#add-items)
+  - [Update item(s)](#update-items)
+  - [Delete item(s)](#delete-items)
+  - [Get available massive actions for an itemtype](#get-available-massive-actions-for-an-itemtype)
+  - [Get available massive actions for an item](#get-available-massive-actions-for-an-item)
+  - [Get massive action parameters](#get-massive-action-parameters)
+  - [Apply massive action](#apply-massive-action)
+  - [Special cases](#special-cases)
+    - [Upload a document file](#upload-a-document-file)
+    - [Download a document file](#download-a-document-file)
+    - [Get a user's profile picture](#get-a-users-profile-picture)
+    - [Sanitized content](#sanitized-content)
+  - [Errors](#errors)
+    - [ERROR\_ITEM\_NOT\_FOUND](#error_item_not_found)
+    - [ERROR\_BAD\_ARRAY](#error_bad_array)
+    - [ERROR\_METHOD\_NOT\_ALLOWED](#error_method_not_allowed)
+    - [ERROR\_RIGHT\_MISSING](#error_right_missing)
+    - [ERROR\_SESSION\_TOKEN\_INVALID](#error_session_token_invalid)
+    - [ERROR\_SESSION\_TOKEN\_MISSING](#error_session_token_missing)
+    - [ERROR\_APP\_TOKEN\_PARAMETERS\_MISSING](#error_app_token_parameters_missing)
+    - [ERROR\_WRONG\_APP\_TOKEN\_PARAMETER](#error_wrong_app_token_parameter)
+    - [ERROR\_NOT\_DELETED](#error_not_deleted)
+    - [ERROR\_NOT\_ALLOWED\_IP](#error_not_allowed_ip)
+    - [ERROR\_LOGIN\_PARAMETERS\_MISSING](#error_login_parameters_missing)
+    - [ERROR\_LOGIN\_WITH\_CREDENTIALS\_DISABLED](#error_login_with_credentials_disabled)
+    - [ERROR\_GLPI\_LOGIN\_USER\_TOKEN](#error_glpi_login_user_token)
+    - [ERROR\_GLPI\_LOGIN](#error_glpi_login)
+    - [ERROR\_ITEMTYPE\_NOT\_FOUND\_NOR\_COMMONDBTM](#error_itemtype_not_found_nor_commondbtm)
+    - [ERROR\_SQL](#error_sql)
+    - [ERROR\_RANGE\_EXCEED\_TOTAL](#error_range_exceed_total)
+    - [ERROR\_GLPI\_ADD](#error_glpi_add)
+    - [ERROR\_GLPI\_PARTIAL\_ADD](#error_glpi_partial_add)
+    - [ERROR\_GLPI\_UPDATE](#error_glpi_update)
+    - [ERROR\_GLPI\_PARTIAL\_UPDATE](#error_glpi_partial_update)
+    - [ERROR\_GLPI\_DELETE](#error_glpi_delete)
+    - [ERROR\_GLPI\_PARTIAL\_DELETE](#error_glpi_partial_delete)
+    - [ERROR\_MASSIVEACTION\_KEY](#error_massiveaction_key)
+    - [ERROR\_MASSIVEACTION\_NO\_IDS](#error_massiveaction_no_ids)
+    - [ERROR\_FIELD\_NOT\_FOUND](#error_field_not_found)
+    - [ERROR\_UNKNOWN](#error_unknown)
+  - [Servers configuration](#servers-configuration)
+    - [Apache Httpd](#apache-httpd)
+    - [Nginx](#nginx)
 
 ## Glossary
 
@@ -45,7 +80,6 @@ Method
 itemtype
 :   A GLPI type, could be an asset, an ITIL or a configuration object, etc.
     This type must be a class who inherits CommonDTBM GLPI class.
-    See [List itemtypes](https://forge.glpi-project.org/apidoc/class-CommonDBTM.html).
 
 searchOption
 :   A column identifier (integer) of an itemtype (ex: 1 -> id, 2 -> name, ...).
@@ -1267,10 +1301,6 @@ $ curl -X GET \
     "label": "Put in trashbin"
   },
   {
-    "key": "MassiveAction:add_transfer_list",
-    "label": "Add to transfer list"
-  },
-  {
     "key": "Appliance:add_item",
     "label": "Associate to an appliance"
   },
@@ -1387,10 +1417,6 @@ $ curl -X GET \
   {
     "key": "MassiveAction:delete",
     "label": "Put in trashbin"
-  },
-  {
-    "key": "MassiveAction:add_transfer_list",
-    "label": "Add to transfer list"
   },
   {
     "key": "Appliance:add_item",
@@ -1736,8 +1762,6 @@ Check the user administration and the GLPI logs files (in files/_logs directory)
 
 You asked a inexistent resource (endpoint). It's not a predefined (initSession, getFullSession, etc) nor a GLPI CommonDBTM resources.
 
-See this documentation for predefined ones or [List itemtypes](https://forge.glpi-project.org/apidoc/class-CommonDBTM.html) for available resources
-
 ### ERROR_SQL
 
 We suspect an SQL error.
@@ -1789,6 +1813,16 @@ Run 'getMassiveActions' endpoint to see available keys.
 
 No ids supplied when trying to run a massive action.
 
+### ERROR_FIELD_NOT_FOUND
+
+The field specified as the key for the searchText parameter does not exist.
+This field must refer to a column in the table corresponding to the element in the query.
+
+### ERROR_UNKNOWN
+
+An unknown error has occurred.
+This may be due to an unexpected condition encountered by the server or an issue that does not fit into any of the predefined error categories.
+Check the server logs for more details or contact the support team.
 
 ## Servers configuration
 

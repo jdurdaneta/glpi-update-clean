@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -49,6 +49,7 @@ class HookManager
      */
     public function enableCSRF(): void
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT][$this->plugin] = true;
@@ -82,12 +83,13 @@ class HookManager
      */
     protected function registerFile(string $hook, string $file): void
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         // Check if the given hook is a valid file hook
         $allowed_file_hooks = Hooks::getFileHooks();
         if (!in_array($hook, $allowed_file_hooks)) {
-            trigger_error("Invalid file hook: '$hook'", E_USER_ERROR);
+            throw new \LogicException(sprintf('Invalid file hook `%s`.', $hook));
         }
 
         // Init target array if needed
@@ -103,18 +105,19 @@ class HookManager
      * Add a functional hook
      *
      * @param string $hook
-     * @param string $file
+     * @param callable $function
      */
     public function registerFunctionalHook(
         string $hook,
         callable $function
     ): void {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         // Check if the given hook is a valid functional hook
         $allowed_file_hooks = Hooks::getFunctionalHooks();
         if (!in_array($hook, $allowed_file_hooks)) {
-            trigger_error("Invalid functional hook: '$hook'", E_USER_ERROR);
+            throw new \LogicException(sprintf('Invalid functional hook `%s`.', $hook));
         }
 
         $PLUGIN_HOOKS[$hook][$this->plugin] = $function;
@@ -125,19 +128,20 @@ class HookManager
      *
      * @param string $hook
      * @param string $itemtype
-     * @param string $file
+     * @param callable $function
      */
     public function registerItemHook(
         string $hook,
         string $itemtype,
         callable $function
     ): void {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         // Check if the given hook is a valid item hook
         $allowed_file_hooks = Hooks::getItemHooks();
         if (!in_array($hook, $allowed_file_hooks)) {
-            trigger_error("Invalid item hook: '$hook'", E_USER_ERROR);
+            throw new \LogicException(sprintf('Invalid item hook `%s`.', $hook));
         }
 
         $PLUGIN_HOOKS[$hook][$this->plugin][$itemtype] = $function;
@@ -150,6 +154,7 @@ class HookManager
      */
     public function registerSecureFields(array $fields): void
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         $PLUGIN_HOOKS[Hooks::SECURED_FIELDS][$this->plugin] = $fields;
@@ -162,6 +167,7 @@ class HookManager
      */
     public function registerSecureConfigs(array $configs): void
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS][$this->plugin] = $configs;

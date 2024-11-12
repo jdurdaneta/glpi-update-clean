@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -258,6 +258,7 @@ class Item_SoftwareVersion extends CommonDBRelation
 
     public function updateDatasForItem($itemtype, $items_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $item = new $itemtype();
@@ -288,6 +289,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      **/
     public static function countForVersion($softwareversions_id, $entity = '')
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $item_version_table = self::getTable(__CLASS__);
@@ -350,6 +352,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      **/
     public static function countForSoftware($softwares_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $iterator = $DB->request([
@@ -452,7 +455,11 @@ class Item_SoftwareVersion extends CommonDBRelation
      **/
     private static function showInstallations($searchID, $crit)
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         if (!Software::canView() || !$searchID) {
             return;
@@ -857,6 +864,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      **/
     public static function showForVersionByEntity(SoftwareVersion $version)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $softwareversions_id = $version->getField('id');
@@ -910,6 +918,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      */
     public static function getFromItem(CommonDBTM $item, $sort = null, $order = null, array $filters = []): DBmysqlIterator
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $selftable     = self::getTable(__CLASS__);
@@ -1004,13 +1013,14 @@ class Item_SoftwareVersion extends CommonDBRelation
     /**
      * Show software installed on a computer
      *
-     * @param Computer $comp         Computer object
-     * @param boolean  $withtemplate template case of the view process
+     * @param CommonDBTM $item
+     * @param integer  $withtemplate template case of the view process
      *
      * @return void
      **/
     public static function showForItem(CommonDBTM $item, $withtemplate = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (!Software::canView()) {
@@ -1144,13 +1154,13 @@ class Item_SoftwareVersion extends CommonDBRelation
                         <input type='hidden' name='filters[active]' value='1'>
                     </td>
                     <td>
-                        <input type='text' class='form-control' name='filters[name]' value='" . ($filters['name'] ?? '') . "'>
+                        <input type='text' class='form-control' name='filters[name]' value='" . htmlspecialchars($filters['name'] ?? '', ENT_QUOTES) . "'>
                     </td>
                     <td>
-                        <input type='text' class='form-control' name='filters[state]' value='" . ($filters['state'] ?? '') . "'>
+                        <input type='text' class='form-control' name='filters[state]' value='" . htmlspecialchars($filters['state'] ?? '', ENT_QUOTES) . "'>
                     </td>
                     <td>
-                        <input type='text' class='form-control' name='filters[version]' value='" . ($filters['version'] ?? '') . "'>
+                        <input type='text' class='form-control' name='filters[version]' value='" . htmlspecialchars($filters['version'] ?? '', ENT_QUOTES) . "'>
                     </td>
                     <td></td>
                     <td>
@@ -1163,7 +1173,7 @@ class Item_SoftwareVersion extends CommonDBRelation
                         ) . "
                     </td>
                     <td>
-                        <input type='text' class='form-control' name='filters[arch]' value='" . ($filters['arch'] ?? '') . "'>
+                        <input type='text' class='form-control' name='filters[arch]' value='" . htmlspecialchars($filters['arch'] ?? '', ENT_QUOTES) . "'>
                     </td>
                     <td>" . Dropdown::showFromArray(
                             "filters[is_dynamic]",
@@ -1374,7 +1384,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      * @param array   $data         data used to display
      * @param string  $itemtype     Type of the item
      * @param integer $items_id     ID of the item
-     * @param boolean $withtemplate template case of the view process
+     * @param integer $withtemplate template case of the view process
      * @param boolean $canedit      user can edit software ?
      * @param boolean $display      display and calculate if true or just calculate
      *
@@ -1388,6 +1398,7 @@ class Item_SoftwareVersion extends CommonDBRelation
         $canedit,
         $display
     ) {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $ID    = $data["id"];
@@ -1506,7 +1517,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      * Display a software for a License (not installed)
      *
      * @param array   $data         data used to display
-     * @param boolean $withtemplate template case of the view process
+     * @param integer $withtemplate template case of the view process
      * @param boolean $canedit      user can edit software ?
      *
      * @return void
@@ -1576,7 +1587,7 @@ class Item_SoftwareVersion extends CommonDBRelation
      *
      * @return void
      **/
-    public function upgrade($instID, $softwareversions_id, $dohistory = 1)
+    public function upgrade($instID, $softwareversions_id, $dohistory = true)
     {
 
         if ($this->getFromDB($instID)) {
@@ -1598,6 +1609,7 @@ class Item_SoftwareVersion extends CommonDBRelation
         $nb = 0;
         switch ($item->getType()) {
             case 'Software':
+                /** @var Software $item */
                 if (!$withtemplate) {
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = self::countForSoftware($item->getID());
@@ -1607,6 +1619,7 @@ class Item_SoftwareVersion extends CommonDBRelation
                 break;
 
             case 'SoftwareVersion':
+                /** @var SoftwareVersion $item */
                 if (!$withtemplate) {
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = self::countForVersion($item->getID());
@@ -1675,6 +1688,7 @@ class Item_SoftwareVersion extends CommonDBRelation
 
     public static function countForItem(CommonDBTM $item)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $params = self::getListForItemParams($item);

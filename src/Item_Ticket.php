@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -107,6 +107,8 @@ class Item_Ticket extends CommonItilObject_Item
         }
 
         $ticket->update($input);
+        $ticket_cost = new TicketCost();
+        $ticket_cost->updateTCOItem($this->fields['itemtype'], $this->fields['items_id']);
         parent::post_addItem();
     }
 
@@ -123,7 +125,8 @@ class Item_Ticket extends CommonItilObject_Item
             $input['_forcenotif'] = true;
         }
         $ticket->update($input);
-
+        $ticket_cost = new TicketCost();
+        $ticket_cost->updateTCOItem($this->fields['itemtype'], $this->fields['items_id']);
         parent::post_purgeItem();
     }
 
@@ -186,6 +189,7 @@ class Item_Ticket extends CommonItilObject_Item
      **/
     public static function itemAddForm(Ticket $ticket, $options = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $params = [
@@ -209,9 +213,10 @@ class Item_Ticket extends CommonItilObject_Item
             return false;
         }
 
+        $ticket_is_closed = in_array($ticket->fields['status'], $ticket->getClosedStatusArray());
         $can_add_items = $_SESSION["glpiactiveprofile"]["helpdesk_hardware"] & pow(2, Ticket::HELPDESK_MY_HARDWARE) || $_SESSION["glpiactiveprofile"]["helpdesk_hardware"] & pow(2, Ticket::HELPDESK_ALL_HARDWARE);
         $canedit = ($can_add_items && $ticket->can($params['id'], UPDATE)
-                  && $params['_canupdate']);
+                  && $params['_canupdate'] && !$ticket_is_closed);
 
        // Ticket update case
         $usedcount = 0;
@@ -289,8 +294,8 @@ class Item_Ticket extends CommonItilObject_Item
 
        // Display list
         if (!empty($params['items_id'])) {
-           // No delete if mandatory and only one item
-            $delete = $ticket->canAddItem(__CLASS__);
+            // No delete if mandatory and only one item or if ticket is closed
+            $delete = $ticket->canAddItem(__CLASS__) && !$ticket_is_closed;
             $cpt = 0;
             foreach ($params['items_id'] as $itemtype => $items) {
                 $cpt += count($items);
@@ -382,13 +387,13 @@ class Item_Ticket extends CommonItilObject_Item
 
         $types_iterator = self::getDistinctTypes($instID);
         $number = count($types_iterator);
-
+        $ticket_closed = in_array($ticket->fields['status'], array_merge(
+            $ticket->getClosedStatusArray(),
+            $ticket->getSolvedStatusArray()
+        ));
         if (
             $canedit
-            && !in_array($ticket->fields['status'], array_merge(
-                $ticket->getClosedStatusArray(),
-                $ticket->getSolvedStatusArray()
-            ))
+            && !$ticket_closed
         ) {
             echo "<div class='firstbloc'>";
             echo "<form name='ticketitem_form$rand' id='ticketitem_form$rand' method='post'
@@ -426,9 +431,8 @@ class Item_Ticket extends CommonItilObject_Item
             Html::closeForm();
             echo "</div>";
         }
-
         echo "<div class='spaced'>";
-        if ($canedit && $number) {
+        if ($canedit && $number && !$ticket_closed) {
             Html::openMassiveActionsForm('mass' . __CLASS__ . $rand);
             $massiveactionparams = ['container' => 'mass' . __CLASS__ . $rand];
             Html::showMassiveActions($massiveactionparams);
@@ -438,7 +442,7 @@ class Item_Ticket extends CommonItilObject_Item
         $header_top    = '';
         $header_bottom = '';
         $header_end    = '';
-        if ($canedit && $number) {
+        if ($canedit && $number && !$ticket_closed) {
             $header_top    .= "<th width='10'>" . Html::getCheckAllAsCheckbox('mass' . __CLASS__ . $rand);
             $header_top    .= "</th>";
             $header_bottom .= "<th width='10'>" . Html::getCheckAllAsCheckbox('mass' . __CLASS__ . $rand);
@@ -483,7 +487,7 @@ class Item_Ticket extends CommonItilObject_Item
                     }
 
                     echo "<tr class='tab_bg_1'>";
-                    if ($canedit) {
+                    if ($canedit && !$ticket_closed) {
                         echo "<td width='10'>";
                         Html::showMassiveActionCheckBox(__CLASS__, $data["linkid"]);
                         echo "</td>";
@@ -506,9 +510,9 @@ class Item_Ticket extends CommonItilObject_Item
                     $item->getFromDB($data["id"]);
                     echo "<td class='center'>" . $item->getKBLinks() . "</td>";
                     echo "<td class='center'>";
-                    echo Dropdown::getDropdownName("glpi_states", $data['states_id']) . "</td>";
+                    echo (isset($data["states_id"]) ? Dropdown::getDropdownName("glpi_states", $data['states_id']) : '') . "</td>";
                     echo "<td class='center'>";
-                    echo Dropdown::getDropdownName("glpi_locations", $data['locations_id']) . "</td>";
+                    echo (isset($data['locations_id']) ? Dropdown::getDropdownName("glpi_locations", $data['locations_id']) : '') . "</td>";
                     echo "</tr>";
                 }
                 $totalnb += $nb;
@@ -520,7 +524,7 @@ class Item_Ticket extends CommonItilObject_Item
         }
 
         echo "</table>";
-        if ($canedit && $number) {
+        if ($canedit && $number && !$ticket_closed) {
             $massiveactionparams['ontop'] = false;
             Html::showMassiveActions($massiveactionparams);
             Html::closeForm();
@@ -536,6 +540,7 @@ class Item_Ticket extends CommonItilObject_Item
             $nb = 0;
             switch ($item->getType()) {
                 case 'Ticket':
+                    /** @var Ticket $item */
                     if (
                         ($_SESSION["glpiactiveprofile"]["helpdesk_hardware"] != 0)
                         && (count($_SESSION["glpiactiveprofile"]["helpdesk_item_type"]) > 0)
@@ -581,9 +586,13 @@ class Item_Ticket extends CommonItilObject_Item
      *
      * @return void
      **/
-    public static function dropdownMyDevices($userID = 0, $entity_restrict = -1, $itemtype = 0, $items_id = 0, $options = [])
+    public static function dropdownMyDevices($userID = 0, $entity_restrict = -1, $itemtype = '', $items_id = 0, $options = [])
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $params = ['tickets_id' => 0,
             'used'       => [],
@@ -598,6 +607,8 @@ class Item_Ticket extends CommonItilObject_Item
         if ($userID == 0) {
             $userID = Session::getLoginUserID();
         }
+
+        $entity_restrict = Session::getMatchingActiveEntities($entity_restrict);
 
         $rand        = $params['rand'];
         $already_add = $params['used'];
@@ -928,6 +939,7 @@ class Item_Ticket extends CommonItilObject_Item
      **/
     public static function dropdown($options = [])
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
        // Default values
@@ -989,7 +1001,7 @@ class Item_Ticket extends CommonItilObject_Item
     /**
      * Return used items for a ticket
      *
-     * @param integer type $tickets_id
+     * @param integer $tickets_id
      *
      * @return array
      */
@@ -1012,6 +1024,7 @@ class Item_Ticket extends CommonItilObject_Item
      **/
     public static function showFormMassiveAction($ma)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         switch ($ma->getAction()) {
@@ -1200,10 +1213,6 @@ class Item_Ticket extends CommonItilObject_Item
             $item = getItemForItemtype($this->fields['itemtype']);
             $item->getFromDB($this->fields['items_id']);
 
-            $link = $item->getFormURL();
-            if (!isset($link)) {
-                return;
-            }
             if (($name = $item->getName()) == NOT_AVAILABLE) {
                //TRANS: %1$s is the itemtype, %2$d is the id of the item
                 $item->fields['name'] = sprintf(
@@ -1252,10 +1261,6 @@ class Item_Ticket extends CommonItilObject_Item
             $item = getItemForItemtype($this->fields['itemtype']);
             $item->getFromDB($this->fields['items_id']);
 
-            $link = $item->getFormURL();
-            if (!isset($link)) {
-                return;
-            }
             if (isset($this->input['_no_message_link'])) {
                 $display = $item->getNameID();
             } else {

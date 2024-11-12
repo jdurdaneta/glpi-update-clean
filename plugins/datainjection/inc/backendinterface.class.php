@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DataInjection. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2007-2022 by DataInjection plugin team.
+ * @copyright Copyright (C) 2007-2023 by DataInjection plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/datainjection
  * -------------------------------------------------------------------------
@@ -33,20 +33,18 @@
 **/
 interface PluginDatainjectionBackendInterface
 {
-
-
     /**
     * Read from file
     *
     * @param $numberOfLines (default 1)
    **/
-    function read($numberOfLines = 1);
+    public function read($numberOfLines = 1);
 
 
     /**
     * Delete file
    **/
-    function deleteFile();
+    public function deleteFile();
 
 
     /**
@@ -58,12 +56,11 @@ interface PluginDatainjectionBackendInterface
     /**
     * Store the number of lines red from the file
    **/
-    function storeNumberOfLines();
+    public function storeNumberOfLines();
 
 
     /**
     * Get the number of lines in the file
    **/
-    function getNumberOfLines();
-
+    public function getNumberOfLines();
 }

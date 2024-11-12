@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -63,6 +63,7 @@ class Widget
      */
     public static function getAllTypes(): array
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $types = [
@@ -392,7 +393,6 @@ HTML;
         $class = $p['class'];
         $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
 
-        $alphabet = range('a', 'z');
         $numbers_html = "";
         $i = 0;
         foreach ($p['data'] as $entry) {
@@ -416,7 +416,7 @@ HTML;
             $formatted_number = Toolbox::shortenNumber($entry['number']);
 
             $numbers_html .= <<<HTML
-            <a {$href} class="line line-{$alphabet[$i]}">
+            <a {$href} class="line line-{$i}">
                <span class="content" {$color}>$formatted_number</span>
                <i class="icon {$entry['icon']}" {$color2}></i>
                <span class="label" {$color2}>{$entry['label']}</span>
@@ -543,7 +543,7 @@ HTML;
         $dark_bg_color = Toolbox::getFgColor($p['color'], 80);
         $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
 
-        $chart_id = "chart-{$p['cache_key']}";
+        $chart_id = Toolbox::slugify("chart-{$p['cache_key']}");
 
         $class = "pie";
         $class .= $p['half'] ? " half" : "";
@@ -1038,7 +1038,7 @@ JAVASCRIPT;
 
         $animation_duration = self::$animation_duration;
 
-        $chart_id = 'chart_' . $p['cache_key'];
+        $chart_id = Toolbox::slugify('chart_' . $p['cache_key']);
 
         $class = "bar";
         $class .= $p['horizontal'] ? " horizontal" : "";
@@ -1484,7 +1484,7 @@ JAVASCRIPT;
         $json_labels = json_encode($labels);
         $json_series = json_encode($series);
 
-        $chart_id = 'chart_' . $p['cache_key'];
+        $chart_id = Toolbox::slugify('chart_' . $p['cache_key']);
 
         $fg_color        = Toolbox::getFgColor($p['color']);
         $line_color      = Toolbox::getFgColor($p['color'], 10);
@@ -1741,12 +1741,14 @@ JAVASCRIPT;
             return $code;
         };
 
+        $content = RichText::getSafeHtml($md->transform($p['markdown_content']));
+
         $html = <<<HTML
       <div
          class="card markdown"
          style="background-color: {$p['color']}; color: {$fg_color}; border-color: {$border_color}">
 
-         <div class="html_content">{$md->transform($p['markdown_content'])}</div>
+         <div class="html_content">{$content}</div>
          <textarea
             class="markdown_content"
             placeholder="{$ph}">{$p['markdown_content']}</textarea>
@@ -1813,7 +1815,7 @@ HTML;
         ];
 
         ob_start();
-        $params = Search::manageParams($p['itemtype'], $params);
+        $params = Search::manageParams($p['itemtype'], $params, false);
        // remove parts of search list
         $params = array_merge($params, [
             'showmassiveactions' => false,
@@ -2011,7 +2013,6 @@ JAVASCRIPT;
             ];
         }
 
-        $alphabet = range('a', 'z');
         $min_l = 20; // min for luminosity
         $max_l = 20; // max ...
         $min_s = 30; // min for saturation
@@ -2026,7 +2027,7 @@ JAVASCRIPT;
         $colors = [];
 
         for ($i = 1; $i <= $nb_series; $i++) {
-            $names[$i - 1] = $alphabet[$i - 1];
+            $names[$i - 1] = $i - 1;
 
            // adjust luminosity
             $i_l_step = $i * $step_l + $min_l / 100;
@@ -2061,6 +2062,7 @@ JAVASCRIPT;
         string $css_dom_parent = "",
         bool $revert = true
     ) {
+        /** @var \Psr\SimpleCache\CacheInterface $GLPI_CACHE */
         global $GLPI_CACHE;
 
         $palette = self::getGradientPalette($bgcolor, $nb_series, $revert);

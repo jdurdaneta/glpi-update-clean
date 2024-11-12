@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -43,6 +43,7 @@ class Hooks
    // File hooks
     const ADD_CSS        = 'add_css';
     const ADD_JAVASCRIPT = 'add_javascript';
+    const ADD_HEADER_TAG = 'add_header_tag';
 
    // Function hooks with no parameters
     const CHANGE_ENTITY               = 'change_entity';
@@ -52,12 +53,14 @@ class Hooks
     const DISPLAY_NETPORT_LIST_BEFORE = 'display_netport_list_before';
     const INIT_SESSION                = 'init_session';
     const POST_INIT                   = 'post_init';
+    const CONFIG_PAGE                 = 'config_page';
 
    // Specific function hooks with parameters
     const RULE_MATCHED          = 'rule_matched';
     const VCARD_DATA            = 'vcard_data';
     const POST_PLUGIN_DISABLE   = 'post_plugin_disable';
     const POST_PLUGIN_CLEAN     = 'post_plugin_clean';
+    const POST_PLUGIN_INSTALL   = 'post_plugin_install';
     const POST_PLUGIN_UNINSTALL = 'post_plugin_uninstall';
     const POST_PLUGIN_ENABLE    = 'post_plugin_enable' ;
 
@@ -133,7 +136,7 @@ class Hooks
 
     const STALE_AGENT_CONFIG = 'stale_agent_config';
 
-   // Debug / Development hooks
+    // Debug / Development hooks
     const DEBUG_TABS = 'debug_tabs';
 
     // Helpdesk Menu Hooks
@@ -168,6 +171,7 @@ class Hooks
         return [
             self::CHANGE_ENTITY,
             self::CHANGE_PROFILE,
+            self::CONFIG_PAGE,
             self::DISPLAY_LOCKED_FIELDS,
             self::DISPLAY_LOGIN,
             self::DISPLAY_CENTRAL,
@@ -183,6 +187,7 @@ class Hooks
             self::UNDISCLOSED_CONFIG_VALUE,
             self::UNLOCK_FIELDS,
             self::VCARD_DATA,
+            self::ADD_HEADER_TAG
         ];
     }
 

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -86,6 +86,7 @@ class KnowbaseItemTranslation extends CommonDBChild
             $nb = 0;
             switch ($item->getType()) {
                 case __CLASS__:
+                    /** @var KnowbaseItemTranslation $item */
                     $ong[1] = $this->getTypeName(1);
                     if ($item->canUpdateItem()) {
                         $ong[3] = __('Edit');
@@ -115,6 +116,7 @@ class KnowbaseItemTranslation extends CommonDBChild
     {
 
         if ($item->getType() == __CLASS__) {
+            /** @var KnowbaseItemTranslation $item */
             switch ($tabnum) {
                 case 1:
                     $item->showFull();
@@ -125,7 +127,7 @@ class KnowbaseItemTranslation extends CommonDBChild
                     break;
 
                 case 3:
-                    $item->showForm($item->getID());
+                    $item->showForm($item->getID(), ['parent' => $item]);
                     break;
             }
         } else if (self::canBeTranslated($item)) {
@@ -143,6 +145,7 @@ class KnowbaseItemTranslation extends CommonDBChild
      **/
     public function showFull($options = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         if (!$this->can($this->fields['id'], READ)) {
@@ -185,6 +188,7 @@ class KnowbaseItemTranslation extends CommonDBChild
      **/
     public static function showTranslations(KnowbaseItem $item)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $canedit = $item->can($item->getID(), UPDATE);
@@ -277,15 +281,17 @@ class KnowbaseItemTranslation extends CommonDBChild
      */
     public function showForm($ID = -1, array $options = [])
     {
-        if (isset($options['parent']) && !empty($options['parent'])) {
-            $item = $options['parent'];
+        if (!($ID > 0) && !isset($options['parent']) || !($options['parent'] instanceof CommonDBTM)) {
+            // parent is mandatory in new item form
+            trigger_error('Parent item must be defined in `$options["parent"]`.', E_USER_WARNING);
+            return false;
         }
         if ($ID > 0) {
             $this->check($ID, READ);
         } else {
            // Create item
-            $options['itemtype']         = get_class($item);
-            $options['knowbaseitems_id'] = $item->getID();
+            $options['itemtype']         = get_class($options['parent']);
+            $options['knowbaseitems_id'] = $options['parent']->getID();
             $this->check(-1, CREATE, $options);
         }
         $this->showFormHeader($options);
@@ -301,7 +307,7 @@ class KnowbaseItemTranslation extends CommonDBChild
                 "language",
                 ['display_none' => false,
                     'value'        => $_SESSION['glpilanguage'],
-                    'used'         => self::getAlreadyTranslatedForItem($item)
+                    'used'         => self::getAlreadyTranslatedForItem($options['parent'])
                 ]
             );
         }
@@ -364,10 +370,11 @@ class KnowbaseItemTranslation extends CommonDBChild
     /**
      * Is kb item translation functionality active
      *
-     * @return true if active, false if not
+     * @return boolean true if active, false if not
      **/
     public static function isKbTranslationActive()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         return $CFG_GLPI['translate_kb'];
@@ -379,9 +386,9 @@ class KnowbaseItemTranslation extends CommonDBChild
      * It be translated if translation if globally on and item is an instance of CommonDropdown
      * or CommonTreeDropdown and if translation is enabled for this class
      *
-     * @param item the item to check
+     * @param $item the item to check
      *
-     * @return true if item can be translated, false otherwise
+     * @return boolean true if item can be translated, false otherwise
      **/
     public static function canBeTranslated(CommonGLPI $item)
     {
@@ -411,12 +418,13 @@ class KnowbaseItemTranslation extends CommonDBChild
     /**
      * Get already translated languages for item
      *
-     * @param item
+     * @param CommonDBTM $item
      *
      * @return array of already translated languages
      **/
     public static function getAlreadyTranslatedForItem($item)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $tab = [];

@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DataInjection. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2007-2022 by DataInjection plugin team.
+ * @copyright Copyright (C) 2007-2023 by DataInjection plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/datainjection
  * -------------------------------------------------------------------------
@@ -32,21 +32,17 @@ require '../../../inc/includes.php';
 
 /* Update mappings */
 if (isset($_POST["update"])) {
-
     PluginDatainjectionInfo::manageInfos($_POST['models_id'], $_POST);
-
 } else if (isset($_POST["delete"])) {
-
     $info = new PluginDatainjectionInfo();
-   foreach ($_POST["item"] as $key => $val) {
-      $input = ['id' => $key];
-      if ($val == 1) {
-         $info->check($key, UPDATE);
-         $info->delete($input);
-      }
-   }
+    foreach ($_POST["item"] as $key => $val) {
+        $input = ['id' => $key];
+        if ($val == 1) {
+            $info->check($key, UPDATE);
+            $info->delete($input);
+        }
+    }
     Html::back();
-
 }
 
 Session::setActiveTab('PluginDatainjectionModel', 'PluginDatainjectionModel$5');

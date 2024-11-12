@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DataInjection. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2007-2022 by DataInjection plugin team.
+ * @copyright Copyright (C) 2007-2023 by DataInjection plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/datainjection
  * -------------------------------------------------------------------------
@@ -32,51 +32,54 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
-class PluginDatainjectionApplianceInjection extends Appliance
-                                            implements PluginDatainjectionInjectionInterface
+class PluginDatainjectionApplianceInjection extends Appliance implements PluginDatainjectionInjectionInterface
 {
+    public static function getTable($classname = null)
+    {
+        $parenttype = get_parent_class(__CLASS__);
+        return $parenttype::getTable();
+    }
 
-   static function getTable($classname = null) {
-      $parenttype = get_parent_class();
-      return $parenttype::getTable();
-   }
+    public function isPrimaryType()
+    {
+        return true;
+    }
 
-   function isPrimaryType() {
-      return true;
-   }
-
-   function connectedTo() {
-      return [];
-   }
+    public function connectedTo()
+    {
+        return [];
+    }
 
    /**
     * @see plugins/datainjection/inc/PluginDatainjectionInjectionInterface::getOptions()
    **/
-   function getOptions($primary_type = '') {
+    public function getOptions($primary_type = '')
+    {
 
-      $tab           = Search::getOptions(get_parent_class($this));
+        $tab           = Search::getOptions(get_parent_class($this));
 
-      //Remove some options because some fields cannot be imported
-      $blacklist     = PluginDatainjectionCommonInjectionLib::getBlacklistedOptions(get_parent_class($this));
-      $notimportable = [5, 9, 31];
+       //Remove some options because some fields cannot be imported
+        $blacklist     = PluginDatainjectionCommonInjectionLib::getBlacklistedOptions(get_parent_class($this));
+        $notimportable = [5, 9, 31];
 
-      $options['ignore_fields'] = array_merge($blacklist, $notimportable);
-      $options['displaytype']   = [
-               "multiline_text" => [4],
-               "dropdown"       => [10, 11, 32],
-               "user"           => [6, 24],
-               "bool"           => [7, 61]
-      ];
+        $options['ignore_fields'] = array_merge($blacklist, $notimportable);
+        $options['displaytype']   = [
+            "multiline_text" => [4],
+            "dropdown"       => [8, 10, 11, 32, 49],
+            "user"           => [6, 24],
+            "bool"           => [7, 61]
+        ];
 
-      return PluginDatainjectionCommonInjectionLib::addToSearchOptions($tab, $options, $this);
-   }
+        return PluginDatainjectionCommonInjectionLib::addToSearchOptions($tab, $options, $this);
+    }
 
    /**
     * @see plugins/datainjection/inc/PluginDatainjectionInjectionInterface::addOrUpdateObject()
    **/
-   function addOrUpdateObject($values = [], $options = []) {
-      $lib = new PluginDatainjectionCommonInjectionLib($this, $values, $options);
-      $lib->processAddOrUpdate();
-      return $lib->getInjectionResults();
-   }
+    public function addOrUpdateObject($values = [], $options = [])
+    {
+        $lib = new PluginDatainjectionCommonInjectionLib($this, $values, $options);
+        $lib->processAddOrUpdate();
+        return $lib->getInjectionResults();
+    }
 }

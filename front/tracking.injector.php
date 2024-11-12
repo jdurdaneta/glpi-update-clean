@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -32,6 +32,16 @@
  *
  * ---------------------------------------------------------------------
  */
+
+use Glpi\Toolbox\Sanitizer;
+
+/**
+ * @var array $CFG_GLPI
+ * @var array $_UPOST
+ */
+global $CFG_GLPI, $_UPOST;
+
+$SECURITY_STRATEGY = 'no_check'; // Anonymous access may be allowed by configuration.
 
 include('../inc/includes.php');
 
@@ -58,9 +68,9 @@ if (isset($_POST["_type"]) && ($_POST["_type"] == "Helpdesk")) {
     Html::header(__('Simplified interface'), '', $_SESSION["glpiname"], "helpdesk", "tracking");
 }
 
-if (isset($_POST['_actors']) && is_string($_POST['_actors'])) {
+if (isset($_UPOST['_actors']) && is_string($_UPOST['_actors'])) {
     try {
-        $_POST['_actors'] = json_decode($_UPOST['_actors'], true, 512, JSON_THROW_ON_ERROR);
+        $_POST['_actors'] = Sanitizer::sanitize(json_decode($_UPOST['_actors'], true, 512, JSON_THROW_ON_ERROR));
     } catch (\JsonException $e) {
         $_POST['_actors'] = [];
     }
@@ -72,8 +82,7 @@ if (isset($_POST['add'])) {
         $track->getEmpty();
     }
     $_POST['check_delegatee'] = true;
-    if (isset($_UPOST['_actors'])) {
-        $_POST['_actors'] = json_decode($_UPOST['_actors'], true);
+    if (isset($_POST['_actors'])) {
        // with self-service, we only have observers
         unset($_POST['_actors']['requester'], $_POST['_actors']['assign']);
     }

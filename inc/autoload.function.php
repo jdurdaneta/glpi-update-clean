@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -57,6 +57,7 @@ function isCommandLine()
  */
 function isAPI()
 {
+    /** @var array $CFG_GLPI */
     global $CFG_GLPI;
 
     $called_url = (!empty($_SERVER['HTTPS'] ?? "") && ($_SERVER['HTTPS'] ?? "") !== 'off'
@@ -92,7 +93,6 @@ function isAPI()
 function isPluginItemType($classname)
 {
 
-    /** @var array $matches */
     if (preg_match("/^Plugin([A-Z][a-z0-9]+)([A-Z]\w+)$/", $classname, $matches)) {
         $plug           = [];
         $plug['plugin'] = $matches[1];
@@ -122,6 +122,7 @@ function isPluginItemType($classname)
  */
 function __($str, $domain = 'glpi')
 {
+    /** @var \Laminas\I18n\Translator\TranslatorInterface $TRANSLATE */
     global $TRANSLATE;
 
     $trans = null;
@@ -191,6 +192,7 @@ function _sx($ctx, $str, $domain = 'glpi')
  */
 function _n($sing, $plural, $nb, $domain = 'glpi')
 {
+    /** @var \Laminas\I18n\Translator\TranslatorInterface $TRANSLATE */
     global $TRANSLATE;
 
     $trans = null;

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -847,6 +847,7 @@ $RELATION = [
         'glpi_budgets'                   => 'locations_id',
         'glpi_cartridgeitems'            => 'locations_id',
         'glpi_certificates'              => 'locations_id',
+        'glpi_changes'                   => 'locations_id',
         'glpi_computers'                 => 'locations_id',
         'glpi_contracts'                 => 'locations_id',
         'glpi_consumableitems'           => 'locations_id',
@@ -857,6 +858,7 @@ $RELATION = [
         'glpi_devicesensors'             => 'locations_id',
         'glpi_enclosures'                => 'locations_id',
         'glpi_items_devicebatteries'     => 'locations_id',
+        'glpi_items_devicecameras'       => 'locations_id',
         'glpi_items_devicecases'         => 'locations_id',
         'glpi_items_devicecontrols'      => 'locations_id',
         'glpi_items_devicedrives'        => 'locations_id',
@@ -882,6 +884,7 @@ $RELATION = [
         'glpi_peripherals'               => 'locations_id',
         'glpi_phones'                    => 'locations_id',
         'glpi_printers'                  => 'locations_id',
+        'glpi_problems'                  => 'locations_id',
         'glpi_racks'                     => 'locations_id',
         'glpi_sockets'                   => 'locations_id',
         'glpi_softwarelicenses'          => 'locations_id',
@@ -1035,7 +1038,7 @@ $RELATION = [
     ],
 
     'glpi_operatingsystems' => [
-        '_glpi_items_operatingsystems' => 'operatingsystems_id',
+        'glpi_items_operatingsystems' => 'operatingsystems_id',
         'glpi_softwareversions'        => 'operatingsystems_id',
     ],
 
@@ -1624,10 +1627,12 @@ $define_mapping_entry = static function (string $source_table, string $target_ta
 };
 
 // Add polymorphic relations based on configuration.
+/** @var array $CFG_GLPI */
 global $CFG_GLPI;
 $specifically_managed_types = [
     Agent::class, // FIXME Agent should be a CommonDBChild with $mustBeAttached=true
     Consumable::class, // Consumables are handled manually to redefine `date_out` to `null`
+    DatabaseInstance::class, // FIXME DatabaseInstance should be a CommonDBChild with $mustBeAttached=true
     Item_Cluster::class, // FIXME $mustBeAttached_1 and $mustBeAttached_2 should probably be set to true
     Item_Enclosure::class, // FIXME $mustBeAttached_1 and $mustBeAttached_2 should probably be set to true
     Item_Rack::class, // FIXME $mustBeAttached_1 and $mustBeAttached_2 should probably be set to true
@@ -1708,6 +1713,7 @@ foreach ($polymorphic_types_mapping as $target_itemtype => $source_itemtypes) {
             // related item will be preserved with its foreign key defined to 0, making it an unwanted orphaned item.
             $target_table_key_prefix = '_';
         }
+        /** @var class-string<CommonDBTM> $target_itemtype */
         $target_table_key = $target_table_key_prefix . $target_itemtype::getTable();
         $source_table     = $source_itemtype::getTable();
 

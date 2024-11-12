@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
@@ -49,7 +49,7 @@ class Unmanaged extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return _n('Unmanaged device', 'Unmanaged devices', $nb);
+        return _n('Unmanaged asset', 'Unmanaged assets', $nb);
     }
 
     public function defineTabs($options = [])
@@ -184,6 +184,15 @@ class Unmanaged extends CommonDBTM
             'name'         => __('IP'),
         ];
 
+        $tab[] = [
+            'id'                 => '31',
+            'table'              => 'glpi_states',
+            'field'              => 'completename',
+            'name'               => __('Status'),
+            'datatype'           => 'dropdown',
+            'condition'          => ['is_visible_unmanaged' => 1]
+        ];
+
         return $tab;
     }
 
@@ -204,8 +213,8 @@ class Unmanaged extends CommonDBTM
     public static function getMassiveActionsForItemtype(
         array &$actions,
         $itemtype,
-        $is_deleted = 0,
-        CommonDBTM $checkitem = null
+        $is_deleted = false,
+        ?CommonDBTM $checkitem = null
     ) {
         if (self::canUpdate()) {
             $actions['Unmanaged' . MassiveAction::CLASS_ACTION_SEPARATOR . 'convert']    = __('Convert');
@@ -214,6 +223,7 @@ class Unmanaged extends CommonDBTM
 
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
         switch ($ma->getAction()) {
             case 'convert':
@@ -231,6 +241,7 @@ class Unmanaged extends CommonDBTM
         CommonDBTM $item,
         array $ids
     ) {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
         switch ($ma->getAction()) {
             case 'convert':
@@ -250,8 +261,9 @@ class Unmanaged extends CommonDBTM
      * @param int         $items_id ID of Unmanaged equipment
      * @param string|null $itemtype Item type to convert to. Will take Unmanaged value if null
      */
-    public function convert(int $items_id, string $itemtype = null)
+    public function convert(int $items_id, ?string $itemtype = null)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $this->getFromDB($items_id);

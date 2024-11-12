@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DataInjection. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2007-2022 by DataInjection plugin team.
+ * @copyright Copyright (C) 2007-2023 by DataInjection plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/datainjection
  * -------------------------------------------------------------------------
@@ -37,8 +37,9 @@ if (strpos($_SERVER['PHP_SELF'], "dropdownSelectModel.php")) {
 
 Session::checkCentralAccess();
 
-if (isset($_SESSION['datainjection']['models_id'])
-    && $_SESSION['datainjection']['models_id']!=$_POST['models_id']
+if (
+    isset($_SESSION['datainjection']['models_id'])
+    && $_SESSION['datainjection']['models_id'] != $_POST['models_id']
 ) {
     PluginDatainjectionModel::cleanSessionVariables();
 }
@@ -46,7 +47,8 @@ if (isset($_SESSION['datainjection']['models_id'])
 $_SESSION['datainjection']['step'] = PluginDatainjectionClientInjection::STEP_UPLOAD;
 $model = new PluginDatainjectionModel();
 
-if (($_POST['models_id'] > 0)
+if (
+    ($_POST['models_id'] > 0)
     && $model->can($_POST['models_id'], READ)
 ) {
     PluginDatainjectionInfo::showAdditionalInformationsForm($model);

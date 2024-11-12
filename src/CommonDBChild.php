@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -248,7 +248,7 @@ abstract class CommonDBChild extends CommonDBConnexity
      * @param $getFromDB   (true by default)
      * @param $getEmpty    (true by default)
      *
-     * @return object of the concerned item or false on error
+     * @return CommonDBTM|false of the concerned item or false on error
      **/
     public function getItem($getFromDB = true, $getEmpty = true)
     {
@@ -550,7 +550,7 @@ abstract class CommonDBChild extends CommonDBConnexity
      *
      * @return void
      **/
-    public function post_updateItem($history = 1)
+    public function post_updateItem($history = true)
     {
 
         if (
@@ -791,7 +791,7 @@ abstract class CommonDBChild extends CommonDBConnexity
      * @param string  $field_name  the name of the HTML field inside Item's form
      * @param integer $id          id of the child
      *
-     * @return void
+     * @return string|void
      **/
     public function showChildForItemForm($canedit, $field_name, $id, bool $display = true)
     {
@@ -832,7 +832,7 @@ abstract class CommonDBChild extends CommonDBConnexity
      * @param boolean      $display     true display or false to return the button HTML code
      *
      *
-     * @return void|string the button HTML code if $display is true, void otherwise
+     * @return void|false|string the button HTML code if $display is true, void otherwise
      **/
     public static function showAddChildButtonForItemForm(
         CommonDBTM $item,
@@ -901,6 +901,7 @@ abstract class CommonDBChild extends CommonDBConnexity
      **/
     public static function showChildsForItemForm(CommonDBTM $item, $field_name, $canedit = null, bool $display = true)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $items_id = $item->getID();
@@ -996,7 +997,7 @@ abstract class CommonDBChild extends CommonDBConnexity
 
     final public static function getItemField($itemtype): string
     {
-        if (is_subclass_of($itemtype, 'Rule')) {
+        if (is_subclass_of($itemtype, 'Rule') && !is_subclass_of($itemtype, 'LevelAgreementLevel')) {
             $itemtype = 'Rule';
         }
 

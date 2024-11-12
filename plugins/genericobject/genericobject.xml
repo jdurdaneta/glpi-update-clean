@@ -3,7 +3,7 @@
    <name>Generic Objects Management</name>
    <key>genericobject</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/pluginsGLPI/genericobject/master/genericobject.png</logo>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/genericobject/main/genericobject.png</logo>
    <description>
       <short>
          <fr><![CDATA[Faites l'inventaire de nouveaux types d'objets]]></fr>
@@ -24,6 +24,46 @@
       <author>Walid Nouh</author>
    </authors>
    <versions>
+      <version>
+         <num>2.14.10</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.10/glpi-genericobject-2.14.10.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.9</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.9/glpi-genericobject-2.14.9.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.8</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.8/glpi-genericobject-2.14.8.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.7</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.7/glpi-genericobject-2.14.7.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.6</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.6/glpi-genericobject-2.14.6.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.5</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.5/glpi-genericobject-2.14.5.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.4</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.4/glpi-genericobject-2.14.4.tar.bz2</download_url>
+      </version>
+      <version>
+         <num>2.14.3</num>
+         <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/genericobject/releases/download/2.14.3/glpi-genericobject-2.14.3.tar.bz2</download_url>
+      </version>
       <version>
          <num>2.14.2</num>
          <compatibility>~10.0.0</compatibility>
@@ -224,7 +264,7 @@
          </cs>
    </tags>
    <screenshots>
-      <screenshot>https://raw.githubusercontent.com/pluginsGLPI/genericobject/master/genericobject.gif</screenshot>
+      <screenshot>https://raw.githubusercontent.com/pluginsGLPI/genericobject/main/genericobject.gif</screenshot>
    </screenshots>
    <license>GPL v2+</license>
 </root>

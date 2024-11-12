@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -45,15 +45,15 @@ class Telemetry extends CommonGLPI
      *
      * @return array
      */
-    public static function getTelemetryInfos()
+    public static function getTelemetryInfos(bool $hide_sensitive_data = false)
     {
         $data = [
-            'glpi'   => self::grabGlpiInfos(),
+            'glpi'   => self::grabGlpiInfos($hide_sensitive_data),
             'system' => [
-                'db'           => self::grabDbInfos(),
-                'web_server'   => self::grabWebserverInfos(),
-                'php'          => self::grabPhpInfos(),
-                'os'           => self::grabOsInfos()
+                'db'           => self::grabDbInfos($hide_sensitive_data),
+                'web_server'   => self::grabWebserverInfos($hide_sensitive_data),
+                'php'          => self::grabPhpInfos($hide_sensitive_data),
+                'os'           => self::grabOsInfos($hide_sensitive_data)
             ]
         ];
 
@@ -65,13 +65,14 @@ class Telemetry extends CommonGLPI
      *
      * @return array
      */
-    public static function grabGlpiInfos()
+    public static function grabGlpiInfos(bool $hide_sensitive_data = false)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $glpi = [
-            'uuid'               => self::getInstanceUuid(),
-            'version'            => GLPI_VERSION,
+            'uuid'               => $hide_sensitive_data ? '********' : self::getInstanceUuid(),
+            'version'            => $hide_sensitive_data ? 'x.y.z' : GLPI_VERSION,
             'plugins'            => [],
             'default_language'   => $CFG_GLPI['language'],
             'install_mode'       => GLPI_INSTALL_MODE,
@@ -95,7 +96,7 @@ class Telemetry extends CommonGLPI
         foreach ($plugins->getList(['directory', 'version']) as $plugin) {
             $glpi['plugins'][] = [
                 'key'       => $plugin['directory'],
-                'version'   => $plugin['version']
+                'version'   => $hide_sensitive_data ? 'x.y.z' : $plugin['version']
             ];
         }
 
@@ -115,8 +116,9 @@ class Telemetry extends CommonGLPI
      *
      * @return array
      */
-    public static function grabDbInfos()
+    public static function grabDbInfos(bool $hide_sensitive_data = false)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $dbinfos = $DB->getInfo();
@@ -129,7 +131,7 @@ class Telemetry extends CommonGLPI
 
         $db = [
             'engine'    => $dbinfos['Server Software'],
-            'version'   => $dbinfos['Server Version'],
+            'version'   => $hide_sensitive_data ? 'x.y.z' : $dbinfos['Server Version'],
             'size'      => $size_res['dbsize'],
             'log_size'  => '',
             'sql_mode'  => $dbinfos['Server SQL Mode']
@@ -139,12 +141,15 @@ class Telemetry extends CommonGLPI
     }
 
     /**
-     * Grab web server part information
+     * Grab web server part information.
+     * As we cannot rely on `$_SERVER` information on CLI context, we have to get to do a request to the GLPI webserver
+     * and get the information from its response, if it is available.
      *
      * @return array
      */
-    public static function grabWebserverInfos()
+    public static function grabWebserverInfos(bool $hide_sensitive_data = false)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $server = [
@@ -153,7 +158,7 @@ class Telemetry extends CommonGLPI
         ];
 
         if (!filter_var(gethostbyname(parse_url($CFG_GLPI['url_base'], PHP_URL_HOST)), FILTER_VALIDATE_IP)) {
-           // Do not try to get headers if hostname cannot be resolved
+            // Do not try to get headers if hostname cannot be resolved
             return $server;
         }
 
@@ -163,16 +168,25 @@ class Telemetry extends CommonGLPI
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HEADER, 1);
 
-       // Issue #3180 - disable SSL certificate validation (wildcard, self-signed)
+        // Issue #3180 - disable SSL certificate validation (wildcard, self-signed)
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         if ($response = curl_exec($ch)) {
             $headers = substr($response, 0, curl_getinfo($ch, CURLINFO_HEADER_SIZE));
             $header_matches = [];
-            if (preg_match('/^Server: (?<engine>[^ ]+)\/(?<version>[^ ]+)/im', $headers, $header_matches)) {
+            // see RFC2616
+            //
+            // `Server` header may contains multiple values (e.g. Apache/2.4.46 (Debian) mod_fcgid/2.3.9 OpenSSL/1.1.1d).
+            // We only get the first value, assuming it corresponds to the server engine.
+            $separators = '\/() ';
+            $server_string_pattern = "(?<engine>[^{$separators}]+)" // mandatory `product`
+                . "(\/(?<version>[^$separators]+))?" // optional `/version`
+                . "( (?<comment>\([^$separators]+\)))?" // optional ` (comment)`
+            ;
+            if (preg_match("/^Server: {$server_string_pattern}/im", $headers, $header_matches) === 1) {
                 $server['engine']  = $header_matches['engine'];
-                $server['version'] = $header_matches['version'];
+                $server['version'] = $hide_sensitive_data ? 'x.y.z' : ($header_matches['version'] ?? null);
             }
         }
 
@@ -184,10 +198,10 @@ class Telemetry extends CommonGLPI
      *
      * @return array
      */
-    public static function grabPhpInfos()
+    public static function grabPhpInfos(bool $hide_sensitive_data = false)
     {
         $php = [
-            'version'   => str_replace(PHP_EXTRA_VERSION, '', PHP_VERSION),
+            'version'   => $hide_sensitive_data ? 'x.y.z' : str_replace(PHP_EXTRA_VERSION, '', PHP_VERSION),
             'modules'   => get_loaded_extensions(),
             'setup'     => [
                 'max_execution_time'    => ini_get('max_execution_time'),
@@ -207,7 +221,7 @@ class Telemetry extends CommonGLPI
      *
      * @return array
      */
-    public static function grabOsInfos()
+    public static function grabOsInfos(bool $hide_sensitive_data = false)
     {
         $distro = false;
         if (file_exists('/etc/redhat-release')) {
@@ -216,7 +230,7 @@ class Telemetry extends CommonGLPI
         $os = [
             'family'       => php_uname('s'),
             'distribution' => ($distro ?: ''),
-            'version'      => php_uname('r')
+            'version'      => $hide_sensitive_data ? 'x.y.z' : php_uname('r'),
         ];
         return $os;
     }
@@ -344,6 +358,7 @@ class Telemetry extends CommonGLPI
      */
     public static function getViewLink()
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $out = "<a id='view_telemetry' href='{$CFG_GLPI['root_doc']}/ajax/telemetry.php' class='btn btn-sm btn-info mt-2'>
@@ -369,6 +384,7 @@ class Telemetry extends CommonGLPI
      */
     public static function enable()
     {
+        /** @var \DBmysql $DB */
         global $DB;
         $DB->update(
             'glpi_crontasks',
@@ -384,6 +400,7 @@ class Telemetry extends CommonGLPI
      */
     public static function disable(): void
     {
+        /** @var \DBmysql $DB */
         global $DB;
         $DB->update(
             'glpi_crontasks',
@@ -399,6 +416,7 @@ class Telemetry extends CommonGLPI
      */
     public static function isEnabled()
     {
+        /** @var \DBmysql $DB */
         global $DB;
         $iterator = $DB->request([
             'SELECT' => ['state'],

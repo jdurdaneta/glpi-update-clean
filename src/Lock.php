@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -62,7 +62,11 @@ class Lock extends CommonGLPI
      **/
     public static function showForItem(CommonDBTM $item)
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $ID       = $item->getID();
         $itemtype = $item->getType();
@@ -239,6 +243,7 @@ class Lock extends CommonGLPI
                     $default_itemtype_label = $row['itemtype']::getTypeName();
                     $default_object_link    = $object->getLink();
                     $default_itemtype       = $row['itemtype'];
+                    $default_items_id       = null;
 
                     //get real type name from Item_Devices
                     // ex: get 'Hard drives' instead of 'Hard drive items'
@@ -276,7 +281,7 @@ class Lock extends CommonGLPI
                     // specific link for CommonDBRelation itemtype (like Item_OperatingSystem)
                     // get 'real' object name inside URL name
                     // ex: get 'Ubuntu 22.04.1 LTS' instead of 'Computer asus-desktop'
-                    if (is_a($row['itemtype'], CommonDBRelation::class, true)) {
+                    if ($default_items_id !== null && is_a($row['itemtype'], CommonDBRelation::class, true)) {
                         $related_object = new $default_itemtype();
                         $related_object->getFromDB($object->fields[$default_items_id]);
                         $default_object_link = "<a href='" . $object->getLinkURL() . "'" . $related_object->getName() . ">" . $related_object->getName() . "</a>";
@@ -338,7 +343,7 @@ class Lock extends CommonGLPI
                 ];
                 $params['FIELDS'] = ['id', 'items_id'];
                 $first  = true;
-                foreach ($DB->request('glpi_computers_items', $params) as $line) {
+                foreach ($DB->request(Computer_Item::getTable(), $params) as $line) {
                     /** @var CommonDBTM $asset */
                     $asset = new $type();
                     $asset->getFromDB($line['items_id']);
@@ -866,6 +871,7 @@ class Lock extends CommonGLPI
             $domain = new Domain();
             $domain_relation = new DomainRelation();
 
+            $link = '';
             if ($domain->getFromDB($row['domains_id'])) {
                 $link = $domain->getLink();
             }
@@ -925,31 +931,28 @@ class Lock extends CommonGLPI
     }
 
 
-    /**
-     * @see CommonGLPI::getTabNameForItem()
-     *
-     * @param $item               CommonGLPI object
-     * @param $withtemplate       (default 0)
-     **/
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
 
-        if ($item->isDynamic() && $item->can($item->fields['id'], UPDATE)) {
+        if (
+            ($item instanceof CommonDBTM)
+            && $item->isDynamic()
+            && $item->can($item->fields['id'], UPDATE)
+        ) {
             return Lock::getTypeName(Session::getPluralNumber());
         }
         return '';
     }
 
 
-    /**
-     * @param $item            CommonGLPI object
-     * @param $tabnum          (default 1)
-     * @param $withtemplate    (default 0)
-     **/
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
-        if ($item->isDynamic() && $item->can($item->fields['id'], UPDATE)) {
+        if (
+            ($item instanceof CommonDBTM)
+            && $item->isDynamic()
+            && $item->can($item->fields['id'], UPDATE)
+        ) {
             self::showForItem($item);
         }
         return true;
@@ -966,6 +969,7 @@ class Lock extends CommonGLPI
      **/
     public static function getLocksQueryInfosByItemType($itemtype, $baseitemtype)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $condition = [];
@@ -1085,9 +1089,10 @@ class Lock extends CommonGLPI
     public static function getMassiveActionsForItemtype(
         array &$actions,
         $itemtype,
-        $is_deleted = 0,
-        CommonDBTM $checkitem = null
+        $is_deleted = false,
+        ?CommonDBTM $checkitem = null
     ) {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $action_unlock_component = __CLASS__ . MassiveAction::CLASS_ACTION_SEPARATOR . 'unlock_component';
@@ -1172,6 +1177,7 @@ class Lock extends CommonGLPI
         CommonDBTM $baseitem,
         array $ids
     ) {
+        /** @var \DBmysql $DB */
         global $DB;
 
         switch ($ma->getAction()) {
@@ -1192,11 +1198,11 @@ class Lock extends CommonGLPI
                             "field" => $lock_fields_name,
                             "is_global" => 0
                         ]);
-                    }
-                    if ($res) {
-                        $ma->itemDone($base_itemtype, $id, MassiveAction::ACTION_OK);
-                    } else {
-                        $ma->itemDone($base_itemtype, $id, MassiveAction::ACTION_KO);
+                        if ($res) {
+                            $ma->itemDone($base_itemtype, $id, MassiveAction::ACTION_OK);
+                        } else {
+                            $ma->itemDone($base_itemtype, $id, MassiveAction::ACTION_KO);
+                        }
                     }
                 }
                 return;

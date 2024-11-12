@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -47,6 +47,7 @@ abstract class Device extends InventoryAsset
      */
     protected function getExisting($itemdevicetable, $fk): array
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $db_existing = [];
@@ -68,6 +69,7 @@ abstract class Device extends InventoryAsset
 
     public function handle()
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $devicetypes = Item_Devices::getItemAffinities($this->item->getType());
@@ -173,7 +175,7 @@ abstract class Device extends InventoryAsset
                         'items_id' => $this->item->fields['id'],
                         'is_dynamic' => 1
                     ] + $this->handleInput($val, $itemdevice);
-                    $itemdevice->add(Sanitizer::sanitize($itemdevice_data), [], false);
+                    $itemdevice->add(Sanitizer::sanitize($itemdevice_data), [], !$this->item->isNewItem()); //log only if mainitem is not new
                     $this->itemdeviceAdded($itemdevice, $val);
                 }
 
@@ -186,12 +188,7 @@ abstract class Device extends InventoryAsset
             foreach ($existing as $data) {
                 foreach ($data as $itemdevice_data) {
                     if ($itemdevice_data['is_dynamic'] == 1) {
-                        $DB->delete(
-                            $itemdevice->getTable(),
-                            [
-                                'id' => $itemdevice_data['id']
-                            ]
-                        );
+                        $itemdevice->delete(['id' => $itemdevice_data['id']], true, !$this->item->isNewItem()); //log only if mainitem is not new
                     }
                 }
             }

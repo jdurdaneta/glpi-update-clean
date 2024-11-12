@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -89,6 +89,7 @@ class Antivirus extends InventoryAsset
      */
     protected function getExisting(): array
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $db_existing = [];
@@ -115,7 +116,7 @@ class Antivirus extends InventoryAsset
         $value = $this->data;
         $computerAntivirus = new ComputerAntivirus();
 
-       //check for existing
+        //check for existing
         foreach ($value as $k => $val) {
             $compare = ['name' => $val->name, 'antivirus_version' => $val->antivirus_version];
             $compare = array_map('strtolower', $compare);
@@ -134,7 +135,7 @@ class Antivirus extends InventoryAsset
             }
         }
 
-        if ((!$this->main_asset || !$this->main_asset->isPartial()) && count($db_antivirus) !== 0) {
+        if (count($db_antivirus) !== 0) {
             foreach ($db_antivirus as $idtmp => $data) {
                 if ($data['is_dynamic'] == 1) {
                     $computerAntivirus->delete(['id' => $idtmp], true);

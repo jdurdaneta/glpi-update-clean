@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -90,6 +90,7 @@ class State extends CommonTreeDropdown
      **/
     public static function dropdownBehaviour($name, $lib = "", $value = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $elements = ["0" => __('Keep status')];
@@ -113,7 +114,11 @@ class State extends CommonTreeDropdown
 
     public static function showSummary()
     {
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
         $state_type = $CFG_GLPI["state_types"];
         $states     = [];
@@ -536,6 +541,7 @@ class State extends CommonTreeDropdown
      */
     public function isUnique($input)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $unicity_fields = ['states_id', 'name'];
@@ -570,14 +576,17 @@ class State extends CommonTreeDropdown
             'WHERE'  => $where
         ];
         $row = $DB->request($query)->current();
-        return (int)$row['cpt'] == 0;
+        return ((int)$row['cpt'] === 0);
     }
 
     /**
      * Get visibility fields from conf
+     *
+     * @return array<string,string>
      */
     protected function getvisibilityFields(): array
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
         $fields = [];
         foreach ($CFG_GLPI['state_types'] as $type) {

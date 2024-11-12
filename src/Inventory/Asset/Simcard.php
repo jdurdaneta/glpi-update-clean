@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -37,14 +37,16 @@ namespace Glpi\Inventory\Asset;
 
 use CommonDBTM;
 use Glpi\Inventory\Conf;
+use Toolbox;
 
 class Simcard extends Device
 {
     public function prepare(): array
     {
         $mapping = [
-            'imsi' => 'serial'
+            'subscriber_id' => 'msin',
         ];
+
         foreach ($this->data as $k => &$val) {
             foreach ($mapping as $origin => $dest) {
                 if (property_exists($val, $origin)) {
@@ -52,6 +54,7 @@ class Simcard extends Device
                 }
             }
         }
+
         return $this->data;
     }
 

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -34,6 +34,7 @@
  */
 
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\Toolbox\Sanitizer;
 
 /**
  * Virtual machine management
@@ -68,7 +69,7 @@ class ComputerVirtualMachine extends CommonDBChild
 
         if (
             !$withtemplate
-            && ($item->getType() == 'Computer')
+            && $item instanceof Computer
             && Computer::canView()
         ) {
             $nb = 0;
@@ -198,7 +199,8 @@ class ComputerVirtualMachine extends CommonDBChild
 
                 $computer = new Computer();
                 foreach ($hosts as $host) {
-                    echo "<tr class='tab_bg_2'>";
+                    $class = $host['is_deleted'] ? "deleted" : "";
+                    echo "<tr class='tab_bg_2 $class' >";
                     echo "<td>";
                     if ($computer->can($host['computers_id'], READ)) {
                         echo "<a href='" . Computer::getFormURLWithID($computer->fields['id']) . "'>";
@@ -397,7 +399,7 @@ class ComputerVirtualMachine extends CommonDBChild
             }
         }
 
-        return $in;
+        return Sanitizer::sanitize($in);
     }
 
 
@@ -410,6 +412,7 @@ class ComputerVirtualMachine extends CommonDBChild
      **/
     public static function findVirtualMachine($fields = [])
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (!isset($fields['uuid']) || empty($fields['uuid'])) {
@@ -489,6 +492,8 @@ class ComputerVirtualMachine extends CommonDBChild
             'datatype'           => 'string',
             'massiveaction'      => false,
         ];
+
+        $tab = array_merge($tab, Computer::rawSearchOptionsToAdd("ComputerVirtualMachine"));
 
         return $tab;
     }

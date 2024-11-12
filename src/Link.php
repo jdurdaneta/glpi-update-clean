@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -46,7 +46,7 @@ class Link extends CommonDBTM
     public static $rightname = 'link';
     public static $tags      = ['[LOGIN]', '[ID]', '[NAME]', '[LOCATION]', '[LOCATIONID]', '[IP]',
         '[MAC]', '[NETWORK]', '[DOMAIN]', '[SERIAL]', '[OTHERSERIAL]',
-        '[USER]', '[GROUP]', '[REALNAME]', '[FIRSTNAME]'
+        '[USER]', '[GROUP]', '[REALNAME]', '[FIRSTNAME]', '[MODEL]'
     ];
 
 
@@ -266,17 +266,18 @@ class Link extends CommonDBTM
      *
      * @param string        $link       original string content
      * @param CommonDBTM    $item       item used to make replacements
-     * @param bool          $safe_url   indicates whether URL should be sanitized or not
      *
      * @return array of link contents (may have several when item have several IP / MAC cases)
-     *
-     * @FIXME Uncomment $safe_url parameter declaration in GLPI 10.1.
      */
-    public static function generateLinkContents($link, CommonDBTM $item/*, bool $safe_url = true*/)
+    public static function generateLinkContents($link, CommonDBTM $item)
     {
         $safe_url = func_num_args() === 3 ? func_get_arg(2) : true;
 
-        global $DB, $CFG_GLPI;
+        /**
+         * @var array $CFG_GLPI
+         * @var \DBmysql $DB
+         */
+        global $CFG_GLPI, $DB;
 
        // Replace [FIELD:<field name>]
         $matches = [];
@@ -307,6 +308,16 @@ class Link extends CommonDBTM
             && $item->isField('serial')
         ) {
             $link = str_replace("[SERIAL]", $item->getField('serial'), $link);
+        }
+        if (
+            strstr($link, "[MODEL]")
+            && ($model_class = $item->getModelClass()) !== null
+        ) {
+            $link = str_replace(
+                "[MODEL]",
+                Dropdown::getDropdownName($model_class::getTable(), $item->getField($model_class::getForeignKeyField())),
+                $link
+            );
         }
         if (
             strstr($link, "[OTHERSERIAL]")
@@ -586,6 +597,7 @@ class Link extends CommonDBTM
      **/
     public static function showForItem(CommonDBTM $item, $withtemplate = 0)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         if (!self::canView()) {
@@ -636,6 +648,7 @@ class Link extends CommonDBTM
      **/
     public static function getAllLinksFor($item, $params = [])
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $computedlinks = [];
@@ -753,6 +766,7 @@ class Link extends CommonDBTM
 
     public static function getLinksDataForItem(CommonDBTM $item)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $restrict = self::getEntityRestrictForItem($item);

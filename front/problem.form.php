@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -34,6 +34,7 @@
  */
 
 use Glpi\Event;
+use Glpi\Toolbox\Sanitizer;
 
 include('../inc/includes.php');
 
@@ -43,9 +44,8 @@ if (empty($_GET["id"])) {
 
 Session::checkLoginUser();
 
-// as _actors virtual field stores json, bypass automatic escaping
 if (isset($_UPOST['_actors'])) {
-    $_POST['_actors'] = json_decode($_UPOST['_actors'], true);
+    $_POST['_actors'] = Sanitizer::sanitize(json_decode($_UPOST['_actors'], true));
     $_REQUEST['_actors'] = $_POST['_actors'];
 }
 
@@ -206,7 +206,7 @@ if (isset($_POST["add"])) {
     } else {
         $options = $_REQUEST;
         if (isset($_GET['id']) && ($_GET['id'] > 0)) {
-            $url = KnowbaseItem::getFormURLWithParam($_GET) . '&_in_modal=1&item_itemtype=Ticket&item_items_id=' . $_GET['id'];
+            $url = KnowbaseItem::getFormURLWithParam($_GET) . '&_in_modal=1&item_itemtype=Problem&item_items_id=' . $_GET['id'];
             if (strpos($url, '_to_kb=') !== false) {
                 $options['after_display'] = Ajax::createIframeModalWindow(
                     'savetokb',

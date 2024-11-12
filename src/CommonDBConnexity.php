@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -112,6 +112,7 @@ abstract class CommonDBConnexity extends CommonDBTM
      **/
     public function cleanDBonItemDelete($itemtype, $items_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
 
         $criteria = static::getSQLCriteriaToSearchForItem($itemtype, $items_id);
@@ -198,6 +199,7 @@ abstract class CommonDBConnexity extends CommonDBTM
      */
     public static function getItemsAssociationRequest($itemtype, $items_id)
     {
+        /** @var \DBmysql $DB */
         global $DB;
         return $DB->request(static::getSQLCriteriaToSearchForItem($itemtype, $items_id));
     }
@@ -282,7 +284,7 @@ abstract class CommonDBConnexity extends CommonDBTM
      * @param $input   array   the new values for the current item
      * @param $fields  array   list of fields that define the attached items
      *
-     * @return true if the attached item has changed, false if the attached items has not changed
+     * @return boolean true if the attached item has changed, false if the attached items has not changed
      **/
     public function checkAttachedItemChangesAllowed(array $input, array $fields)
     {
@@ -307,22 +309,24 @@ abstract class CommonDBConnexity extends CommonDBTM
            // Solution 1 : If we cannot create the new item or delete the old item,
            // then we cannot update the item
             unset($new_item->fields);
+
             if (
-                !$new_item->can(-1, CREATE, $input)
-                || !$this->can($this->getID(), DELETE)
-                || !$this->can($this->getID(), PURGE)
+                $new_item->can(-1, CREATE, $input)
+                && (!$this->maybeDeleted() || $this->can($this->getID(), DELETE))
+                && $this->can($this->getID(), PURGE)
             ) {
-                Session::addMessageAfterRedirect(
-                    sprintf(
-                        __('Cannot update item %s #%s: not enough right on the parent(s) item(s)'),
-                        $new_item->getTypeName(),
-                        $new_item->getID()
-                    ),
-                    INFO,
-                    true
-                );
-                return false;
+                return true;
             }
+            Session::addMessageAfterRedirect(
+                sprintf(
+                    __('Cannot update item %s #%s: not enough right on the parent(s) item(s)'),
+                    $new_item->getTypeName(),
+                    $new_item->getID()
+                ),
+                INFO,
+                true
+            );
+            return false;
 
            // Solution 2 : simple check ! Can we update the item with new values ?
            // if (!$new_item->can($input['id'], 'w')) {
@@ -396,7 +400,7 @@ abstract class CommonDBConnexity extends CommonDBTM
      * @param string          $items_id      the name of the field of the id of the item to get
      * @param CommonDBTM|null &$item         the item concerned by the item
      *
-     * @return true if we have absolute right to create the current connexity
+     * @return boolean true if we have absolute right to create the current connexity
      **/
     public function canConnexityItem(
         $methodItem,
@@ -404,7 +408,7 @@ abstract class CommonDBConnexity extends CommonDBTM
         $item_right,
         $itemtype,
         $items_id,
-        CommonDBTM &$item = null
+        ?CommonDBTM &$item = null
     ) {
 
        // Do not get it twice
@@ -532,8 +536,8 @@ abstract class CommonDBConnexity extends CommonDBTM
     public static function getMassiveActionsForItemtype(
         array &$actions,
         $itemtype,
-        $is_deleted = 0,
-        CommonDBTM $checkitem = null
+        $is_deleted = false,
+        ?CommonDBTM $checkitem = null
     ) {
 
         $unaffect = false;
@@ -650,6 +654,7 @@ abstract class CommonDBConnexity extends CommonDBTM
                 return true;
 
             case 'affect':
+                $peertype  = null;
                 $peertypes = [];
                 foreach ($itemtypes as $itemtype => $specificities) {
                     if (!$specificities['reaffect']) {
@@ -679,7 +684,7 @@ abstract class CommonDBConnexity extends CommonDBTM
                 if (count($peertypes) == 1) {
                     $options['name']   = 'peers_id';
                     $type_for_dropdown = $peertypes[0];
-                    if (preg_match('/^itemtype/', $peertype)) {
+                    if ($peertype !== null && preg_match('/^itemtype/', $peertype)) {
                         echo Html::hidden('peertype', ['value' => $type_for_dropdown]);
                     }
                     $type_for_dropdown::dropdown($options);

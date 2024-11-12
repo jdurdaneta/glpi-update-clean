@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -147,7 +147,7 @@ class Sanitizer
      *
      * @param string $value
      *
-     * @return string
+     * @return bool
      */
     public static function isDbEscaped(string $value): bool
     {
@@ -219,6 +219,7 @@ class Sanitizer
 
     /**
      * Check wether the value correspond to a valid namespaced class (or a callable identifier related to a valid class).
+     * Note: also support the {namespace}${tab number} format used for tab identifications
      *
      * @param string $value
      *
@@ -227,8 +228,12 @@ class Sanitizer
     public static function isNsClassOrCallableIdentifier(string $value): bool
     {
         $class_match = [];
-        return preg_match('/^(?<class>(([a-zA-Z0-9_]+\\\)+[a-zA-Z0-9_]+))(:?:[a-zA-Z0-9_]+)?$/', $value, $class_match)
-            && class_exists($class_match['class']);
+
+        return preg_match(
+            '/^(?<class>(([a-zA-Z0-9_]+\\\)+[a-zA-Z0-9_]+))(:?:[a-zA-Z0-9_]+)?(\$[0-9]+)?$/',
+            $value,
+            $class_match
+        ) && class_exists($class_match['class']);
     }
 
     /**
@@ -363,6 +368,7 @@ class Sanitizer
             return $value;
         }
 
+        /** @var \DBmysql $DB */
         global $DB;
         return $DB->escape($value);
     }

@@ -7,7 +7,7 @@
  *
  * http://glpi-project.org
  *
- * @copyright 2015-2023 Teclib' and contributors.
+ * @copyright 2015-2024 Teclib' and contributors.
  * @copyright 2003-2014 by the INDEPNET Development Team.
  * @copyright 2010-2022 by the FusionInventory Development Team.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
@@ -138,6 +138,9 @@ class NetworkEquipment extends MainAsset
                 $stack->$model_field = $switch->model;
                 $stack->description = $stack->name . ' - ' . ($switch->name ?? $switch->description);
                 $stack->name = $stack->name . ' - ' . ($switch->name ?? $switch->description);
+                if (($switch->name ?? $switch->description) != $switch->stack_number ?? '') {
+                    $stack->name .= ' - ' . $switch->stack_number;
+                }
                 $stack->stack_number = $switch->stack_number ?? null;
                 $this->data[] = $stack;
             }
@@ -232,7 +235,7 @@ class NetworkEquipment extends MainAsset
         }
     }
 
-    public function handleLinks(array $data = null)
+    public function handleLinks(?array $data = null)
     {
         if ($this->current_key !== null) {
             $data = [$this->data[$this->current_key]];
@@ -342,60 +345,6 @@ class NetworkEquipment extends MainAsset
 
         ksort($switches);
         return $switches;
-    }
-
-    /**
-     * Returns a mapping of port indexes to chassis id
-     *
-     * @return array
-     */
-    public function getStackedPortsMap(): array
-    {
-        $components = $this->extra_data['network_components'] ?? [];
-        foreach ($components as $i => $component) {
-            foreach (['type', 'contained_index', 'index'] as $prop) {
-                if (!property_exists($component, $prop)) {
-                    unset($components[$i]);
-                    continue 2;
-                }
-            }
-        }
-        if (!count($components)) {
-            return [];
-        }
-
-        $map = [];
-        foreach ($components as $component) {
-            if ($component->type == 'port') {
-                $chassis_id = $this->traverseComponents($components, $component->contained_index);
-                if ($chassis_id) {
-                    $map[$component->index] = $chassis_id;
-                }
-            }
-        }
-
-        return $map;
-    }
-
-    private function traverseComponents(array $components, int $index, int $depth = 0): ?int
-    {
-        // max level of recursion
-        if ($depth > 5) {
-            return null;
-        }
-
-        foreach ($components as $component) {
-            if ($component->index == $index) {
-                if ($component->type == 'chassis') {
-                    return $component->index;
-                } else {
-                    $depth++;
-                    return $this->traverseComponents($components, $component->contained_index, $depth);
-                }
-            }
-        }
-
-        return null;
     }
 
     /**

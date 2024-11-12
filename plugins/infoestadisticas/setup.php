@@ -35,7 +35,7 @@ define('PLUGIN_INFOESTADISTICAS_VERSION', '3.0');
 // Minimal GLPI version, inclusive
 define('PLUGIN_INFOESTADISTICAS_MIN_GLPI', '9.5.0');
 // Maximum GLPI version, exclusive
-define('PLUGIN_INFOESTADISTICAS_MAX_GLPI', '10.0.9');
+define('PLUGIN_INFOESTADISTICAS_MAX_GLPI', '10.0.20');
 
 /**
  * Init hooks of the plugin.
