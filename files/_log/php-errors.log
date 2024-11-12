@@ -1,0 +1,31 @@
+[2024-11-12 09:28:46] glpiphplog.WARNING: Test logger  
+[2024-11-12 09:29:07] glpiphplog.WARNING: Test logger  
+[2024-11-12 09:30:48] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/palettes/auror.scss  {"user":"@PC140-08"} 
+[2024-11-12 09:31:07] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/gridstack-grids.scss  {"user":"100111@PC140-08"} 
+[2024-11-12 09:31:10] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/chartist.scss  {"user":"100111@PC140-08"} 
+[2024-11-12 09:31:10] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/dashboard.scss  {"user":"100111@PC140-08"} 
+[2024-11-12 09:31:42] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/reservations.scss  {"user":"100111@PC140-08"} 
+[2024-11-12 09:31:56] glpiphplog.WARNING:   *** PHP User Warning (512): The picture 'C:\xampp\htdocs\glpi_7_new/files/_pictures/a7/3go.png' referenced by the ComputerModel with ID 215 does not exist in C:\xampp\htdocs\glpi_7_new\src\CommonDBTM.php at line 6113
+  Backtrace :
+  src\CommonDBTM.php:6113                            trigger_error()
+  ...\twig\twig\src\Extension\CoreExtension.php:1635 CommonDBTM->getItemtypeOrModelPicture()
+  ...ates\a8\a8d42a98bcdb3496f114f2e5b0202436.php:52 twig_get_attribute()
+  vendor\twig\twig\src\Template.php:394              __TwigTemplate_dc52d20c9b27f32ec56888f8bf729d9d->doDisplay()
+  vendor\twig\twig\src\Template.php:367              Twig\Template->displayWithErrorHandling()
+  vendor\twig\twig\src\Template.php:379              Twig\Template->display()
+  vendor\twig\twig\src\TemplateWrapper.php:40        Twig\Template->render()
+  ...\twig\twig\src\Extension\CoreExtension.php:1347 Twig\TemplateWrapper->render()
+  ...tes\c3\c38d6a7a109b8d932eab737e7392c892.php:118 twig_include()
+  vendor\twig\twig\src\Template.php:394              __TwigTemplate_af0cc283d72c1eaf9abf6cfcc818726e->doDisplay()
+  vendor\twig\twig\src\Template.php:367              Twig\Template->displayWithErrorHandling()
+  vendor\twig\twig\src\TemplateWrapper.php:47        Twig\Template->display()
+  src\Application\View\TemplateRenderer.php:179      Twig\TemplateWrapper->display()
+  src\CommonDBTM.php:489                             Glpi\Application\View\TemplateRenderer->display()
+  src\CommonGLPI.php:676                             CommonDBTM->showForm()
+  ajax\common.tabs.php:116                           CommonGLPI::displayStandardTab()
+  

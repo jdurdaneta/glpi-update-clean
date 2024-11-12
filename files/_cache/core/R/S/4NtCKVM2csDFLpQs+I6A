@@ -1,0 +1,8 @@
+0
+a1417685a1fde3dccf70aed203d7a73bda039500
+s:186:"body.navbar-collapsed .navbar-brand .glpi-logo {
+    background: url("../pics/logos/logo_espana.png") no-repeat;
+    background-size: contain;
+    width: 40px;
+    height: 40px;
+  }";

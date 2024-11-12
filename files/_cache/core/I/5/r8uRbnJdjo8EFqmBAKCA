@@ -1,0 +1,163 @@
+1731400317
+738b924673d8cbecabeb33f8ee2e3826ce83fa63
+a:1:{s:58:"count_Computer_Entity_a1016149-3b38-4f97-aafb-5a9f04f5a692";s:19282:"      <style>
+         #chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 {
+            background-color: #fafafa;
+            color: #949494
+         }
+
+         .theme-dark #chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 {
+            background-color: #2e2e2e;
+            color: #949494;
+         }
+
+         #chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .ct-label {
+            fill: #949494;
+            color: #949494;
+         }
+
+         .theme-dark #chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .ct-label {
+            fill: #949494;
+            color: #949494;
+         }
+
+         
+      </style>
+      <div style="height: 100%">
+         <div class="card g-chart pie half donut filter-dates filter-dates_mod filter-location filter-manufacturer filter-group_tech filter-user_tech filter-state"
+            id="chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710">
+            <div class="chart ct-chart"></div>
+            <span class="main-label">Ordenadores por Entidades</span>
+            <i class="main-icon ti ti-stack"></i>
+         </div>
+      </div><script type="text/javascript">
+//<![CDATA[
+
+      $(function () {
+         if (Dashboard.getActiveDashboard()) {
+            var target = Dashboard.getActiveDashboard().element.find('#chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .chart')[0];
+         } else {
+            var target = '#chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .chart';
+         }
+         var chart = new Chartist.Pie(target, {
+            labels: ["Ministerio de Educaci\u00f3n > Melilla > 41 CEIP Pintor Eduardo Morillas","Ministerio de Educaci\u00f3n > Melilla > 43 CEIP Reyes Cat\u00f3licos","Ministerio de Educaci\u00f3n > Melilla > 55 IES Virgen de la Victoria","Ministerio de Educaci\u00f3n > Melilla > 51 IES Juan Antonio Fern\u00e1ndez P\u00e9rez","Ministerio de Educaci\u00f3n > Melilla > 44 CEIP Vel\u00e1zquez","Ministerio de Educaci\u00f3n > Melilla > 39 CEIP Juan Caro Romero","Ministerio de Educaci\u00f3n > Melilla > 53 IES Miguel Fern\u00e1ndez","Ministerio de Educaci\u00f3n > Melilla > 52 IES Leopoldo Queipo","Ministerio de Educaci\u00f3n > Melilla > 36 CEIP Pedro de Estopi\u00f1\u00e1n","Ministerio de Educaci\u00f3n > Melilla > 54 IES Rusadir","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 104 CEIP Jose Ortega y Gasset","Ministerio de Educaci\u00f3n > Melilla > 45 CEIP Espa\u00f1a","Ministerio de Educaci\u00f3n > Melilla > 35 CEIP Anselmo Pardo Alcaide","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 137 IES Siete Colinas","Ministerio de Educaci\u00f3n > Melilla > 42 CEIP Real","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 139 CIFP N\u00ba 1","Ministerio de Educaci\u00f3n > Melilla > 40 CEIP Le\u00f3n Sol\u00e1","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 134 IES Clara Campoamor","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 135 IES Luis de Camoens","Ministerio de Educaci\u00f3n > Melilla > 50 IES Enrique Nieto","Ministerio de Educaci\u00f3n > Melilla > 38 CEIP Hip\u00f3dromo","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 118 CEIP Lope de Vega","Ministerio de Educaci\u00f3n > Melilla > 37 CEIP Constituci\u00f3n","Ministerio de Educaci\u00f3n > Melilla > 60 EA Miguel Marmolejo","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 107 CEIP Ciudad de Ceuta","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 105 CEIP Maestro Jose Acosta","Ministerio de Educaci\u00f3n > Melilla > 71 CEIP Mediterr\u00e1neo","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 133 IES Almina","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 110 CEIP Santiago Ram\u00f3n y Cajal","Ministerio de Educaci\u00f3n > Melilla > 56 CIFP Reina Victoria Eugenia","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 103 CEIP Federico Garc\u00eda Lorca","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 121 CEIP Principe Felipe","Ministerio de Educaci\u00f3n > Melilla > 68 - CEIP Encarna Le\u00f3n","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 119 CEIP Mare Nostrum","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 122 CEIP Ram\u00f3n Ma del Valle Incl\u00e1n","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 123 CEIP Reina Sof\u00eda","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 117 CEIP Andr\u00e9s Manj\u00f3n","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 106 CEIP Maestro Juan Morej\u00f3n","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 136 IES Puertas del Campo","Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 108 CEIP Rey Juan Carlos I"],
+            series: [{"meta":"Ministerio de Educaci\u00f3n > Melilla > 41 CEIP Pintor Eduardo Morillas","value":1085,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=10&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 43 CEIP Reyes Cat\u00f3licos","value":831,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=11&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 55 IES Virgen de la Victoria","value":820,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=21&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 51 IES Juan Antonio Fern\u00e1ndez P\u00e9rez","value":789,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=17&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 44 CEIP Vel\u00e1zquez","value":778,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=12&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 39 CEIP Juan Caro Romero","value":754,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=3&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 53 IES Miguel Fern\u00e1ndez","value":754,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=19&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 52 IES Leopoldo Queipo","value":744,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=18&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 36 CEIP Pedro de Estopi\u00f1\u00e1n","value":726,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=9&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 54 IES Rusadir","value":698,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=20&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 104 CEIP Jose Ortega y Gasset","value":671,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000365&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 45 CEIP Espa\u00f1a","value":649,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=6&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 35 CEIP Anselmo Pardo Alcaide","value":646,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=4&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 137 IES Siete Colinas","value":611,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000298&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 42 CEIP Real","value":591,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=2&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 139 CIFP N\u00ba 1","value":580,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51111112&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 40 CEIP Le\u00f3n Sol\u00e1","value":551,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=7&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 134 IES Clara Campoamor","value":510,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51004671&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 135 IES Luis de Camoens","value":508,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000638&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 50 IES Enrique Nieto","value":496,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=16&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 38 CEIP Hip\u00f3dromo","value":493,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=1&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 118 CEIP Lope de Vega","value":450,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000195&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 37 CEIP Constituci\u00f3n","value":449,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=5&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 60 EA Miguel Marmolejo","value":407,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=29&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 107 CEIP Ciudad de Ceuta","value":406,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51004711&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 105 CEIP Maestro Jose Acosta","value":401,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000249&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 71 CEIP Mediterr\u00e1neo","value":399,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=8&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 133 IES Almina","value":380,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000304&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 110 CEIP Santiago Ram\u00f3n y Cajal","value":363,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000201&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 56 CIFP Reina Victoria Eugenia","value":362,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=28&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 103 CEIP Federico Garc\u00eda Lorca","value":346,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000171&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 121 CEIP Principe Felipe","value":317,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000353&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n > Melilla > 68 - CEIP Encarna Le\u00f3n","value":300,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=52&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 119 CEIP Mare Nostrum","value":296,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000501&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 122 CEIP Ram\u00f3n Ma del Valle Incl\u00e1n","value":281,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000225&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 123 CEIP Reina Sof\u00eda","value":277,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000420&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 117 CEIP Andr\u00e9s Manj\u00f3n","value":260,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000213&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 106 CEIP Maestro Juan Morej\u00f3n","value":251,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000237&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 136 IES Puertas del Campo","value":225,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000331&reset=reset"},{"meta":"Ministerio de Educaci\u00f3n &gt; Ceuta &gt; 108 CEIP Rey Juan Carlos I","value":219,"url":"\/glpi_7_new\/front\/computer.php?reset&criteria%5B0%5D%5Bfield%5D=80&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=51000456&reset=reset"}],
+         }, {
+            width: '100%',
+            chartPadding: 9,
+            donut: true,
+            
+            donutSolid: true,
+            showLabel: true,
+            labelInterpolationFnc: function(value) {
+               return '20.7K';
+            },
+         
+            
+            startAngle: 270,
+            total: 41348,
+         
+            donutWidth: '50%',
+            plugins: [
+               Chartist.plugins.tooltip({
+                  appendToBody: true,
+                  class: 'dashboard-tooltip'
+               })
+            ]
+         });
+
+
+         chart.on('draw', function(data) {
+            // animate
+            if (data.type === 'slice') {
+               // set url redirecting on slice
+               var url = _.get(data, 'series.url') || "";
+               if (url.length > 0) {
+                  data.element.attr({
+                     'data-clickable': true
+                  });
+                  data.element._node.onclick = function() {
+                     if (!Dashboard.getActiveDashboard().edit_mode) {
+                        window.location = url;
+                     }
+                  }
+               }
+
+               // Get the total path length in order to use for dash array animation
+               var pathLength = data.element._node.getTotalLength();
+
+               // Set a dasharray that matches the path length as prerequisite to animate dashoffset
+               data.element.attr({
+                  'stroke-dasharray': pathLength + 'px ' + pathLength + 'px'
+               });
+
+               // Create animation definition while also assigning an ID to the animation for later sync usage
+               var animationDefinition = {
+                  'stroke-dashoffset': {
+                     id: 'anim' + data.index,
+                     dur: 1000,
+                     from: -pathLength + 'px',
+                     to:  '0px',
+                     easing: Chartist.Svg.Easing.easeOutQuint,
+                     // We need to use `fill: 'freeze'` otherwise our animation will fall back to initial (not visible)
+                     fill: 'freeze'
+                  }
+               };
+
+               // We need to set an initial value before the animation starts as we are not in guided mode which would do that for us
+               data.element.attr({
+                  'stroke-dashoffset': -pathLength + 'px'
+               });
+
+               // We can't use guided mode as the animations need to rely on setting begin manually
+               // See http://gionkunz.github.io/chartist-js/api-documentation.html#chartistsvg-function-animate
+               data.element.animate(animationDefinition, false);
+            }
+
+            // donut center label
+            if (data.type === 'label') {
+               if (data.index === 0) {
+                  var width = data.element.root().width() / 2;
+                  var height = data.element.root().height() / 2;
+                  var fontsize = ((height / 2) / (1.3 * "20.7K".length));
+                  data.element.attr({
+                     dx: width,
+                     dy: height - (9 / 2),
+                     'style': 'font-size: '+fontsize,
+                  });
+
+                  // apend real total
+                  var text = new Chartist.Svg('title');
+                  text.text("20674");
+                  data.element.append(text);
+               } else {
+                  data.element.remove();
+               }
+            }
+
+            // fade others bars on one mouseouver
+            chart.on('created', function(bar) {
+               $('#chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .ct-series')
+                  .mouseover(function() {
+                     $(this).parent().children().addClass('disable-animation');
+                     $(this).addClass('mouseover');
+                     $(this).siblings()
+                        .addClass('notmouseover');
+
+                     $('#chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .ct-label')
+                        .addClass('fade');
+                  })
+                  .mouseout(function() {
+                     $(this).removeClass('mouseover');
+                     $(this).siblings()
+                        .removeClass('notmouseover');
+
+                     $('#chart-dashboard_card_central_c1ceb94f658ee26e991853ac4958913befa54710 .ct-label')
+                        .removeClass('fade');
+                  });
+            });
+         });
+      });
+
+//]]>
+</script>";}

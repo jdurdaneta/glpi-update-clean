@@ -1,0 +1,37 @@
+1731400317
+9b791eb11e902601f6b27eb0500429307fa66ad3
+a:1:{s:61:"bn_count_tickets_waiting_ed68a249-41c6-4b6e-947b-4663200bf0e8";s:1301:"      <style>
+         #bn_1749211717 {
+            background-color: #ffcb7d;
+            color: #b06a00;
+         }
+
+         #bn_1749211717:hover {
+            background-color: #ffac31;
+            border: 1px solid #e38800;
+         }
+
+         .theme-dark #bn_1749211717 {
+            background-color: #b06a00;
+            color: #ffcb7d;
+         }
+
+         .theme-dark #bn_1749211717:hover {
+            background-color: #ffac31;
+            color: #b06a00;
+            border: 1px solid #e38800;
+         }
+      </style>
+      <a href='/glpi_7_new/front/ticket.php?criteria%5B0%5D%5Bfield%5D=12&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=4&reset=reset'
+         id="bn_1749211717"
+         class="card big-number  filter-dates filter-dates_mod filter-itilcategory filter-group_tech filter-user_tech filter-requesttype filter-location"
+         title="">
+         <span class="content">            <span title="170"
+                  class="formatted-number"
+                  data-precision='0'>
+               <span class="number">170</span>
+               <span class="suffix"></span>
+            </span></span>
+         <div class="label" title="Peticiones pendientes">Peticiones pendientes</div>
+         <i class="main-icon fas fa-pause-circle"></i>
+      </a>";}

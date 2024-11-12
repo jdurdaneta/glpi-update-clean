@@ -1,0 +1,3 @@
+2024-11-12 09:30:40 [@PC140-08]
+El esquema de la base de datos no es coherente con la versión actual de GLPI.
+It is recommended to run the "php bin/console database:check_schema_integrity" command to see the differences. @ 

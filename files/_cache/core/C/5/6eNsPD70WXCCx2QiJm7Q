@@ -1,0 +1,37 @@
+1731400317
+9887b5b4ba51b643ce7eabe4809a3200636a7633
+a:1:{s:64:"bn_count_QueuedNotification_097849ef-378d-4faf-a55c-a528b2a94155";s:1117:"      <style>
+         #bn_366886235 {
+            background-color: #fafafa;
+            color: #949494;
+         }
+
+         #bn_366886235:hover {
+            background-color: #d4d4d4;
+            border: 1px solid #aeaeae;
+         }
+
+         .theme-dark #bn_366886235 {
+            background-color: #949494;
+            color: #fafafa;
+         }
+
+         .theme-dark #bn_366886235:hover {
+            background-color: #d4d4d4;
+            color: #949494;
+            border: 1px solid #aeaeae;
+         }
+      </style>
+      <a href='/glpi_7_new/front/queuednotification.php?reset=reset'
+         id="bn_366886235"
+         class="card big-number  filter-dates filter-dates_mod"
+         title="">
+         <span class="content">            <span title="7"
+                  class="formatted-number"
+                  data-precision='0'>
+               <span class="number">7</span>
+               <span class="suffix"></span>
+            </span></span>
+         <div class="label" title="Cola de notificaciones">Cola de notificaciones</div>
+         <i class="main-icon ti ti-notification"></i>
+      </a>";}
