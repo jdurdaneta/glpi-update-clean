@@ -5345,3 +5345,11 @@ Compile css/standalone/reservations.scss  {"user":"100111@PC140-08"}
   src\CommonGLPI.php:676                             CommonDBTM->showForm()
   ajax\common.tabs.php:116                           CommonGLPI::displayStandardTab()
   
+[2024-11-12 11:51:10] glpiphplog.WARNING:   *** PHP User Warning (512): Unable to load plugin "oauthsso" information. in C:\xampp\htdocs\glpi_7_new\src\Plugin.php at line 571
+  Backtrace :
+  src\Plugin.php:571                                 trigger_error()
+  src\Plugin.php:497                                 Plugin->checkPluginState()
+  front\marketplace.php:43                           Plugin->checkStates()
+  
+[2024-11-12 11:51:12] glpiphplog.DEBUG: Html::compileScss() in C:\xampp\htdocs\glpi_7_new\src\Html.php line 6842
+Compile css/standalone/marketplace.scss  {"user":"100111@PC140-08"} 
